@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Borrowing Location for Library Books -->
+        <record id="stock_location_library_borrowing" model="stock.location">
+            <field name="name">Kho sách đang mượn</field>
+            <field name="usage">internal</field>
+            <field name="location_id" ref="stock.stock_location_locations"/>
+            <field name="company_id" ref="base.main_company"/>
+            <field name="comment">Vị trí lưu trữ sách đang được mượn</field>
+        </record>
+    </data>
+</odoo>
