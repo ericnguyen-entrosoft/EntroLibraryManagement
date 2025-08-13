@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Root Library Menu -->
+        <menuitem
+            id="menu_library"
+            name="Thư viện"
+            web_icon="school,static/description/menu_icons/icons_library.png"
+            sequence="1"
+            groups="library.group_librarian,library.group_userian"
+        />
+
+        <!-- Configuration Menu -->
+        <menuitem
+            id="menu_library_config"
+            name="Thiết lập"
+            parent="menu_library"
+            sequence="99"
+            groups="library.group_librarian,library.group_userian"
+        />
+
+        <!-- Books Menu -->
+        <menuitem
+            id="menu_books_student"
+            name="Sách"
+            parent="menu_library"
+            action="action_product_book_list"
+            sequence="71"
+            groups="library.group_librarian,library.group_userian"
+        />
+
+        <record id="action_borrowing_transfers" model="ir.actions.act_window">
+            <field name="name">Phiếu mượn sách</field>
+            <field name="res_model">stock.picking</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">[('is_book_borrowing', '=', True)]</field>
+            <field name="context">{
+                'search_default_picking_type_id': False,
+                'search_default_available': False,
+                'default_is_book_borrowing': True,
+            }</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Chưa có phiếu mượn sách nào!
+                </p>
+                <p>
+                    Tại đây bạn có thể quản lý tất cả các phiếu mượn sách trong thư viện.
+                    Sử dụng nút "Mượn sách" trên form sách để tạo phiếu mượn mới.
+                </p>
+            </field>
+        </record>
+
+
+        <!-- Borrowing Management Menu -->
+        <menuitem
+            id="menu_borrowing_transfers"
+            name="Quản lý mượn sách"
+            parent="menu_library"
+            action="action_borrowing_transfers"
+            sequence="72"
+            groups="library.group_librarian,library.group_userian"
+        />
+
+        <!-- Library Cards Menu -->
+        <menuitem
+            id="menu_card_main"
+            name="Thẻ mượn sách"
+            parent="menu_library"
+            action="action_card_info"
+            sequence="74"
+            groups="library.group_librarian,library.group_userian"
+        />
+
+        <!-- Inventory Position Menu -->
+        <menuitem
+            id="menu_valuation"
+            name="Vị trí"
+            parent="menu_library"
+            action="stock.action_view_quants"
+            sequence="96"
+            groups="library.group_librarian"
+        />
+
+        <!-- Configuration Sub-menus -->
+        
+        <record id="action_lang" model="ir.actions.act_window">
+            <field name="name">Ngôn ngữ</field>
+            <field name="res_model">product.lang</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+        <!-- Languages Menu -->
+        <menuitem
+            id="menu_lang"
+            name="Ngôn ngữ"
+            parent="menu_library_config"
+            action="action_lang"
+            groups="library.group_librarian"
+        />
+
+        <!-- Serial Numbers Menu -->
+        <menuitem
+            id="menu_stock_lots"
+            name="Số serial sách"
+            parent="menu_library_config"
+            action="stock.action_production_lot_form"
+            sequence="95"
+            groups="library.group_librarian"
+        />
+
+        <!-- Authors Menu -->
+        <menuitem
+            id="author_menu"
+            name="Tác giả"
+            parent="menu_library_config"
+            action="action_author_list"
+            groups="library.group_librarian"
+        />
+
+        <!-- User Library Management Menu -->
+        <menuitem
+            id="menu_user_library"
+            name="Quản lý thư viện cá nhân"
+            parent="menu_library"
+            sequence="60"
+            groups="library.group_userian"
+        />
+
+        <!-- My Library Cards -->
+        <menuitem
+            id="menu_my_library_cards"
+            name="Thẻ thư viện của tôi"
+            parent="menu_user_library"
+            action="action_my_library_cards"
+            sequence="10"
+            groups="library.group_userian"
+        />
+
+        <!-- Search and Borrow Books -->
+        <menuitem
+            id="menu_search_borrow_books"
+            name="Tìm kiếm &amp; Mượn sách"
+            parent="menu_user_library"
+            action="action_search_borrow_books"
+            sequence="20"
+            groups="library.group_userian"
+        />
+
+        <!-- Return Books -->
+        <menuitem
+            id="menu_return_books"
+            name="Trả sách"
+            parent="menu_user_library"
+            action="action_my_borrowing_transfers"
+            sequence="30"
+            groups="library.group_userian"
+        />
+
+    </data>
+</odoo>

@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Paper Format for Label -->
+    <record id="paperformat_lot_label" model="report.paperformat">
+        <field name="name">Lot Barcode Label</field>
+        <field name="default" eval="False"/>
+        <field name="format">custom</field>
+        <field name="page_height">50</field>
+        <field name="page_width">80</field>
+        <field name="orientation">Portrait</field>
+        <field name="margin_top">5</field>
+        <field name="margin_bottom">5</field>
+        <field name="margin_left">5</field>
+        <field name="margin_right">5</field>
+        <field name="header_line" eval="False"/>
+        <field name="header_spacing">0</field>
+        <field name="dpi">96</field>
+    </record>
+
+    <!-- Report Action for Lot Barcode Label -->
+    <record id="action_report_lot_barcode_label" model="ir.actions.report">
+        <field name="name">Nhãn mã vạch số serial</field>
+        <field name="model">stock.lot</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">library.report_lot_barcode_label</field>
+        <field name="report_file">library.report_lot_barcode_label</field>
+        <field name="binding_model_id" ref="stock.model_stock_lot"/>
+        <field name="binding_type">report</field>
+        <field name="paperformat_id" ref="paperformat_lot_label"/>
+    </record>
+
+    <!-- Report Template -->
+    <template id="report_lot_barcode_label">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="lot">
+                <t t-call="web.basic_layout">
+                    <div class="page" style="font-family: Arial, sans-serif; text-align: center; padding: 5mm;">
+                        <!-- Book Title -->
+                        <div style="font-size: 10px; font-weight: bold; margin-bottom: 2mm; line-height: 1.2;">
+                            <t t-esc="lot.product_id.name"/>
+                        </div>
+                        
+                        <!-- Serial Number -->
+                        <div style="font-size: 12px; font-weight: bold; margin-bottom: 3mm;">
+                            Serial: <t t-esc="lot.name"/>
+                        </div>
+                        
+                        <!-- Barcode -->
+                        <div style="margin-bottom: 2mm;">
+                            <img t-att-src="'/report/barcode/?type=%s&amp;value=%s&amp;width=%s&amp;height=%s&amp;humanreadable=%s' % ('Code128', lot.library_barcode, 200, 50, 1)" 
+                                 style="width: 60mm; height: 10mm;"/>
+                        </div>
+                        
+                        <!-- Barcode Text -->
+                        <div style="font-size: 8px; font-family: monospace; margin-bottom: 2mm;">
+                            <t t-esc="lot.library_barcode"/>
+                        </div>
+                        
+                        <!-- Location Info -->
+                        <div style="font-size: 8px; color: #666;">
+                            <t t-if="lot.product_id.rack">
+                                Vị trí: <t t-esc="lot.product_id.rack.name"/>
+                            </t>
+                        </div>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>

@@ -1,0 +1,67 @@
+<?xml version="1.0" ?>
+<odoo>
+    <!-- Form View Of Library Author -->
+    <record id="author_form" model="ir.ui.view">
+        <field name="name">library.author.form</field>
+        <field name="model">library.author</field>
+        <field name="arch" type="xml">
+            <form string="Authors">
+                <sheet>
+                    <notebook>
+                        <page string="General Information">
+                            <group>
+                                <field name="name" placeholder="Author Name" />
+                            </group>
+                            <separator string="Books" colspan="4" />
+                            <field
+                                name="book_ids"
+                                nolabel="1"
+                                colspan="4"
+                                domain="[('categ_id.book_categ','=',True),('is_ebook','=',False),('availability','=','available')]"
+                            />
+                        </page>
+                        <page string="More Information">
+                            <separator string="Editors" colspan="4" />
+                            <field name="editor_ids" nolabel="1" colspan="4" />
+                            <separator string="Notes" colspan="4" />
+                            <field name="note" nolabel="1" colspan="4" />
+                            <separator string="Biography" colspan="4" />
+                            <field name="biography" nolabel="1" colspan="4" />
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Tree View Of Library Author -->
+    <record id="author_tree" model="ir.ui.view">
+        <field name="name">library.author.tree</field>
+        <field name="model">library.author</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name" />
+            </tree>
+        </field>
+    </record>
+
+    <!-- Search View Of Library Author -->
+    <record id="author_search" model="ir.ui.view">
+        <field name="name">library.author.search</field>
+        <field name="model">library.author</field>
+        <field name="arch" type="xml">
+            <search string="Authors">
+                <field name="name" />
+            </search>
+        </field>
+    </record>
+
+    <!-- Action Of Form & Tree Views Of Author -->
+    <record id="action_author_list" model="ir.actions.act_window">
+        <field name="name">Authors</field>
+        <field name="res_model">library.author</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="author_search" />
+    </record>
+</odoo>

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Form View for Book Barcode Wizard -->
+    <record id="library_book_barcode_wizard_form" model="ir.ui.view">
+        <field name="name">library.book.barcode.wizard.form</field>
+        <field name="model">library.book.barcode.wizard</field>
+        <field name="arch" type="xml">
+            <form string="In nhãn mã vạch">
+                <group>
+                    <field name="product_id" readonly="1"/>
+                    <field name="available_lot_ids" invisible="1"/>
+                    <field name="all_lots"/>
+                    <field name="lot_ids" 
+                           domain="[('id', 'in', available_lot_ids)]"
+                           invisible="all_lots"
+                           widget="many2many_tags"
+                           options="{'no_create': True, 'no_create_edit': True}"/>
+                </group>
+                <group string="Thông tin" invisible="not lot_ids and not all_lots">
+                    <p invisible="not all_lots">
+                        Sẽ in nhãn cho tất cả <field name="available_lot_ids" readonly="1" widget="integer"/> số serial của sách này.
+                    </p>
+                    <p invisible="all_lots or not lot_ids">
+                        Sẽ in nhãn cho <field name="lot_ids" readonly="1" widget="integer"/> số serial đã chọn.
+                    </p>
+                </group>
+                <footer>
+                    <button name="action_print_labels" 
+                            string="In nhãn" 
+                            type="object" 
+                            class="oe_highlight"
+                            icon="fa-print"/>
+                    <button string="Hủy" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

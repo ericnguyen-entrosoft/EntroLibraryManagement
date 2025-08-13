@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- My Library Cards Action -->
+    <record id="action_my_library_cards" model="ir.actions.act_window">
+        <field name="name">Thẻ thư viện của tôi</field>
+        <field name="res_model">library.card</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('user_id', '=', uid)]</field>
+        <field name="context">{'create': False, 'edit': False}</field>
+    </record>
+
+    <!-- Search and Borrow Books Action -->
+    <record id="action_search_borrow_books" model="ir.actions.act_window">
+        <field name="name">Tìm kiếm &amp; Mượn sách</field>
+        <field name="res_model">product.product</field>
+        <field name="view_mode">kanban,tree,form</field>
+        <field name="view_id" ref="books_kanban_view" />
+        <field name="context">{'search_default_book':1,'default_type':'product'}</field>
+    </record>
+
+    <!-- My Borrowing Transfers Action -->
+    <record id="action_my_borrowing_transfers" model="ir.actions.act_window">
+        <field name="name">Phiếu mượn của tôi</field>
+        <field name="res_model">stock.picking</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('picking_type_id.code', '=', 'outgoing'), ('is_borrowing_transfer', '=', True), ('user_id', '=', uid)]</field>
+        <field name="context">{'create': False, 'edit': False}</field>
+    </record>
+
+    <!-- User-specific Book Form View for Borrowing -->
+    <record id="view_product_book_user_form" model="ir.ui.view">
+        <field name="name">product.book.user.form.view</field>
+        <field name="model">product.product</field>
+        <field name="priority">17</field>
+        <field name="arch" type="xml">
+            <form string="Sách" create="false" edit="false">
+                <header>
+                    <button name="action_borrow_book" 
+                            string="Mượn sách" 
+                            type="object" 
+                            class="oe_highlight"
+                            groups="library.group_userian"/>
+                </header>
+                <sheet>
+                    <field name="image_1920" widget="image" class="oe_avatar" options="{'preview_image': 'image_128'}"/>
+                    <div class="oe_title">
+                        <label for="name" string="Tên sách"/>
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group name="group_left">
+                            <field name="isbn" readonly="1"/>
+                            <field name="author" readonly="1"/>
+                            <field name="categ_id" readonly="1"/>
+                            <field name="books_available" readonly="1"/>
+                        </group>
+                        <group name="group_right">
+                            <field name="list_price" readonly="1"/>
+                            <field name="availability" readonly="1"/>
+                            <field name="day_to_return_book" readonly="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Thông tin sách">
+                            <group>
+                                <group>
+                                    <field name="nbpage" readonly="1"/>
+                                    <field name="creation_date" readonly="1"/>
+                                    <field name="format" readonly="1"/>
+                                    <field name="num_edition" readonly="1"/>
+                                </group>
+                                <group>
+                                    <field name="lang" readonly="1"/>
+                                    <field name="is_ebook" readonly="1"/>
+                                    <field name="weight" readonly="1"/>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="Mô tả">
+                            <field name="description" readonly="1"/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- User-specific Borrowing Transfer Tree View -->
+    <record id="view_my_borrowing_transfer_tree" model="ir.ui.view">
+        <field name="name">my.borrowing.transfer.tree</field>
+        <field name="model">stock.picking</field>
+        <field name="arch" type="xml">
+            <tree decoration-info="state == 'draft'" decoration-muted="state == 'cancel'" decoration-danger="state == 'confirmed'" decoration-success="state == 'done'">
+                <field name="name"/>
+                <field name="partner_id" string="Người mượn"/>
+                <field name="scheduled_date" string="Ngày mượn"/>
+                <field name="date_done" string="Ngày hoàn thành"/>
+                <field name="state" widget="badge" 
+                       decoration-info="state == 'draft'"
+                       decoration-warning="state == 'waiting'"
+                       decoration-danger="state == 'confirmed'"
+                       decoration-success="state == 'done'"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- User-specific Borrowing Transfer Form View -->
+    <record id="view_my_borrowing_transfer_form" model="ir.ui.view">
+        <field name="name">my.borrowing.transfer.form</field>
+        <field name="model">stock.picking</field>
+        <field name="arch" type="xml">
+            <form string="Phiếu mượn sách" create="false" edit="false">
+                <header>
+                    <field name="state" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name" readonly="1"/>
+                            <field name="partner_id" readonly="1"/>
+                            <field name="scheduled_date" readonly="1"/>
+                            <field name="location_id" readonly="1"/>
+                            <field name="location_dest_id" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="date_done" readonly="1"/>
+                            <field name="user_id" readonly="1"/>
+                            <field name="picking_type_id" readonly="1"/>
+                            <field name="is_borrowing_transfer" invisible="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Sách được mượn">
+                            <field name="move_ids" readonly="1">
+                                <tree>
+                                    <field name="product_id"/>
+                                    <field name="lot_ids" widget="many2many_tags"/>
+                                    <field name="product_uom_qty"/>
+                                    <field name="quantity"/>
+                                    <field name="state"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Action window view for user book form -->
+    <record id="action_search_borrow_books_form" model="ir.actions.act_window.view">
+        <field name="sequence" eval="3"/>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_product_book_user_form"/>
+        <field name="act_window_id" ref="action_search_borrow_books"/>
+    </record>
+
+    <!-- Action window view for borrowing transfer tree -->
+    <record id="action_my_borrowing_transfers_tree" model="ir.actions.act_window.view">
+        <field name="sequence" eval="1"/>
+        <field name="view_mode">tree</field>
+        <field name="view_id" ref="view_my_borrowing_transfer_tree"/>
+        <field name="act_window_id" ref="action_my_borrowing_transfers"/>
+    </record>
+
+    <!-- Action window view for borrowing transfer form -->
+    <record id="action_my_borrowing_transfers_form" model="ir.actions.act_window.view">
+        <field name="sequence" eval="2"/>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_my_borrowing_transfer_form"/>
+        <field name="act_window_id" ref="action_my_borrowing_transfers"/>
+    </record>
+</odoo>

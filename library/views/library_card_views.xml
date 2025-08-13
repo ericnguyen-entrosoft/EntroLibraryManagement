@@ -1,0 +1,114 @@
+<?xml version="1.0" ?>
+<odoo>
+    <!-- Form View Of Library Card Details -->
+    <record id="product_card_form_view" model="ir.ui.view">
+        <field name="name">library.card.form</field>
+        <field name="model">library.card</field>
+        <field name="arch" type="xml">
+            <form string="Card Details">
+                <header>
+                    <button
+                        name="running_state"
+                        type="object"
+                        string="Confirm"
+                        invisible="state == 'running'"
+                        groups="library.group_librarian"
+                    />
+                    <button
+                        name="draft_state"
+                        type="object"
+                        string="Draft State"
+                        invisible="state == 'draft'"
+                        groups="library.group_librarian"
+                    />
+                    <button
+                        name="action_print_library_card"
+                        type="object"
+                        string="In thẻ thư viện"
+                        invisible="state != 'running'"
+                        class="btn-primary"
+                        groups="library.group_librarian"
+                    />
+                    <field name="state" widget="statusbar" readonly="1" />
+                </header>
+                <sheet>
+                    <separator string="Card Details" colspan="4" col="4" />
+                    <group col="4" colspan="4">
+                        <field name="code" placeholder="Code" readonly="1" />
+                        <field name="book_limit" readonly="state == 'running'" />
+                        <field name="user" required="1" readonly="state == 'running'" />
+                        <field name="user_type" readonly="state == 'running'" />
+                        <field name="card_name" string="Card Name" />
+                    </group>
+                    <separator string="Membership Details" />
+                    <group col="4" colspan="4">
+                        <field
+                            name="start_date"
+                            string="Start Date"
+                            required="1"
+                            readonly="state == 'running'"
+                        />
+                        <field
+                            name="duration"
+                            string="Duration (Months)"
+                            required="1"
+                            readonly="state == 'running'"
+                        />
+                        <field name="end_date" />
+                    </group>
+                    <separator string="Contact Information" />
+                    <group col="4" colspan="4">
+                        <field name="partner_id" string="Liên hệ" help="Thông tin liên hệ của người sở hữu thẻ"/>
+                        <field name="user_id" string="Tài khoản" help="Tài khoản đăng nhập của người sở hữu thẻ"/>
+                        <field name="card_barcode" string="Mã vạch" readonly="1"/>
+                        <field name="has_user_account" invisible="1"/>
+                    </group>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_create_user_account" 
+                                type="object" 
+                                class="oe_stat_button" 
+                                icon="fa-user-plus"
+                                invisible="has_user_account"
+                                string="Tạo tài khoản"/>
+                    </div>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Tree View Of Library Card Details -->
+    <record id="product_card_tree_view" model="ir.ui.view">
+        <field name="name">library.card.tree</field>
+        <field name="model">library.card</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="code" />
+                <field name="user" />
+                <field name="user_type" />
+                <field name="book_limit" />
+                <field name="card_name" />
+                <field name="state" />
+            </tree>
+        </field>
+    </record>
+
+    <!-- Search View Of Library Card Details -->
+    <record id="product_card_search_view" model="ir.ui.view">
+        <field name="name">library.card.search</field>
+        <field name="model">library.card</field>
+        <field name="arch" type="xml">
+            <search string="Card Details">
+                <field name="code" />
+                <field name="user" />
+                <field name="card_name" />
+            </search>
+        </field>
+    </record>
+
+    <!-- Actions Of Form & Tree Views Of Library Card Details -->
+    <record id="action_card_info" model="ir.actions.act_window">
+        <field name="name">Thẻ mượn sách</field>
+        <field name="res_model">library.card</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+</odoo>

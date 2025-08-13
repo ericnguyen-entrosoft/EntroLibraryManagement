@@ -125,18 +125,10 @@ class ProductProduct(models.Model):
 
     @api.depends("qty_available")
     def _compute_books_available(self):
-        """Computes the available books"""
-        book_issue_obj = self.env["library.book.issue"]
+        # TODO
         for rec in self:
-            issue_rec_no = book_issue_obj.sudo().search_count(
-                [("name", "=", rec.id), ("state", "in", ("issue", "reissue"))]
-            )
-            # reduces the quantity when book is issued
-            rec.books_available = rec.qty_available - issue_rec_no
-            rec.availability = "notavailable"
-            if rec.books_available >= 1:
-                rec.availability = "available"
-        return True
+            rec.books_available = rec.qty_available
+            rec.availability = "available"
 
     @api.depends("books_available", "day_to_return_book")
     def _compute_books_availablity(self):
@@ -347,6 +339,9 @@ class ProductProduct(models.Model):
             'borrower_info': borrower_info,
             'due_date': due_date,
             'is_book_borrowing': True,
+            'is_borrowing_transfer': True,
+            'user_id': self.env.user.id,  # Assign to current user
+            'partner_id': library_card.partner_id.id if library_card and library_card.partner_id else False,
         }
         picking = self.env['stock.picking'].create(picking_vals)
         
@@ -432,6 +427,110 @@ class ProductProduct(models.Model):
         help="Số lượng phiếu mượn sách"
     )
 
+    def action_print_barcode_labels(self):
+        """Open wizard to select lots and print barcode labels"""
+        return {
+            'name': 'In nhãn mã vạch',
+            'type': 'ir.actions.act_window',
+            'res_model': 'library.book.barcode.wizard',
+            'view_mode': 'form',
+            'context': {
+                'default_product_id': self.id,
+            },
+            'target': 'new',
+        }
+
+    def action_internal_transfer(self):
+        """Open wizard for internal transfer of books"""
+        return {
+            'name': 'Chuyển kho nội bộ',
+            'type': 'ir.actions.act_window',
+            'res_model': 'library.book.transfer.wizard',
+            'view_mode': 'form',
+            'context': {
+                'default_product_id': self.id,
+            },
+            'target': 'new',
+        }
+
+    def create_book_internal_transfer(self, lot_ids, source_location, dest_location, transfer_date=None):
+        """Create internal transfer for moving books between locations"""
+        if not transfer_date:
+            transfer_date = fields.Datetime.now()
+        
+        # Get warehouse
+        warehouse = self.env['stock.warehouse'].search([
+            ('company_id', '=', self.env.company.id)
+        ], limit=1)
+        
+        if not warehouse:
+            raise ValidationError(_("Không tìm thấy kho hàng!"))
+        
+        # Create internal transfer picking
+        picking_vals = {
+            'picking_type_id': warehouse.int_type_id.id,
+            'location_id': source_location.id,
+            'location_dest_id': dest_location.id,
+            'origin': f'Chuyển kho: {self.name}',
+            'scheduled_date': transfer_date,
+            'move_type': 'direct',
+        }
+        picking = self.env['stock.picking'].create(picking_vals)
+        
+        # Create stock moves for each selected lot
+        moves_created = []
+        for lot in lot_ids:
+            # Verify lot is available at source location
+            quant = self.env['stock.quant'].search([
+                ('lot_id', '=', lot.id),
+                ('location_id', '=', source_location.id),
+                ('quantity', '>', 0)
+            ], limit=1)
+            
+            if not quant:
+                continue  # Skip if lot not available at source location
+                
+            move_vals = {
+                'name': f'Chuyển kho: {self.name} - {lot.name}',
+                'product_id': self.id,
+                'product_uom_qty': 1,
+                'product_uom': self.uom_id.id,
+                'picking_id': picking.id,
+                'location_id': source_location.id,
+                'location_dest_id': dest_location.id,
+                'date': transfer_date,
+            }
+            move = self.env['stock.move'].create(move_vals)
+            
+            # Create move line with lot assignment
+            move_line_vals = {
+                'move_id': move.id,
+                'product_id': self.id,
+                'lot_id': lot.id,
+                'quantity': 1,
+                'product_uom_id': self.uom_id.id,
+                'location_id': source_location.id,
+                'location_dest_id': dest_location.id,
+                'picking_id': picking.id,
+            }
+            self.env['stock.move.line'].create(move_line_vals)
+            moves_created.append(move)
+        
+        if not moves_created:
+            picking.unlink()
+            raise ValidationError(_("Không có sách nào có thể chuyển từ vị trí nguồn đã chọn!"))
+        
+        # Confirm and process picking
+        picking.action_confirm()
+        picking.action_assign()
+        picking.button_validate()
+        
+        return {
+            'picking': picking,
+            'moves_created': moves_created,
+            'transferred_lots': [move.move_line_ids.lot_id for move in moves_created]
+        }
+
 
     isbn = fields.Char(
         "Mã ISBN",
@@ -463,7 +562,6 @@ class ProductProduct(models.Model):
         string="TẬP", help="Lưu trữ thông tin công việc trong nhiều tập"
     )
     nbpage = fields.Integer("Số trang", help="Nhập số trang")
-    rack = fields.Many2one("library.rack", "Giá sách", help="Hiển thị vị trí của sách")
     books_available = fields.Float(
         "Sách có sẵn",
         compute="_compute_books_available",
@@ -581,26 +679,6 @@ class ProductProduct(models.Model):
             result["views"] = [(res and res.id or False, "form")]
             result["res_id"] = purchase.order_id.id
         return result
-
-    def action_book_req(self):
-        """Method to request book"""
-        book_req_obj = self.env["library.book.request"]
-        for rec in self:
-            book_req = book_req_obj.search(
-                ["|", ("name", "=", rec.id), ("ebook_name", "=", rec.id)]
-            )
-            if not book_req:
-                raise ValidationError(_("There is no Book requested"))
-            action = self.env.ref("library.action_lib_book_req")
-            result = action.read()[0]
-            req = [request_rec.id for request_rec in book_req]
-            if len(req) != 1:
-                result["domain"] = "[('id', 'in', " + str(req) + ")]"
-            else:
-                res = self.env.ref("library.view_book_library_req_form", False)
-                result["views"] = [(res and res.id or False, "form")]
-                result["res_id"] = book_req.id
-            return result
 
 
 class BookAttachment(models.Model):

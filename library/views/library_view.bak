@@ -61,58 +61,7 @@
         <field name="view_mode">tree,form</field>
         <field name="search_view_id" ref="author_search" />
     </record>
-    <!-- Form View Of Library Rack -->
-    <record id="rack_form" model="ir.ui.view">
-        <field name="name">Library Rack</field>
-        <field name="model">library.rack</field>
-        <field name="arch" type="xml">
-            <form string="Authors">
-                <sheet>
-                    <group>
-                        <field name="name" string="Name" />
-                        <field name="code" string="Code" />
-                        <field name="active" string="Active" widget="boolean_toggle" />
-                    </group>
-                </sheet>
-            </form>
-        </field>
-    </record>
-    <!-- Tree View Of Library Rack -->
-    <record id="rack_tree" model="ir.ui.view">
-        <field name="name">Library Rack Tree</field>
-        <field name="model">library.rack</field>
-        <field name="arch" type="xml">
-            <tree>
-                <field name="name" />
-                <field name="code" />
-                <field name="active" />
-            </tree>
-        </field>
-    </record>
-    <!-- Search View Of Library Rack -->
-    <record id="rack_search" model="ir.ui.view">
-        <field name="name">Library Rack Search</field>
-        <field name="model">library.rack</field>
-        <field name="arch" type="xml">
-            <search string="Authors">
-                <field name="name" />
-                <field name="code" />
-                <field name="active" />
-                <filter
-                    name="archived"
-                    string="Đã lưu trữ"
-                    domain="[('active','=',False)]"
-                />
-            </search>
-        </field>
-    </record>
-    <!-- Actions Of Form & Tree Views Of library.card -->
-    <record id="action_library_rack" model="ir.actions.act_window">
-        <field name="name">Library Rack</field>
-        <field name="type">ir.actions.act_window</field>
-        <field name="res_model">library.rack</field>
-        <field name="view_mode">tree,form</field>
-    </record>
+
     <!-- Menu Items Of Library -->
 
     <menuitem
@@ -129,13 +78,7 @@
         sequence="99"
         groups="library.group_librarian,group_userian"
     />
-    <menuitem
-        id="menu_library_rack"
-        name="Kệ sách"
-        parent="menu_library_config"
-        action="action_library_rack"
-        groups="school.group_school_administration,library.group_librarian,library.group_userian"
-    />
+
     <!-- Form View Of Product Book -->
     <record id="view_product_book_form" model="ir.ui.view">
         <field name="name">product.book.form.view</field>
@@ -143,6 +86,23 @@
         <field name="priority">16</field>
         <field name="arch" type="xml">
             <form string="Books">
+                <header>
+                    <button name="action_borrow_book" 
+                            string="Mượn sách" 
+                            type="object" 
+                            class="oe_highlight"
+                            groups="library.group_librarian,library.group_userian"/>
+                    <button name="action_add_quantity" 
+                            string="Thêm số lượng" 
+                            type="object"
+                            class="btn-secondary" 
+                            groups="library.group_librarian"/>
+                    <button name="action_print_barcode_labels" 
+                            string="In nhãn mã vạch" 
+                            type="object" 
+                            class="btn-secondary"
+                            groups="library.group_librarian"/>
+                </header>
                 <sheet>
                     <div class="oe_button_box" name="button_box">
                         <button
@@ -152,35 +112,10 @@
                             groups="library.group_librarian"
                         >
                             <field
-                                string="Số lượng"
+                                string="Vị trí"
                                 name="qty_available"
                                 widget="statinfo"
                             />
-                        </button>
-                        <button name="action_book_req" type="object" icon="fa-book">
-                            <field
-                                string="Số sách có thể mượn"
-                                name="books_available"
-                                widget="statinfo"
-                            />
-                        </button>
-                        <button name="action_add_quantity" 
-                                type="object" 
-                                icon="fa-plus"
-                                groups="library.group_librarian">
-                            <div class="o_field_widget o_stat_info">
-                                <span class="o_stat_text">Thêm</span>
-                                <span class="o_stat_text">Số lượng</span>
-                            </div>
-                        </button>
-                        <button name="action_borrow_book" 
-                                type="object" 
-                                icon="fa-handshake-o"
-                                groups="library.group_librarian">
-                            <div class="o_field_widget o_stat_info">
-                                <span class="o_stat_text">Mượn</span>
-                                <span class="o_stat_text">Sách</span>
-                            </div>
                         </button>
                         <button name="action_view_borrowing_transfers" 
                                 type="object" 
@@ -193,27 +128,41 @@
                                 <span class="o_stat_text">Phiếu mượn</span>
                             </div>
                         </button>
+                        <button name="action_internal_transfer" 
+                                type="object" 
+                                icon="fa-arrows"
+                                groups="library.group_librarian">
+                            <div class="o_field_widget o_stat_info">
+                                <span class="o_stat_text">Chuyển</span>
+                                <span class="o_stat_text">kho</span>
+                            </div>
+                        </button>
                     </div>
-                    <h1>
-                        <field
-                            name="name"
-                            style="width:100%;"
-                            placeholder="Book Name"
-                            nolabel="1"
-                        />
-                    </h1>
-                    <group col="5">
-                        <group col="1" class="oe_left">
+                    <field name="image_1920" widget="image" class="oe_avatar" options="{'preview_image': 'image_128'}"/>
+                    <div class="oe_title">
+                        <label for="name" string="Tên sách"/>
+                        <h1>
                             <field
-                                name="image_1920"
-                                widget="image"
-                                class="oe_avatar"
-                                options="{'preview_image': 'image_128'}"
-                                nolabel="1"
+                                name="name"
+                                class="text-break"
+                                options="{'line_breaks': False}" 
+                                widget="text"
+                                placeholder="Tên sách"
                             />
-                        </group>
-                        <group col="2" />
-                        <group col="2" colspan="2">
+                        </h1>
+                        <div name="options">
+                            <span class="d-inline-flex">
+                                <field name="sale_ok" string="Có thể bán"/>
+                                <label for="sale_ok"/>
+                            </span>
+                            <span class="d-inline-flex">
+                                <field name="purchase_ok" string="Có thể mua"/>
+                                <label for="purchase_ok"/>
+                            </span>
+                        </div>
+                    </div>
+                    <group>
+                        <group name="group_left">
                             <field name="isbn" placeholder="ISBN Number" />
                             <field
                                 name="default_code"
@@ -229,70 +178,79 @@
                                 options="{'no_create': True,}"
                                 domain="[('book_categ','=',True)]"
                             />
+                        </group>
+                        <group name="group_right">
                             <field
                                 name="author"
                                 placeholder="Name of Author"
                                 options="{'no_create': True,}"
                             />
+                            <field name="list_price" string="Giá bán"/>
+                            <field name="standard_price" string="Chi phí"/>
+                            <field name="uom_id" groups="uom.group_uom"/>
                             <field name="type" invisible="1" />
                         </group>
                     </group>
                     <notebook>
                         <page string="Thông tin chung">
-                            <group col="4" colspan="2">
-                                <field
-                                    name="availability"
-                                    invisible="is_ebook == True"
-                                />
-                                <field
-                                    name="nbpage"
-                                    placeholder="No of Page in books"
-                                />
-                                <field
-                                    name="day_to_return_book"
-                                    placeholder="Days of Returnning"
-                                    required="is_ebook == False"
-                                    invisible="is_ebook == True"
-                                />
-                                <field name="creation_date" />
-                                <field name="tome" />
-                                <field name="format" placeholder="Format of Book" />
-                                <field name="weight" invisible="is_ebook == True" />
-                                <field
-                                    name="rack"
-                                    placeholder="Position of book"
-                                    options="{'no_create': True,}"
-                                    invisible="is_ebook == True"
-                                />
-                                <field name="back" />
-                                <field
-                                    name="num_edition"
-                                    placeholder="No of Addition of Book"
-                                />
-                                <field
-                                    name="catalog_num"
-                                    placeholder="Enter Catalog No"
-                                />
-                                <field
-                                    name="lang"
-                                    placeholder="Language of Book"
-                                    options="{'no_create': True,}"
-                                />
-                                <field name="is_ebook" />
-                                <field
-                                    name="is_subscription"
-                                    invisible="is_ebook == False"
-                                />
-                                <field
-                                    name="subscrption_amt"
-                                    required="is_subscription == True"
-                                    invisible="is_ebook == False"
-                                />
-                                <field
-                                    name="attach_ebook"
-                                    required="is_ebook == True"
-                                    invisible="is_ebook == False"
-                                />
+                            <group>
+                                <group name="group_general_left" string="Thông tin cơ bản">
+                                    <field
+                                        name="availability"
+                                        invisible="is_ebook == True"
+                                    />
+                                    <field
+                                        name="nbpage"
+                                        placeholder="No of Page in books"
+                                    />
+                                    <field
+                                        name="day_to_return_book"
+                                        placeholder="Days of Returnning"
+                                        required="is_ebook == False"
+                                        invisible="is_ebook == True"
+                                    />
+                                    <field name="creation_date" />
+                                    <field name="tome" />
+                                    <field name="format" placeholder="Format of Book" />
+                                    <field name="weight" invisible="is_ebook == True" />
+                                    <field
+                                        name="rack"
+                                        placeholder="Position of book"
+                                        options="{'no_create': True,}"
+                                        invisible="is_ebook == True"
+                                    />
+                                </group>
+                                <group name="group_general_right" string="Thông tin bổ sung">
+                                    <field name="back" />
+                                    <field
+                                        name="num_edition"
+                                        placeholder="No of Addition of Book"
+                                    />
+                                    <field
+                                        name="catalog_num"
+                                        placeholder="Enter Catalog No"
+                                    />
+                                    <field
+                                        name="lang"
+                                        placeholder="Language of Book"
+                                        options="{'no_create': True,}"
+                                    />
+                                    <field name="is_ebook" />
+                                    <field
+                                        name="is_subscription"
+                                        invisible="is_ebook == False"
+                                    />
+                                    <field
+                                        name="subscrption_amt"
+                                        required="is_subscription == True"
+                                        invisible="is_ebook == False"
+                                    />
+                                    <field
+                                        name="attach_ebook"
+                                        required="is_ebook == True"
+                                        invisible="is_ebook == False"
+                                    />
+                                </group>
                             </group>
                         </page>
                         <page string="Tác giả">
@@ -316,8 +274,14 @@
                             <field name="lot_ids" nolabel="1">
                                 <tree>
                                     <field name="name" readonly="1"/>
+                                    <field name="library_barcode" readonly="1"/>
                                     <field name="create_date" readonly="1"/>
                                     <field name="product_qty" readonly="1"/>
+                                    <button name="action_print_barcode_label" 
+                                            type="object" 
+                                            string="In nhãn" 
+                                            icon="fa-print"
+                                            title="In nhãn mã vạch"/>
                                 </tree>
                             </field>
                         </page>
@@ -363,79 +327,46 @@
         <field name="arch" type="xml">
             <kanban>
                 <field name="name" />
-                <field name="color" />
                 <field name="author" />
-                <field name="num_edition" />
-                <field name="lang" />
-                <field name="availability" />
                 <field name="books_available" />
+                <field name="image_1920" />
                 <field name="id" />
                 <templates>
                     <t t-name="kanban-box">
-                        <div
-                            class="oe_kanban_global_click o_kanban_record_has_image_fill o_hr_kanban_record"
-                        >
-                            <div
-                                class="o_kanban_image_fill_left d-none d-md-block"
-                                t-attf-style="background-image: url(#{kanban_image('product.product', 'image_512', record.id.raw_value)})"
-                                role="img"
-                            />
-                             <div class="oe_kanban_details">
-                                <div class="o_kanban_record_top">
-                                    <div class="o_kanban_record_headings">
-                                        <strong
-                                            class="o_kanban_record_title oe_partner_heading"
-                                        >
-                                            <field name="name" />
-                                        </strong>
-                                        <div
-                                            class="o_kanban_tags_section oe_kanban_partner_categories"
-                                        />
-                                        <ul>
-                                            <li
-                                                t-if="record.author.raw_value"
-                                            >Tác giả: <field name="author" /></li>
-                                            <li
-                                                t-if="record.num_edition.raw_value"
-                                            >Tái bản: <field name="num_edition" /></li>
-                                            <li
-                                                t-if="record.lang.raw_value"
-                                            >Ngôn ngữ: <field name="lang" /></li>
-                                            <li
-                                                t-if="record.availability.raw_value"
-                                            >Số lượng: <field
-                                                    name="availability"
-                                                /></li>
-                                            <li
-                                                t-if="record.nbpage.raw_value"
-                                            >Số trang: <field name="nbpage" /></li>
-                                            <div class="o_kanban_record_bottom">
-                                                <div
-                                                    class="oe_kanban_bottom_left o_kanban_project_tasks"
-                                                >
-                                                    <span>Số lượng có thể mượn: </span>
-                                                     <div
-                                                        t-attf-class="oe_kanban_align badge {{ record.books_available.raw_value &gt; 0 ? 'border-success' : 'border-danger' }} me-0"
-                                                    >
-                                                        <field
-                                                            name="books_available"
-                                                            widget="timesheet_uom"
-                                                        />
-                                                    </div>
-                                                </div>
-                                                <div
-                                                    class="oe_kanban_bottom_right o_kanban_project_tasks"
-                                                >
-                                                    <span>Tổng số sách: </span>
-                                                    <div
-                                                        t-attf-class="oe_kanban_align badge me-0"
-                                                    >
-                                                        <field name="qty_available" />
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </ul>
-                                        <div class="oe_kanban_partner_links" />
+                        <div class="oe_kanban_global_click" style="background-color: #f9f9f9; border: 1px solid #ddd; border-radius: 8px; padding: 8px; margin: 4px; height: auto;">
+                            <!-- Book Image -->
+                            <div class="o_kanban_image text-center" style="margin-bottom: 6px;">
+                                <img t-att-src="kanban_image('product.product', 'image_1920', record.id.raw_value)" 
+                                     alt="Book Cover" 
+                                     style="max-height: 70px; max-width: 100%; border-radius: 4px; box-shadow: 0 1px 2px rgba(0,0,0,0.1);"/>
+                            </div>
+                            
+                            <!-- Book Details -->
+                            <div class="oe_kanban_details">
+                                <!-- Book Name -->
+                                <div class="o_kanban_record_title text-center" style="margin-bottom: 4px;">
+                                    <strong style="font-size: 12px; color: #2c3e50; line-height: 1.1;">
+                                        <field name="name" />
+                                    </strong>
+                                </div>
+                                
+                                <!-- Author -->
+                                <div class="text-center" style="margin-bottom: 4px; color: #7f8c8d; font-size: 10px;">
+                                    <i class="fa fa-user" style="margin-right: 2px;"/>
+                                    <span t-if="record.author.raw_value">
+                                        <field name="author" />
+                                    </span>
+                                    <span t-if="!record.author.raw_value" style="font-style: italic;">
+                                        Chưa có tác giả
+                                    </span>
+                                </div>
+                                
+                                <!-- Number of books available -->
+                                <div class="text-center">
+                                    <div t-attf-class="badge {{ record.books_available.raw_value > 0 ? 'bg-success' : 'bg-danger' }}" 
+                                         style="font-size: 10px; padding: 2px 6px;">
+                                        <i class="fa fa-book" style="margin-right: 2px;"/>
+                                        <field name="books_available" /> có thể mượn
                                     </div>
                                 </div>
                             </div>
@@ -491,6 +422,38 @@
         action="action_product_book_list"
         sequence="71"
         groups="school.group_school_administration,school.group_school_student,library.group_librarian,library.group_userian"
+    />
+
+    <!-- Action for Borrowing Transfers -->
+    <record id="action_borrowing_transfers" model="ir.actions.act_window">
+        <field name="name">Phiếu mượn sách</field>
+        <field name="res_model">stock.picking</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('is_book_borrowing', '=', True)]</field>
+        <field name="context">{
+            'search_default_picking_type_id': False,
+            'search_default_available': False,
+            'default_is_book_borrowing': True,
+        }</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Chưa có phiếu mượn sách nào!
+            </p>
+            <p>
+                Tại đây bạn có thể quản lý tất cả các phiếu mượn sách trong thư viện.
+                Sử dụng nút "Mượn sách" trên form sách để tạo phiếu mượn mới.
+            </p>
+        </field>
+    </record>
+
+    <!-- Menu Item for Borrowing Transfers -->
+    <menuitem
+        id="menu_borrowing_transfers"
+        name="Quản lý mượn sách"
+        parent="menu_library"
+        action="action_borrowing_transfers"
+        sequence="72"
+        groups="library.group_librarian,library.group_userian"
     />
     <!-- Action Of Form View Of View Book -->
     <record id="action_view_book" model="ir.actions.act_window.view">
@@ -568,6 +531,14 @@
                         invisible="state == 'draft'"
                         groups="library.group_librarian"
                     />
+                    <button
+                        name="action_print_library_card"
+                        type="object"
+                        string="In thẻ thư viện"
+                        invisible="state != 'running'"
+                        class="btn-primary"
+                        groups="library.group_librarian"
+                    />
                     <field name="state" widget="statusbar" readonly="1" />
                 </header>
                 <sheet>
@@ -577,31 +548,6 @@
                         <field name="book_limit" readonly="state == 'running'" />
                         <field name="user" required="1" readonly="state == 'running'" />
                         <field name="card_name" string="Card Name" />
-                    </group>
-                    <group invisible="user != 'student'">
-                        <field
-                            name="student_id"
-                            widget="selection"
-                            domain="[('state','=','done')]"
-                            required="user == 'student'"
-                            readonly="state == 'running'"
-                        />
-                        <field name="roll_no" readonly="1" string="Roll No" />
-                        <field
-                            name="standard_id"
-                            widget="selection"
-                            readonly="1"
-                            string="Class"
-                        />
-                    </group>
-                    <group col="2" colspan="2" invisible="user != 'teacher'">
-                        <separator colspan="2" col="2" />
-                        <field
-                            name="teacher_id"
-                            widget="selection"
-                            required="user == 'teacher'"
-                            readonly="state == 'running'"
-                        />
                     </group>
                     <separator string="Membership Details" />
                     <group col="4" colspan="4">
@@ -620,9 +566,20 @@
                         <field name="end_date" />
                     </group>
                     <separator string="Contact Information" />
-                    <group col="2" colspan="2">
+                    <group col="4" colspan="4">
                         <field name="partner_id" string="Liên hệ" help="Thông tin liên hệ của người sở hữu thẻ"/>
+                        <field name="user_id" string="Tài khoản" help="Tài khoản đăng nhập của người sở hữu thẻ"/>
+                        <field name="card_barcode" string="Mã vạch" readonly="1"/>
+                        <field name="has_user_account" invisible="1"/>
                     </group>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_create_user_account" 
+                                type="object" 
+                                class="oe_stat_button" 
+                                icon="fa-user-plus"
+                                invisible="has_user_account"
+                                string="Tạo tài khoản"/>
+                    </div>
                 </sheet>
             </form>
         </field>
@@ -667,539 +624,7 @@
         sequence="74"
         groups="school.group_school_administration,school.group_school_student,school.group_school_teacher,library.group_librarian,library.group_userian"
     />
-    <!-- Form View Of Library Book Issue -->
-    <record id="view_book_library_form_1" model="ir.ui.view">
-        <field name="name">library.book.issue.form</field>
-        <field name="model">library.book.issue</field>
-        <field name="arch" type="xml">
-            <form string="Student Information">
-                <header>
-                    <button
-                        name="return_book"
-                        type="object"
-                        class="oe_highlight"
-                        icon="fa-undo"
-                        string="Book Return"
-                        invisible="ebook_check == True or state not in ['issue','reissue']"
-                        groups="school.group_school_administration,library.group_librarian"
-                    />
-                    <button
-                        name="issue_book"
-                        type="object"
-                        string="Book Issue"
-                        class="oe_highlight"
-                        icon="fa-check-circle"
-                        invisible="state != 'draft'"
-                        groups="school.group_school_administration,library.group_librarian"
-                    />
-                    <button
-                        name="reissue_book"
-                        type="object"
-                        class="oe_highlight"
-                        icon="fa-reply"
-                        string="Book Reissue"
-                        invisible="ebook_check == True or state not in ['issue']"
-                        groups="school.group_school_administration,library.group_librarian"
-                    />
-                    <button
-                        name="cancel_book"
-                        type="object"
-                        string="Cancel"
-                        invisible="ebook_check == True or state not in ['draft', 'issue', 'subscribe']"
-                        groups="school.group_school_administration,library.group_librarian"
-                    />
-                    <button
-                        name="draft_book"
-                        type="object"
-                        class="oe_highlight"
-                        icon="fa-file-code-o"
-                        string="Draft"
-                        invisible="state != 'cancel' and book_request_id.state != 'cancel'"
-                        groups="school.group_school_administration,library.group_librarian"
-                    />
-                    <button
-                        name="lost_book"
-                        type="object"
-                        class="oe_highlight"
-                        icon="fa-snowflake-o"
-                        string="Book Lost"
-                        invisible="ebook_check == True or state not in ['issue', 'reissue']"
-                        groups="school.group_school_administration,library.group_librarian"
-                    />
-                    <button
-                        name="user_fine"
-                        class="oe_highlight"
-                        icon="fa-circle"
-                        string="Fine"
-                        type="object"
-                        invisible="state not in ['return', 'lost'] or lost_penalty &lt; 1.0"
-                        groups="school.group_school_administration,library.group_librarian"
-                    />
-                    <button
-                        name="user_fine"
-                        class="oe_highlight"
-                        icon="fa-circle"
-                        string="Fine"
-                        type="object"
-                        invisible="state not in ['return', 'lost'] or penalty &lt; 1.0"
-                        groups="school.group_school_administration,library.group_librarian"
-                    />
-                    <button
-                        name="subscription_pay"
-                        class="oe_highlight"
-                        icon="fa-circle"
-                        string="Subscription Payment"
-                        type="object"
-                        invisible="state != 'subscribe'"
-                        groups="school.group_school_administration,library.group_librarian"
-                    />
-                    <field name="book_request_id" invisible="1" />
-                    <field
-                        name="state"
-                        string="State"
-                        widget="statusbar"
-                        statusbar_visible="draft,issue,fine,cancel"
-                        align="right"
-                        readonly="1"
-                    />
-                </header>
-                <sheet>
-                    <div class="oe_button_box" name="button_box">
-                        <button
-                            name="view_invoice"
-                            type="object"
-                            invisible="state not in ['fine','paid','pending']"
-                            groups="library.group_librarian"
-                            icon="fa-pencil-square-o"
-                        >
-                            <field
-                                name="compute_inv"
-                                widget="statinfo"
-                                string="Invoices"
-                            />
-                        </button>
-                    </div>
-                    <separator string="Book Issue" />
-                    <group readonly="state in ['issue', 'reissue', 'return']">
-                        <group>
-                            <field name="issue_code" readonly="1" />
-                            <field
-                                name="name"
-                                domain="[('availability','=','available'),('categ_id.book_categ', '=', True),('is_ebook','=',False)]"
-                                readonly="state != 'draft'"
-                                options="{'no_create': True}"
-                            />
-                            <field name="lot_id" 
-                                   invisible="ebook_check == True"
-                                   readonly="state != 'draft'"
-                                   options="{'no_create': True}"/>
-                        </group>
-                        <group>
-                            <field
-                                name="card_id"
-                                readonly="state != 'draft'"
-                                options="{'no_create': True}"
-                                domain="[('state', '=', 'running')]"
-                            />
-                            <field name="user" readonly="1" />
-                            <field name="card_name" invisible="True" />
-                        </group>
-                    </group>
-                    <group invisible="user != 'Student'">
-                        <separator string="Student Details" />
-                        <group>
-                            <field
-                                name="student_id"
-                                invisible="user == 'teacher'"
-                                domain="[('state','=','done')]"
-                                readonly="1"
-                            />
-                            <field
-                                name="roll_no"
-                                invisible="user == 'teacher'"
-                                readonly="1"
-                            />
-                        </group>
-                        <group>
-                            <field
-                                name="standard_id"
-                                invisible="user == 'teacher'"
-                                readonly="1"
-                                string="Class"
-                            />
-                            <field name="ebook_check" invisible="1" />
-                        </group>
-                    </group>
-                    <group
-                        col="2"
-                        colspan="2"
-                        invisible="user != 'Teacher'"
-                        readonly="state in ['issue', 'reissue', 'return']"
-                    >
-                        <separator string="Teacher Details" colspan="2" col="2" />
-                        <field
-                            name="teacher_id"
-                            readonly="state != 'draft'"
-                            widget="selection"
-                        />
-                    </group>
-                    <group
-                        invisible="state in ['draft','subscribe','pending']"
-                        readonly="state in ['reissue', 'return']"
-                    >
-                        <separator
-                            string="Issue Date"
-                            invisible="ebook_check == True"
-                        />
-                        <group>
-                            <field
-                                name="day_to_return_book"
-                                readonly="1"
-                                invisible="ebook_check == True"
-                            />
-                            <field
-                                name="date_return"
-                                readonly="1"
-                                invisible="ebook_check == True"
-                            />
-                            <field
-                                name="penalty"
-                                invisible="state not in ['return','fine','paid'] or penalty &lt; 1.0"
-                            />
-                            <field
-                                name="lost_penalty"
-                                invisible="state not in ['lost', 'fine','paid'] or lost_penalty &lt; 1.0"
-                            />
-                        </group>
-                        <group>
-                            <field
-                                name="date_issue"
-                                readonly="1"
-                                invisible="ebook_check == True"
-                            />
-                            <field
-                                name="actual_return_date"
-                                readonly="state not in ['issue','reissue']"
-                                invisible="ebook_check == True"
-                            />
-                        </group>
-                    </group>
-                    <group
-                        string="E Book Details"
-                        invisible="state in ['issue','ressiue','cancel','return','lost','fine','draft']"
-                        readonly="state != 'done'"
-                    >
-                        <field
-                            name="subscription_amt"
-                            invisible="state == 'paid'"
-                            readonly="state in ['pending','subscribe']"
-                        />
-                        <field
-                            name="ebook_download"
-                            readonly="state in ['pending','subscribe','paid']"
-                        />
-                    </group>
-                </sheet>
-            </form>
-        </field>
-    </record>
-    <!-- Tree View Of Library Book Issue -->
-    <record id="view_library_book_tree" model="ir.ui.view">
-        <field name="name">library.book.issue.tree</field>
-        <field name="model">library.book.issue</field>
-        <field name="arch" type="xml">
-            <tree>
-                <field name="issue_code" />
-                <field name="name" />
-                <field name="lot_id" />
-                <field name="user" />
-                <field name="card_name" />
-                <field name="date_issue" />
-                <field name="date_return" />
-                <field
-                    name="state"
-                    widget="badge"
-                    decoration-info="state in ('draft', 'returned', 'pending')"
-                    decoration-danger="state in ('cancel', 'lost','fine')"
-                    decoration-success="state in ('issued', 'reissued','paid','subscribe')"
-                />
-                <field name="actual_return_date" />
-                <field name="penalty" />
-                <field name="lost_penalty" />
-            </tree>
-        </field>
-    </record>
-    <!-- Kanban View Of Library Book Issue -->
-    <record id="library_book_issue_kanban_view" model="ir.ui.view">
-        <field name="name">library.book.issue.kanban</field>
-        <field name="model">library.book.issue</field>
-        <field name="arch" type="xml">
-            <kanban default_group_by="state">
-                <field name="color" />
-                <field name="user" />
-                <field name="name" />
-                <field name="card_id" />
-                <field name="card_name" />
-                <field name="standard_id" invisible="user != 'Student'" />
-                <field name="roll_no" invisible="user != 'Student'" />
-                <field name="date_issue" />
-                <field name="date_return" />
-                <field name="day_to_return_book" />
-                <field name="state" />
-                <templates>
-                    <t t-name="kanban-box">
-                        <div
-                            class="oe_kanban_global_click o_kanban_record_has_image_fill o_hr_kanban_record"
-                        >
-                            <div
-                                t-if="record.name"
-                                class="o_kanban_image_fill_left d-none d-md-block"
-                                t-attf-style="background-image: url(#{kanban_image('product.product', 'image_512', record.name.raw_value)})"
-                                role="img"
-                            />
-                            <div class="oe_kanban_details">
-                                <div class="o_kanban_record_top">
-                                    <div class="o_kanban_record_headings">
-                                        <strong
-                                            class="o_kanban_record_title oe_partner_heading"
-                                        >
-                                            <field name="name" />
-                                        </strong>
-                                        <div
-                                            class="o_kanban_tags_section oe_kanban_partner_categories"
-                                        />
-                                        <ul>
-                                            <li
-                                                t-if="record.card_id.raw_value"
-                                            >Card No: <field name="card_id" /></li>
-                                            <li
-                                                t-if="record.date_issue.raw_value"
-                                            >Date Issue: <field
-                                                    name="date_issue"
-                                                /></li>
-                                            <li
-                                                t-if="record.date_return.raw_value"
-                                            >Date Return: <field
-                                                    name="date_return"
-                                                /></li>
-                                            <li
-                                                t-if="record.day_to_return_book.raw_value"
-                                            >Day To Return Book: <field
-                                                    name="day_to_return_book"
-                                                /></li>
-                                            <li
-                                                t-if="record.state.raw_value"
-                                            >Status: <field name="state" /></li>
-                                        </ul>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </t>
-                </templates>
-            </kanban>
-        </field>
-    </record>
-    <!-- Search View Of Library Book Issue -->
-    <record id="view_book_issue_search" model="ir.ui.view">
-        <field name="name">library.book.issue.search</field>
-        <field name="model">library.book.issue</field>
-        <field name="arch" type="xml">
-            <search string="Search">
-                <filter name="issue" string="Issue" domain="[('state','=','issue')]" />
-                <filter
-                    name="return"
-                    string="Return"
-                    domain="[('state','=','return')]"
-                />
-                <filter name="lost" string="Lost" domain="[('state','=','lost')]" />
-                <field name="name" />
-                <field name="user" />
-                <field name="card_name" />
-                <field name="issue_code" />
-                <newline />
-                <group expand="0" string="Group By" colspan="12" col="10">
-                    <filter
-                        name="state"
-                        string="State"
-                        help="By State"
-                        context="{'group_by':'state'}"
-                    />
-                    <separator orientation="vertical" />
-                    <filter
-                        name="book_name"
-                        string="Name of book"
-                        help="By Book Name"
-                        context="{'group_by':'name'}"
-                    />
-                    <separator orientation="vertical" />
-                    <filter
-                        name="user"
-                        string="User"
-                        help="User"
-                        context="{'group_by':'user'}"
-                    />
-                </group>
-            </search>
-        </field>
-    </record>
-    <!-- Action Of Form, Tree & Kanban Views Of Library Book Issue -->
-    <record id="action_library_book_list1" model="ir.actions.act_window">
-        <field name="name">Book Issue</field>
-        <field name="res_model">library.book.issue</field>
-        <field name="type">ir.actions.act_window</field>
-        <field name="view_mode">kanban,tree,form</field>
-    </record>
-    <!--Menu Item Of Library Book Issue -->
-    <menuitem
-        id="menu_book_issue_sub_form"
-        name="Mượn sách"
-        parent="menu_library"
-        action="action_library_book_list1"
-        sequence="73"
-        groups="school.group_school_administration,library.group_librarian,library.group_userian"
-    />
-    <!-- Form View Of Library Book Request -->
-    <record id="view_book_library_req_form" model="ir.ui.view">
-        <field name="name">library.book.req.form</field>
-        <field name="model">library.book.request</field>
-        <field name="arch" type="xml">
-            <form string="Book Request Form">
-                <header>
-                    <button
-                        name="confirm_book_request"
-                        icon="fa fa-undo"
-                        type="object"
-                        string="Confirm Request"
-                        groups="library.group_librarian"
-                        invisible="type == 'new' or state != 'draft'"
-                    />
-                    <button
-                        name="cancle_book_request"
-                        icon="fa-snowflake-o"
-                        string="Cancel Request"
-                        type="object"
-                        invisible="state != 'confirm'"
-                    />
-                    <field name="book_issue_id" invisible="1" />
-                    <field name="state" widget="statusbar" align="right" readonly="1" />
-                </header>
-                <sheet>
-                    <group>
-                        <separator string="Book Request" />
-                        <group>
-                            <field name="req_id" readonly="1" />
-                        </group>
-                        <group>
-                            <field
-                                name="card_id"
-                                domain="[('state','=','running')]"
-                                placeholder="Card Id"
-                                widget="selection"
-                                readonly="state != 'draft'"
-                            />
-                        </group>
-                    </group>
-                    <group>
-                        <group>
-                            <field
-                                name="ebook_name"
-                                readonly="state != 'draft'"
-                                invisible="type != 'ebook'"
-                                required="type == 'ebook'"
-                                domain="[('categ_id.book_categ', '!=', False),('is_ebook', '=', True)]"
-                                widget="selection"
-                            />
-                            <field
-                                name="name"
-                                readonly="state != 'draft'"
-                                invisible="type != 'existing'"
-                                required="type == 'existing'"
-                                domain="[('categ_id.book_categ', '=', True),('is_ebook', '=', False)]"
-                                widget="selection"
-                            />
-                            <field name="book_name" invisible="1" />
-                            <field
-                                name="type"
-                                readonly="state != 'draft'"
-                                invisible="0"
-                                required="1"
-                            />
-                        </group>
-                        <group>
-                            <field
-                                name="book_return_days"
-                                readonly="1"
-                                invisible="type !=  'existing'"
-                            />
-                            <field name="active" invisible="1" />
-                        </group>
-                    </group>
-                </sheet>
-            </form>
-        </field>
-    </record>
-    <!-- Tree View Of Library Book Request -->
-    <record id="view_library_req_tree" model="ir.ui.view">
-        <field name="name">library.book.req.tree</field>
-        <field name="model">library.book.request</field>
-        <field name="arch" type="xml">
-            <tree>
-                <field name="req_id" />
-                <field name="card_id" />
-                <field name="type" />
-                <field name="name" />
-                <field name="ebook_name" />
-                <field
-                    name="state"
-                    widget="badge"
-                    decoration-info="state == 'draft'"
-                    decoration-danger="state == 'cancel'"
-                    decoration-success="state == 'confirm'"
-                />
-            </tree>
-        </field>
-    </record>
-    <!-- Search View Of Library Book Request -->
-    <record id="view_book_library_req_search" model="ir.ui.view">
-        <field name="name">library.book.req.search</field>
-        <field name="model">library.book.request</field>
-        <field name="arch" type="xml">
-            <search string="Book Request Search">
-                <group colspan="6" col="4">
-                    <field name="req_id" />
-                    <field name="card_id" />
-                    <filter
-                        name="fil_state"
-                        domain="[('state','=','draft')]"
-                        string="Draft"
-                    />
-                </group>
-                <separator orientation="vertical" />
-                <newline />
-                <group expand="0" string="Group By..." colspan="6" col="4">
-                    <filter string="Type" name="type" context="{'group_by':'type'}" />
-                </group>
-            </search>
-        </field>
-    </record>
-    <!-- Actions Of Form & Tree Views Of Library Book Request -->
-    <record id="action_lib_book_req" model="ir.actions.act_window">
-        <field name="name">Yêu cầu mượn sách</field>
-        <field name="res_model">library.book.request</field>
-        <field name="view_mode">tree,form</field>
-        <field
-            name="context"
-        >{'search_default_fil_state':1,'search_default_state':'draft'}</field>
-    </record>
-    <!-- Menu Item Of Library Book Request -->
-    <menuitem
-        id="menu_lib_book_sub_req"
-        parent="menu_library"
-        action="action_lib_book_req"
-        sequence="72"
-        groups="school.group_school_administration,school.group_school_student,library.group_librarian,library.group_userian"
-    />
+
     <!-- Form view Of Product Language -->
     <record id="product_lang_form_view" model="ir.ui.view">
         <field name="name">product.lang.form</field>
@@ -1751,5 +1176,13 @@
               action="stock.action_production_lot_form"
               sequence="95"
               groups="school.group_school_administration,library.group_librarian"/>
+
+    <!-- Inventory Valuation Menu -->
+    <menuitem id="menu_valuation"
+              name="Vị trí"
+              parent="library.menu_library"
+              action="stock.action_view_quants"
+              sequence="96"
+              groups="library.group_librarian"/>
 
 </odoo>

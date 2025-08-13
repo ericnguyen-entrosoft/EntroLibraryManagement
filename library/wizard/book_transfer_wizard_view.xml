@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Form View for Book Transfer Wizard -->
+    <record id="library_book_transfer_wizard_form" model="ir.ui.view">
+        <field name="name">library.book.transfer.wizard.form</field>
+        <field name="model">library.book.transfer.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Chuyển kho nội bộ">
+                <group>
+                    <group name="group_left">
+                        <field name="product_id" readonly="1"/>
+                        <field name="source_location_id" options="{'no_create': True, 'no_create_edit': True}"/>
+                        <field name="dest_location_id" options="{'no_create': True, 'no_create_edit': True}"/>
+                        <field name="transfer_date"/>
+                    </group>
+                    <group name="group_right">
+                        <field name="available_lot_ids" invisible="1"/>
+                        <field name="all_lots"/>
+                        <field name="lot_ids" 
+                               domain="[('id', 'in', available_lot_ids)]"
+                               invisible="all_lots"
+                               widget="many2many_tags"
+                               options="{'no_create': True, 'no_create_edit': True}"/>
+                    </group>
+                </group>
+                
+                <group string="Thông tin chuyển kho" invisible="not source_location_id">
+                    <div invisible="not available_lot_ids">
+                        <p>
+                            <strong>Số serial có sẵn tại vị trí nguồn:</strong> 
+                            <field name="available_lot_ids" readonly="1" widget="integer"/> cuốn
+                        </p>
+                    </div>
+                    <div invisible="available_lot_ids">
+                        <p style="color: orange;">
+                            <i class="fa fa-warning"/> Không có sách nào tại vị trí nguồn đã chọn.
+                        </p>
+                    </div>
+                    <div invisible="not all_lots or not available_lot_ids">
+                        <p style="color: green;">
+                            <i class="fa fa-check"/> Sẽ chuyển tất cả <field name="available_lot_ids" readonly="1" widget="integer"/> cuốn sách.
+                        </p>
+                    </div>
+                    <div invisible="all_lots or not lot_ids">
+                        <p style="color: blue;">
+                            <i class="fa fa-info"/> Sẽ chuyển <field name="lot_ids" readonly="1" widget="integer"/> cuốn sách đã chọn.
+                        </p>
+                    </div>
+                </group>
+                
+                <footer>
+                    <button name="action_transfer_books" 
+                            string="Chuyển kho" 
+                            type="object" 
+                            class="oe_highlight"
+                            icon="fa-exchange"
+                            invisible="not available_lot_ids"/>
+                    <button string="Hủy" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

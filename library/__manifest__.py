@@ -1,5 +1,3 @@
-# See LICENSE file for full copyright and licensing details.
-
 {
     "name": "Library Management for Education ERP",
     "version": "17.0.1.0.0",
@@ -9,7 +7,7 @@
     "license": "AGPL-3",
     "summary": "A Module For Library Management For School",
     "complexity": "easy",
-    "depends": ["school", "stock", "delivery", "purchase"],
+    "depends": ["stock", "delivery", "purchase"],
     "data": [
         "data/library_sequence.xml",
         "data/library_category_data.xml",
@@ -20,17 +18,26 @@
         "views/card_details.xml",
         "report/report_view.xml",
         "report/qrcode_label.xml",
-        "views/library_view.xml",
-        "wizard/terminate_reason.xml",
+        # Separated view files by model
+        "views/library_author_views.xml",
+        "views/library_card_views.xml",
+        "views/product_views.xml",
+        "views/user_library_views.xml",
+        "views/menus.xml",
+        # Wizard files
         "wizard/book_receipt_wizard_view.xml",
         "wizard/book_borrow_wizard_view.xml",
+        "wizard/book_barcode_wizard_view.xml",
+        "wizard/book_transfer_wizard_view.xml",
+        # Report files
+        "report/lot_barcode_label_report.xml",
+        "report/library_card_report.xml",
     ],
     "assets": {
         "web.assets_backend": [
             "library/static/src/css/library.css",
         ]
     },
-    "demo": ["demo/library_demo.xml"],
     "image": ["static/description/Banner_library_17.png"],
     "installable": True,
     "application": True,

@@ -28,7 +28,6 @@
         "report/leaving_certificate.xml",
         "report/teacher_identity_card.xml",
     ],
-    "demo": ["demo/school_demo.xml"],
     "assets": {"web.assets_backend": ["/school/static/src/scss/schoolcss.scss"]},
     "installable": True,
     "application": True,
