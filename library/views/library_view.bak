@@ -364,7 +364,7 @@
                                 <!-- Number of books available -->
                                 <div class="text-center">
                                     <div t-attf-class="badge {{ record.books_available.raw_value > 0 ? 'bg-success' : 'bg-danger' }}" 
-                                         style="font-size: 10px; padding: 2px 6px;">
+                                         style="font-size: 10px; padding: 2px 6px; color:white">
                                         <i class="fa fa-book" style="margin-right: 2px;"/>
                                         <field name="books_available" /> có thể mượn
                                     </div>

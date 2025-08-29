@@ -1,6 +1,6 @@
 {
     "name": "Library Management for Education ERP",
-    "version": "17.0.1.0.0",
+    "version": "18.0.1.0.0",
     "author": "Serpent Consulting Services Pvt. Ltd.",
     "category": "School Management",
     "website": "http://www.serpentcs.com",
@@ -9,10 +9,6 @@
     "complexity": "easy",
     "depends": ["stock", "delivery", "purchase"],
     "data": [
-        "data/library_sequence.xml",
-        "data/library_category_data.xml",
-        "data/library_location_data.xml",
-        "data/library_card_schedular.xml",
         "security/library_security.xml",
         "security/ir.model.access.csv",
         "views/card_details.xml",

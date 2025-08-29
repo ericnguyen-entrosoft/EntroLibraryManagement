@@ -76,19 +76,19 @@
         </field>
     </record>
 
-    <!-- Tree View Of Library Card Details -->
+    <!-- List View Of Library Card Details -->
     <record id="product_card_tree_view" model="ir.ui.view">
-        <field name="name">library.card.tree</field>
+        <field name="name">library.card.list</field>
         <field name="model">library.card</field>
         <field name="arch" type="xml">
-            <tree>
+            <list>
                 <field name="code" />
                 <field name="user" />
                 <field name="user_type" />
                 <field name="book_limit" />
                 <field name="card_name" />
                 <field name="state" />
-            </tree>
+            </list>
         </field>
     </record>
 
@@ -109,6 +109,6 @@
     <record id="action_card_info" model="ir.actions.act_window">
         <field name="name">Thẻ mượn sách</field>
         <field name="res_model">library.card</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">list,form</field>
     </record>
 </odoo>

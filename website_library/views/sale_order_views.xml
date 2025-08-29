@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    
+    <!-- Sale Order Form View -->
+    <record id="sale_order_form_view_library" model="ir.ui.view">
+        <field name="name">sale.order.form.library</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <!-- Add library-specific fields -->
+            <field name="partner_id" position="after">
+                <field name="library_card_id" string="Library Card" 
+                       invisible="not is_library_borrowing"/>
+                <field name="is_library_borrowing" invisible="1"/>
+                <field name="borrowing_due_date" string="Due Date" 
+                       invisible="not is_library_borrowing"/>
+            </field>
+            
+            <!-- Add action buttons -->
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="action_return_books" type="object" 
+                        string="Return Books" 
+                        class="oe_stat_button" 
+                        icon="fa-undo"
+                        invisible="not is_library_borrowing or state != 'sale'"/>
+                <button name="action_view_borrowing_pickings" type="object" 
+                        string="Borrowing Transfers" 
+                        class="oe_stat_button" 
+                        icon="fa-truck"
+                        invisible="not is_library_borrowing"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Sale Order Line Form View -->
+    <record id="sale_order_line_form_view_library" model="ir.ui.view">
+        <field name="name">sale.order.line.form.library</field>
+        <field name="model">sale.order.line</field>
+        <field name="arch" type="xml">
+            <form string="Order Line">
+                <group>
+                    <field name="product_id"/>
+                    <field name="lot_id" string="Serial Number" 
+                           domain="[('product_id', '=', product_id)]"
+                           invisible="not product_id or not product_id.categ_id.book_categ"/>
+                    <field name="product_uom_qty"/>
+                    <field name="price_unit"/>
+                </group>
+            </form>
+        </field>
+    </record>
+
+    <!-- Sale Order Tree View -->
+    <record id="sale_order_tree_view_library" model="ir.ui.view">
+        <field name="name">sale.order.tree.library</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_quotation_tree"/>
+        <field name="arch" type="xml">
+            <field name="amount_total" position="after">
+                <field name="is_library_borrowing" string="Library Borrowing"/>
+                <field name="borrowing_due_date" string="Due Date" 
+                       invisible="not is_library_borrowing"/>
+            </field>
+        </field>
+    </record>
+
+    <!-- Library Borrowing Orders Menu -->
+    <record id="action_library_borrowing_orders" model="ir.actions.act_window">
+        <field name="name">Library Borrowing Orders</field>
+        <field name="res_model">sale.order</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('is_library_borrowing', '=', True)]</field>
+        <field name="context">{'default_is_library_borrowing': True}</field>
+    </record>
+
+    <menuitem id="menu_library_borrowing_orders"
+              name="Borrowing Orders"
+              parent="library.menu_library"
+              action="action_library_borrowing_orders"
+              sequence="30"/>
+
+</odoo>

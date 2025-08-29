@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        
+        <!-- Demo Library Card for Admin -->
+        <record id="demo_library_card_admin" model="library.card">
+            <field name="name">DEMO-ADMIN-2024</field>
+            <field name="partner_id" ref="base.partner_admin"/>
+            <field name="state">running</field>
+            <field name="issue_date" eval="(DateTime.now() - timedelta(days=30)).strftime('%Y-%m-%d')"/>
+            <field name="duration">365</field>
+        </record>
+
+        <!-- Demo Book Categories -->
+        <record id="demo_book_category_fiction" model="product.category">
+            <field name="name">Fiction</field>
+            <field name="book_categ" eval="True"/>
+        </record>
+
+        <record id="demo_book_category_science" model="product.category">
+            <field name="name">Science</field>
+            <field name="book_categ" eval="True"/>
+        </record>
+
+        <!-- Demo Authors -->
+        <record id="demo_author_1" model="library.author">
+            <field name="name">John Doe</field>
+            <field name="biography">Famous fiction writer</field>
+        </record>
+
+        <record id="demo_author_2" model="library.author">
+            <field name="name">Jane Smith</field>
+            <field name="biography">Renowned science author</field>
+        </record>
+
+        <!-- Demo Books -->
+        <record id="demo_book_1" model="product.template">
+            <field name="name">The Great Adventure</field>
+            <field name="categ_id" ref="demo_book_category_fiction"/>
+            <field name="sale_ok" eval="True"/>
+            <field name="purchase_ok" eval="False"/>
+            <field name="type">product</field>
+            <field name="tracking">serial</field>
+            <field name="isbn">978-3-16-148410-0</field>
+            <field name="author" ref="demo_author_1"/>
+            <field name="nbpage">320</field>
+            <field name="description_sale">An exciting adventure story that will keep you on the edge of your seat.</field>
+        </record>
+
+        <record id="demo_book_2" model="product.template">
+            <field name="name">Introduction to Physics</field>
+            <field name="categ_id" ref="demo_book_category_science"/>
+            <field name="sale_ok" eval="True"/>
+            <field name="purchase_ok" eval="False"/>
+            <field name="type">product</field>
+            <field name="tracking">serial</field>
+            <field name="isbn">978-0-13-485047-6</field>
+            <field name="author" ref="demo_author_2"/>
+            <field name="nbpage">450</field>
+            <field name="description_sale">A comprehensive introduction to the fundamental principles of physics.</field>
+        </record>
+
+        <record id="demo_book_3" model="product.template">
+            <field name="name">Mystery at Midnight</field>
+            <field name="categ_id" ref="demo_book_category_fiction"/>
+            <field name="sale_ok" eval="True"/>
+            <field name="purchase_ok" eval="False"/>
+            <field name="type">product</field>
+            <field name="tracking">serial</field>
+            <field name="isbn">978-1-23-456789-1</field>
+            <field name="author" ref="demo_author_1"/>
+            <field name="nbpage">280</field>
+            <field name="description_sale">A thrilling mystery novel set in a haunted mansion.</field>
+        </record>
+
+    </data>
+</odoo>

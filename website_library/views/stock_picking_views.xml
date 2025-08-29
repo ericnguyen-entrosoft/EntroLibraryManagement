@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    
+    <!-- Stock Picking Form View -->
+    <record id="stock_picking_form_view_library" model="ir.ui.view">
+        <field name="name">stock.picking.form.library</field>
+        <field name="model">stock.picking</field>
+        <field name="inherit_id" ref="stock.view_picking_form"/>
+        <field name="arch" type="xml">
+            <!-- Add library-specific fields -->
+            <field name="partner_id" position="after">
+                <field name="is_library_borrowing" invisible="1"/>
+                <field name="is_book_return" invisible="1"/>
+                <field name="library_card_id" string="Library Card" 
+                       invisible="not is_library_borrowing and not is_book_return"/>
+                <field name="borrowing_due_date" string="Due Date" 
+                       invisible="not is_library_borrowing"/>
+                <field name="return_location_info" string="Return Location" 
+                       invisible="not is_book_return"/>
+            </field>
+            
+            <!-- Add action buttons -->
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="action_create_return_picking" type="object" 
+                        string="Create Return" 
+                        class="oe_stat_button" 
+                        icon="fa-undo"
+                        invisible="not is_library_borrowing or state != 'done'"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Stock Picking Tree View -->
+    <record id="stock_picking_tree_view_library" model="ir.ui.view">
+        <field name="name">stock.picking.tree.library</field>
+        <field name="model">stock.picking</field>
+        <field name="inherit_id" ref="stock.vpicktree"/>
+        <field name="arch" type="xml">
+            <field name="state" position="after">
+                <field name="is_library_borrowing" string="Borrowing"/>
+                <field name="is_book_return" string="Return"/>
+                <field name="borrowing_due_date" string="Due Date" 
+                       invisible="not is_library_borrowing"/>
+            </field>
+        </field>
+    </record>
+
+    <!-- Library Borrowing Transfers Menu -->
+    <record id="action_library_borrowing_transfers" model="ir.actions.act_window">
+        <field name="name">Library Borrowing Transfers</field>
+        <field name="res_model">stock.picking</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('is_library_borrowing', '=', True)]</field>
+        <field name="context">{'default_is_library_borrowing': True}</field>
+    </record>
+
+    <menuitem id="menu_library_borrowing_transfers"
+              name="Borrowing Transfers"
+              parent="library.menu_library"
+              action="action_library_borrowing_transfers"
+              sequence="40"/>
+
+    <!-- Library Return Transfers Menu -->
+    <record id="action_library_return_transfers" model="ir.actions.act_window">
+        <field name="name">Library Return Transfers</field>
+        <field name="res_model">stock.picking</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('is_book_return', '=', True)]</field>
+        <field name="context">{'default_is_book_return': True}</field>
+    </record>
+
+    <menuitem id="menu_library_return_transfers"
+              name="Return Transfers"
+              parent="library.menu_library"
+              action="action_library_return_transfers"
+              sequence="50"/>
+
+</odoo>

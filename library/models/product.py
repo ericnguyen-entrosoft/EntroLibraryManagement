@@ -9,6 +9,33 @@ class ProductTemplate(models.Model):
     _inherit = "product.template"
 
     name = fields.Char("Tên sách", required=True, help="Tên sách")
+    
+    @api.depends("product_variant_ids.availability")
+    def _compute_template_availability(self):
+        """Compute availability based on variants"""
+        for template in self:
+            available_variants = template.product_variant_ids.filtered(
+                lambda v: v.availability == 'available'
+            )
+            template.availability = 'available' if available_variants else 'notavailable'
+    
+    @api.depends("product_variant_ids.available_lots")
+    def _compute_template_available_lots(self):
+        """Compute available lots based on variants"""
+        for template in self:
+            template.available_lots = sum(template.product_variant_ids.mapped('available_lots'))
+    
+    availability = fields.Selection(
+        [("available", "Có sẵn"), ("notavailable", "Không có sẵn")],
+        "Tình trạng sách",
+        compute="_compute_template_availability",
+        help="Tình trạng có sẵn của sách",
+    )
+    available_lots = fields.Integer(
+        "Serial có sẵn",
+        compute="_compute_template_available_lots", 
+        help="Số serial có sẵn để mượn"
+    )
 
 
 class ProductCategory(models.Model):
@@ -175,13 +202,12 @@ class ProductProduct(models.Model):
                 'name': f'Book Serial {year}',
                 'code': sequence_code,
                 'prefix': year,
-                'suffix': first_letter,
                 'padding': 6,
                 'number_increment': 1,
                 'number_next': 1,
             })
         
-        serial_number = sequence_obj.sudo().next_by_code(sequence_code)
+        serial_number = f"{sequence_obj.sudo().next_by_code(sequence_code)}{first_letter}"
         return serial_number
 
     def action_add_quantity(self):

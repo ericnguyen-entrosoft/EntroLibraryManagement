@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<templates id="template" xml:space="preserve">
+    
+    <!-- Library Book Card Template -->
+    <t t-name="website_library.book_card">
+        <div class="library-book-card card h-100">
+            <div class="library-book-image card-img-top">
+                <t t-if="book.image">
+                    <img t-att-src="book.image" class="img-fluid"/>
+                </t>
+                <t t-else="">
+                    <i class="fa fa-book fa-4x text-muted"></i>
+                </t>
+            </div>
+            <div class="card-body d-flex flex-column">
+                <h5 class="card-title">
+                    <a t-att-href="'/library/book/' + book.id" class="text-decoration-none">
+                        <t t-esc="book.name"/>
+                    </a>
+                </h5>
+                <p class="card-text flex-grow-1">
+                    <t t-if="book.author">
+                        <small class="text-muted">by <t t-esc="book.author"/></small>
+                    </t>
+                </p>
+                <div class="mt-auto">
+                    <span t-att-class="'badge library-availability-badge ' + (book.available ? 'available' : 'not-available')">
+                        <t t-if="book.available">Available</t>
+                        <t t-else="">Not Available</t>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </t>
+
+    <!-- Library Search Form Template -->
+    <t t-name="website_library.search_form">
+        <form method="get" class="library-search-form d-flex">
+            <input type="text" name="search" class="form-control" 
+                   placeholder="Search books by title, author, ISBN..." 
+                   t-att-value="search_term"/>
+            <button type="submit" class="btn btn-primary">
+                <i class="fa fa-search"></i>
+            </button>
+        </form>
+    </t>
+
+    <!-- Library Cart Item Template -->
+    <t t-name="website_library.cart_item">
+        <tr class="library-cart-item">
+            <td>
+                <strong t-esc="item.book_name"/>
+                <t t-if="item.author">
+                    <br/><small class="text-muted">by <t t-esc="item.author"/></small>
+                </t>
+            </td>
+            <td>
+                <t t-if="item.serial">
+                    <span class="badge bg-secondary"><t t-esc="item.serial"/></span>
+                </t>
+                <t t-else="">
+                    <small class="text-muted">Any available</small>
+                </t>
+            </td>
+            <td>
+                <button type="button" class="btn btn-sm btn-outline-danger remove-from-cart" 
+                        t-att-data-line-id="item.line_id">
+                    <i class="fa fa-trash"></i>
+                </button>
+            </td>
+        </tr>
+    </t>
+
+</templates>

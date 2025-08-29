@@ -4,7 +4,7 @@
     <record id="action_my_library_cards" model="ir.actions.act_window">
         <field name="name">Thẻ thư viện của tôi</field>
         <field name="res_model">library.card</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">list,form</field>
         <field name="domain">[('user_id', '=', uid)]</field>
         <field name="context">{'create': False, 'edit': False}</field>
     </record>
@@ -13,7 +13,7 @@
     <record id="action_search_borrow_books" model="ir.actions.act_window">
         <field name="name">Tìm kiếm &amp; Mượn sách</field>
         <field name="res_model">product.product</field>
-        <field name="view_mode">kanban,tree,form</field>
+        <field name="view_mode">kanban,list,form</field>
         <field name="view_id" ref="books_kanban_view" />
         <field name="context">{'search_default_book':1,'default_type':'product'}</field>
     </record>
@@ -22,7 +22,7 @@
     <record id="action_my_borrowing_transfers" model="ir.actions.act_window">
         <field name="name">Phiếu mượn của tôi</field>
         <field name="res_model">stock.picking</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">list,form</field>
         <field name="domain">[('picking_type_id.code', '=', 'outgoing'), ('is_borrowing_transfer', '=', True), ('user_id', '=', uid)]</field>
         <field name="context">{'create': False, 'edit': False}</field>
     </record>
@@ -92,7 +92,7 @@
         <field name="name">my.borrowing.transfer.tree</field>
         <field name="model">stock.picking</field>
         <field name="arch" type="xml">
-            <tree decoration-info="state == 'draft'" decoration-muted="state == 'cancel'" decoration-danger="state == 'confirmed'" decoration-success="state == 'done'">
+            <list decoration-info="state == 'draft'" decoration-muted="state == 'cancel'" decoration-danger="state == 'confirmed'" decoration-success="state == 'done'">
                 <field name="name"/>
                 <field name="partner_id" string="Người mượn"/>
                 <field name="scheduled_date" string="Ngày mượn"/>
@@ -102,7 +102,7 @@
                        decoration-warning="state == 'waiting'"
                        decoration-danger="state == 'confirmed'"
                        decoration-success="state == 'done'"/>
-            </tree>
+            </list>
         </field>
     </record>
 
@@ -134,13 +134,13 @@
                     <notebook>
                         <page string="Sách được mượn">
                             <field name="move_ids" readonly="1">
-                                <tree>
+                                <list>
                                     <field name="product_id"/>
                                     <field name="lot_ids" widget="many2many_tags"/>
                                     <field name="product_uom_qty"/>
                                     <field name="quantity"/>
                                     <field name="state"/>
-                                </tree>
+                                </list>
                             </field>
                         </page>
                     </notebook>
@@ -160,7 +160,7 @@
     <!-- Action window view for borrowing transfer tree -->
     <record id="action_my_borrowing_transfers_tree" model="ir.actions.act_window.view">
         <field name="sequence" eval="1"/>
-        <field name="view_mode">tree</field>
+        <field name="view_mode">list</field>
         <field name="view_id" ref="view_my_borrowing_transfer_tree"/>
         <field name="act_window_id" ref="action_my_borrowing_transfers"/>
     </record>

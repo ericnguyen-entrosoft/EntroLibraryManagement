@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    
+    <!-- Website Library Menu Configuration -->
+    <record id="website_library_menu_config" model="ir.ui.view">
+        <field name="name">website.library.menu.config</field>
+        <field name="model">website.menu</field>
+        <field name="inherit_id" ref="website.menu_tree"/>
+        <field name="arch" type="xml">
+            <list position="attributes">
+                <attribute name="create">1</attribute>
+            </list>
+        </field>
+    </record>
+
+</odoo>
