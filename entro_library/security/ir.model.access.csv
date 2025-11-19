@@ -1,0 +1,12 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_library_book_user,library.book.user,model_library_book,base.group_user,1,1,1,1
+access_library_author_user,library.author.user,model_library_author,base.group_user,1,1,1,1
+access_library_publisher_user,library.publisher.user,model_library_publisher,base.group_user,1,1,1,1
+access_library_category_user,library.category.user,model_library_category,base.group_user,1,1,1,1
+access_library_series_user,library.series.user,model_library_series,base.group_user,1,1,1,1
+access_library_location_user,library.location.user,model_library_location,base.group_user,1,1,1,1
+access_character_mapping_user,character.mapping.user,model_character_mapping,base.group_user,1,1,1,1
+access_library_borrowing_user,library.borrowing.user,model_library_borrowing,base.group_user,1,1,1,1
+access_library_borrowing_portal,library.borrowing.portal,model_library_borrowing,base.group_portal,1,0,0,0
+access_library_reservation_user,library.reservation.user,model_library_reservation,base.group_user,1,1,1,1
+access_library_reservation_portal,library.reservation.portal,model_library_reservation,base.group_portal,1,0,0,0

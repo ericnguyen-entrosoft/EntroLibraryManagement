@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Sequences -->
+    <record id="seq_library_borrowing" model="ir.sequence">
+        <field name="name">Library Borrowing Sequence</field>
+        <field name="code">library.borrowing</field>
+        <field name="prefix">PM</field>
+        <field name="padding">5</field>
+        <field name="number_increment">1</field>
+    </record>
+
+    <record id="seq_library_reservation" model="ir.sequence">
+        <field name="name">Library Reservation Sequence</field>
+        <field name="code">library.reservation</field>
+        <field name="prefix">DT</field>
+        <field name="padding">5</field>
+        <field name="number_increment">1</field>
+    </record>
+
+    <record id="seq_library_borrower" model="ir.sequence">
+        <field name="name">Library Borrower Sequence</field>
+        <field name="code">library.borrower</field>
+        <field name="prefix">DG</field>
+        <field name="padding">5</field>
+        <field name="number_increment">1</field>
+    </record>
+
+    <!-- Cron Jobs -->
+    <!-- Update overdue status daily at 1:00 AM -->
+    <record id="cron_update_overdue_borrowings" model="ir.cron">
+        <field name="name">Library: Update Overdue Borrowings</field>
+        <field name="model_id" ref="model_library_borrowing"/>
+        <field name="state">code</field>
+        <field name="code">model._cron_update_overdue_status()</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+        <field name="active" eval="True"/>
+    </record>
+
+    <!-- Send due date reminders daily at 8:00 AM -->
+    <record id="cron_send_due_reminders" model="ir.cron">
+        <field name="name">Library: Send Due Date Reminders</field>
+        <field name="model_id" ref="model_library_borrowing"/>
+        <field name="state">code</field>
+        <field name="code">model._cron_send_due_reminders()</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+        <field name="active" eval="True"/>
+    </record>
+
+    <!-- Expire old reservations daily at 2:00 AM -->
+    <record id="cron_expire_reservations" model="ir.cron">
+        <field name="name">Library: Expire Old Reservations</field>
+        <field name="model_id" ref="model_library_reservation"/>
+        <field name="state">code</field>
+        <field name="code">model._cron_expire_reservations()</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+        <field name="active" eval="True"/>
+    </record>
+</odoo>

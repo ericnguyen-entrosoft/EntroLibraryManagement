@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Main Menu -->
+    <menuitem id="menu_library_root"
+              name="Thư viện Pháp Đăng"
+              web_icon="entro_library,static/description/icon.png"
+              sequence="10"/>
+
+    <!-- Books Menu -->
+    <menuitem id="menu_library_books"
+              name="Sách"
+              parent="menu_library_root"
+              action="action_library_book"
+              sequence="10"/>
+
+    <!-- Borrowing Management Menu -->
+    <menuitem id="menu_library_borrowing_management"
+              name="Mượn/Trả"
+              parent="menu_library_root"
+              sequence="30"/>
+
+    <!-- Borrowing Menu -->
+    <menuitem id="menu_library_borrowing"
+              name="Mượn/Trả sách"
+              parent="menu_library_borrowing_management"
+              action="action_library_borrowing"
+              sequence="10"/>
+
+    <!-- Reservation Menu -->
+    <menuitem id="menu_library_reservation"
+              name="Đặt trước"
+              parent="menu_library_borrowing_management"
+              action="action_library_reservation"
+              sequence="20"/>
+
+    <!-- Borrowers Menu -->
+    <menuitem id="menu_library_borrowers"
+              name="Độc giả"
+              parent="menu_library_borrowing_management"
+              action="action_library_borrowers"
+              sequence="30"/>
+
+    <!-- Reports Menu -->
+    <menuitem id="menu_library_reports"
+              name="Báo cáo"
+              parent="menu_library_root"
+              sequence="90"/>
+
+    <!-- Overdue Books Report -->
+    <menuitem id="menu_library_overdue_report"
+              name="Sách quá hạn"
+              parent="menu_library_reports"
+              action="action_library_borrowing_overdue"
+              sequence="10"/>
+
+    <!-- Configuration Menu -->
+    <menuitem id="menu_library_config"
+              name="Cấu hình"
+              parent="menu_library_root"
+              sequence="100"/>
+
+    <!-- Locations Menu -->
+    <menuitem id="menu_library_locations"
+              name="Vị trí lưu trữ"
+              parent="menu_library_config"
+              action="action_library_location"
+              sequence="5"/>
+
+    <!-- Authors Menu -->
+    <menuitem id="menu_library_authors"
+              name="Tác giả"
+              parent="menu_library_config"
+              action="action_library_author"
+              sequence="10"/>
+
+    <!-- Publishers Menu -->
+    <menuitem id="menu_library_publishers"
+              name="Nhà xuất bản"
+              parent="menu_library_config"
+              action="action_library_publisher"
+              sequence="20"/>
+
+    <!-- Categories Menu -->
+    <menuitem id="menu_library_categories"
+              name="Nhóm"
+              parent="menu_library_config"
+              action="action_library_category"
+              sequence="30"/>
+
+    <!-- Series Menu -->
+    <menuitem id="menu_library_series"
+              name="Tùng thư"
+              parent="menu_library_config"
+              action="action_library_series"
+              sequence="40"/>
+
+    <!-- Character Mapping Menu -->
+    <menuitem id="menu_character_mapping"
+              name="Ánh xạ ký tự"
+              parent="menu_library_config"
+              action="action_character_mapping"
+              sequence="50"/>
+</odoo>

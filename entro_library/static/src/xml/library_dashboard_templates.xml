@@ -1,0 +1,245 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="EntroLibrary.Dashboard">
+        <div class="library_dashboard">
+            <!-- Loading State -->
+            <t t-if="state.loading">
+                <div class="d-flex justify-content-center align-items-center" style="min-height: 400px;">
+                    <div class="text-center">
+                        <i class="fa fa-spinner fa-spin fa-3x text-primary mb-3"/>
+                        <p class="text-muted">Đang tải dữ liệu...</p>
+                    </div>
+                </div>
+            </t>
+
+            <!-- Dashboard Content -->
+            <t t-if="!state.loading and state.data">
+                <!-- Header -->
+                <div class="library_dashboard_header">
+                    <!-- Banner -->
+                    <div class="mb-4" style="border-radius: 8px; overflow: hidden;">
+                        <img src="/entro_library/static/src/image/banner.png" alt="Library Banner" style="width: 100%; height: auto; display: block;"/>
+                    </div>
+                    <!-- <div class="d-flex justify-content-between align-items-center mb-4">
+                        <div>
+                            <h1 class="mb-0" style="color:#8c675a">
+                                <img src="/entro_library/static/src/image/logo.png" alt="Library Logo" style="height: 60px; margin-right: 12px; vertical-align: middle;"/>
+                                Thư Viện Pháp Đăng
+                            </h1>
+                            <p class="text-muted mt-2">Hệ thống quản lý sách và mượn trả</p>
+                        </div>
+                    </div> -->
+                </div>
+
+                <!-- Statistics Cards -->
+                <div class="row g-3 mb-4">
+                    <!-- Total Books -->
+                    <div class="col-12 col-md-6 col-lg-3">
+                        <div class="card library_stat_card stat_primary h-100" t-on-click="openBooks">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <p class="text-muted mb-1">Tổng số sách</p>
+                                        <h2 class="mb-0" t-esc="state.data.statistics.total_books" style="color:#591202"/>
+                                        <small class="text-muted" t-esc="state.data.statistics.total_copies + ' bản'"/>
+                                    </div>
+                                    <div class="stat_icon">
+                                        <i class="fa fa-book fa-2x"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Borrowed Books -->
+                    <div class="col-12 col-md-6 col-lg-3">
+                        <div class="card library_stat_card stat_success h-100" t-on-click="openBorrowings">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <p class="text-muted mb-1">Đang mượn</p>
+                                        <h2 class="mb-0" t-esc="state.data.statistics.borrowed_books" style="color:#591202"/>
+                                        <small class="text-muted">giao dịch</small>
+                                    </div>
+                                    <div class="stat_icon">
+                                        <i class="fa fa-exchange fa-2x"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Active Users -->
+                    <div class="col-12 col-md-6 col-lg-3">
+                        <div class="card library_stat_card stat_info h-100" t-on-click="openBorrowers">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <p class="text-muted mb-1">Độc giả</p>
+                                        <h2 class="mb-0" t-esc="state.data.statistics.active_borrowers" style="color:#591202"/>
+                                        <small class="text-muted">Đang hoạt động</small>
+                                    </div>
+                                    <div class="stat_icon">
+                                        <i class="fa fa-users fa-2x"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Overdue Books -->
+                    <div class="col-12 col-md-6 col-lg-3">
+                        <div class="card library_stat_card stat_danger h-100" t-on-click="openOverdueBorrowings">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <p class="text-muted mb-1">Quá hạn</p>
+                                        <h2 class="mb-0" t-esc="state.data.statistics.overdue_books" style="color:#591202"/>
+                                        <small class="text-muted">Cần xử lý</small>
+                                    </div>
+                                    <div class="stat_icon">
+                                        <i class="fa fa-exclamation-triangle fa-2x"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Charts Section -->
+                <div class="row g-3 mb-4">
+                    <!-- Popular Books -->
+                    <div class="col-12 col-lg-6">
+                        <div class="card h-100">
+                            <div class="card-header">
+                                <h5 class="mb-0" style="color:#8c675a">
+                                    <i class="fa fa-line-chart me-2" style="color:#591202"/>
+                                    Sách được mượn nhiều nhất
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <t t-if="state.data.popular_books.length">
+                                    <t t-foreach="state.data.popular_books" t-as="book" t-key="book.id">
+                                        <div class="popular_book_item mb-3">
+                                            <div class="d-flex align-items-center">
+                                                <div class="book_rank me-3">
+                                                    <t t-esc="book_index + 1"/>
+                                                </div>
+                                                <div class="flex-grow-1">
+                                                    <div class="d-flex justify-content-between">
+                                                        <div>
+                                                            <h6 class="mb-0 cursor-pointer text-primary" t-on-click="() => this.openBook(book.id)" t-esc="book.name"/>
+                                                            <small class="text-muted" t-esc="book.author"/>
+                                                        </div>
+                                                        <div class="text-end">
+                                                            <strong class="text-primary d-block" t-esc="book.times_borrowed"/>
+                                                            <small class="text-muted">lượt mượn</small>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </t>
+                                </t>
+                                <t t-else="">
+                                    <div class="text-center text-muted py-5">
+                                        <i class="fa fa-book fa-3x mb-3 opacity-25"/>
+                                        <p>Chưa có dữ liệu</p>
+                                    </div>
+                                </t>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Category Distribution -->
+                    <div class="col-12 col-lg-6">
+                        <div class="card h-100">
+                            <div class="card-header">
+                                <h5 class="mb-0" style="color:#8c675a">
+                                    <i class="fa fa-pie-chart me-2" style="color:#591202"/>
+                                    Phân loại sách
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <t t-if="state.data.category_distribution.length">
+                                    <t t-foreach="state.data.category_distribution" t-as="category" t-key="category_index">
+                                        <div class="mb-3">
+                                            <div class="d-flex justify-content-between mb-1">
+                                                <span t-esc="category.category"/>
+                                                <strong t-esc="category.count"/>
+                                            </div>
+                                            <div class="progress" style="height: 8px;">
+                                                <div class="progress-bar" role="progressbar"
+                                                     t-att-style="'width: ' + (category.count / state.data.category_distribution.reduce((sum, c) => sum + c.count, 0) * 100) + '%'"
+                                                     t-att-aria-valuenow="category.count"/>
+                                            </div>
+                                        </div>
+                                    </t>
+                                </t>
+                                <t t-else="">
+                                    <div class="text-center text-muted py-5">
+                                        <i class="fa fa-list fa-3x mb-3 opacity-25"/>
+                                        <p>Chưa có dữ liệu</p>
+                                    </div>
+                                </t>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Borrowings Table -->
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0" style="color:#8c675a">
+                            <i class="fa fa-calendar me-2" style="color:#591202"/>
+                            Giao dịch mượn sách gần đây
+                        </h5>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Mã phiếu</th>
+                                        <th>Sách</th>
+                                        <th>Người mượn</th>
+                                        <th>Ngày mượn</th>
+                                        <th>Hạn trả</th>
+                                        <th>Trạng thái</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <t t-if="state.data.recent_borrowings.length">
+                                        <t t-foreach="state.data.recent_borrowings" t-as="borrowing" t-key="borrowing.id">
+                                            <tr class="cursor-pointer" t-on-click="() => this.openBorrowing(borrowing.id)">
+                                                <td><strong t-esc="borrowing.name"/></td>
+                                                <td>
+                                                    <div t-esc="borrowing.book_title"/>
+                                                    <small class="text-muted" t-esc="borrowing.book_code"/>
+                                                </td>
+                                                <td t-esc="borrowing.borrower"/>
+                                                <td t-esc="formatDate(borrowing.borrow_date)"/>
+                                                <td t-esc="formatDate(borrowing.due_date)"/>
+                                                <td>
+                                                    <span class="badge" t-att-class="'bg-' + getStateColor(borrowing.state)" t-esc="getStateLabel(borrowing.state)"/>
+                                                </td>
+                                            </tr>
+                                        </t>
+                                    </t>
+                                    <t t-else="">
+                                        <tr>
+                                            <td colspan="6" class="text-center text-muted py-5">
+                                                <i class="fa fa-inbox fa-3x mb-3 opacity-25"/>
+                                                <p>Chưa có giao dịch mượn sách</p>
+                                            </td>
+                                        </tr>
+                                    </t>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </t>
+        </div>
+    </t>
+</templates>

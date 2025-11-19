@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Partner Form View Extension -->
+    <record id="view_partner_form_library" model="ir.ui.view">
+        <field name="name">res.partner.form.library</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='category_id']" position="after">
+                <field name="is_borrower"/>
+                <field name="borrower_type" invisible="not is_borrower"/>
+            </xpath>
+
+            <xpath expr="//notebook" position="inside">
+                <page string="Thông tin độc giả" name="library_borrower" invisible="not is_borrower">
+                    <group>
+                        <group string="Thông tin thành viên">
+                            <field name="borrower_code" readonly="1"/>
+                            <field name="membership_date"/>
+                            <field name="membership_expiry"/>
+                            <field name="is_membership_active" readonly="1"/>
+                        </group>
+                        <group string="Giới hạn">
+                            <field name="max_books" placeholder="Sử dụng giá trị mặc định"/>
+                            <field name="max_days" placeholder="Sử dụng giá trị mặc định"/>
+                        </group>
+                    </group>
+
+                    <group string="Thống kê">
+                        <group>
+                            <field name="borrowing_count"/>
+                            <field name="current_borrowing_count"/>
+                            <field name="overdue_count"/>
+                        </group>
+                        <group>
+                            <field name="total_fine" widget="monetary"/>
+                            <field name="reservation_count"/>
+                        </group>
+                    </group>
+
+                    <group>
+                        <field name="borrower_notes" placeholder="Nhập ghi chú về độc giả..."/>
+                    </group>
+
+                    <group>
+                        <button name="action_view_borrowings" string="Xem lịch sử mượn" type="object"
+                                class="oe_stat_button" icon="fa-book"/>
+                        <button name="action_view_reservations" string="Xem đặt trước" type="object"
+                                class="oe_stat_button" icon="fa-bookmark"/>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Borrowers List View -->
+    <record id="view_borrower_list" model="ir.ui.view">
+        <field name="name">res.partner.borrower.list</field>
+        <field name="model">res.partner</field>
+        <field name="arch" type="xml">
+            <list string="Danh sách độc giả">
+                <field name="borrower_code"/>
+                <field name="name"/>
+                <field name="borrower_type"/>
+                <field name="email"/>
+                <field name="phone"/>
+                <field name="current_borrowing_count"/>
+                <field name="overdue_count" decoration-danger="overdue_count > 0"/>
+                <field name="total_fine" widget="monetary"/>
+                <field name="is_membership_active" widget="boolean"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Borrowers Kanban View -->
+    <record id="view_borrower_kanban" model="ir.ui.view">
+        <field name="name">res.partner.borrower.kanban</field>
+        <field name="model">res.partner</field>
+        <field name="arch" type="xml">
+            <kanban>
+                <field name="name"/>
+                <field name="borrower_code"/>
+                <field name="borrower_type"/>
+                <field name="current_borrowing_count"/>
+                <field name="overdue_count"/>
+                <field name="is_membership_active"/>
+                <templates>
+                    <t t-name="card">
+                        <div class="oe_kanban_global_click">
+                            <div class="o_kanban_record_top">
+                                <div class="o_kanban_record_headings">
+                                    <strong class="o_kanban_record_title"><field name="name"/></strong>
+                                    <br/>
+                                    <span><field name="borrower_code"/></span>
+                                </div>
+                                <span t-if="record.is_membership_active.raw_value" class="badge badge-success">Hoạt động</span>
+                                <span t-else="" class="badge badge-danger">Hết hạn</span>
+                            </div>
+                            <div class="o_kanban_record_body">
+                                <field name="borrower_type"/>
+                            </div>
+                            <div class="o_kanban_record_bottom">
+                                <div class="oe_kanban_bottom_left">
+                                    Đang mượn: <field name="current_borrowing_count"/>
+                                </div>
+                                <div class="oe_kanban_bottom_right" t-if="record.overdue_count.raw_value > 0">
+                                    <span class="badge badge-danger">Quá hạn: <field name="overdue_count"/></span>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- Borrowers Search View -->
+    <record id="view_borrower_search" model="ir.ui.view">
+        <field name="name">res.partner.borrower.search</field>
+        <field name="model">res.partner</field>
+        <field name="arch" type="xml">
+            <search string="Tìm kiếm độc giả">
+                <field name="name"/>
+                <field name="borrower_code"/>
+                <field name="email"/>
+                <field name="phone"/>
+                <separator/>
+                <filter string="Thẻ còn hiệu lực" name="active_membership" domain="[('is_membership_active', '=', True)]"/>
+                <filter string="Thẻ hết hạn" name="expired_membership" domain="[('is_membership_active', '=', False)]"/>
+                <filter string="Có sách đang mượn" name="has_borrowings" domain="[('current_borrowing_count', '>', 0)]"/>
+                <filter string="Có sách quá hạn" name="has_overdue" domain="[('overdue_count', '>', 0)]"/>
+                <separator/>
+                <group expand="0" string="Nhóm theo">
+                    <filter string="Loại độc giả" name="group_type" context="{'group_by': 'borrower_type'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action for Borrowers -->
+    <record id="action_library_borrowers" model="ir.actions.act_window">
+        <field name="name">Độc giả</field>
+        <field name="res_model">res.partner</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="domain">[('is_borrower', '=', True)]</field>
+        <field name="context">{'default_is_borrower': True, 'search_default_active_membership': 1}</field>
+        <field name="view_ids" eval="[(5, 0, 0),
+            (0, 0, {'view_mode': 'kanban', 'view_id': ref('view_borrower_kanban')}),
+            (0, 0, {'view_mode': 'list', 'view_id': ref('view_borrower_list')}),
+            (0, 0, {'view_mode': 'form', 'view_id': ref('base.view_partner_form')})]"/>
+        <field name="search_view_id" ref="view_borrower_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Tạo độc giả mới
+            </p>
+            <p>
+                Nhấn vào nút "Tạo" để thêm độc giả mới vào hệ thống.
+            </p>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Configuration Settings View -->
+    <record id="view_library_config_settings" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.inherit.library</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form" position="inside">
+                <app data-string="Thư viện" string="Thư viện" name="library" groups="base.group_system">
+                    <block title="Cài đặt mượn/trả sách" name="borrowing_settings">
+                        <setting id="default_borrowing_days_setting" string="Số ngày mượn mặc định"
+                                 help="Số ngày mặc định cho một lần mượn sách">
+                            <field name="default_borrowing_days"/>
+                        </setting>
+                        <setting id="max_books_per_borrower_setting" string="Số sách tối đa mỗi người"
+                                 help="Số lượng sách tối đa một người có thể mượn cùng lúc">
+                            <field name="max_books_per_borrower"/>
+                        </setting>
+                    </block>
+
+                    <block title="Cài đặt phạt" name="fine_settings">
+                        <setting id="fine_rate_per_day_setting" string="Phạt mỗi ngày (VNĐ)"
+                                 help="Số tiền phạt cho mỗi ngày trễ hạn">
+                            <field name="fine_rate_per_day"/>
+                        </setting>
+                        <setting id="grace_period_days_setting" string="Số ngày ân hạn"
+                                 help="Số ngày ân hạn trước khi tính phạt">
+                            <field name="grace_period_days"/>
+                        </setting>
+                    </block>
+
+                    <block title="Cài đặt thông báo" name="notification_settings">
+                        <setting id="enable_email_notifications_setting" string="Kích hoạt thông báo email"
+                                 help="Tự động gửi email thông báo cho người mượn">
+                            <field name="enable_email_notifications"/>
+                        </setting>
+                        <setting id="reminder_days_before_setting" string="Nhắc nhở trước (ngày)"
+                                 help="Gửi email nhắc nhở bao nhiêu ngày trước khi đến hạn trả">
+                            <field name="reminder_days_before"/>
+                        </setting>
+                    </block>
+
+                    <block title="Cài đặt đặt trước" name="reservation_settings">
+                        <setting id="reservation_hold_days_setting" string="Số ngày giữ sách đặt trước"
+                                 help="Số ngày giữ sách sau khi thông báo có sẵn cho người đặt trước">
+                            <field name="reservation_hold_days"/>
+                        </setting>
+                    </block>
+
+                    <block title="Cài đặt thành viên" name="membership_settings">
+                        <setting id="default_membership_months_setting" string="Thời hạn thẻ mặc định (tháng)"
+                                 help="Thời hạn thẻ độc giả mặc định tính bằng tháng">
+                            <field name="default_membership_months"/>
+                        </setting>
+                    </block>
+                </app>
+            </xpath>
+        </field>
+    </record>
+</odoo>

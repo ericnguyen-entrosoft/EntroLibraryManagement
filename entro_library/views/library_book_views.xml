@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- List View -->
+    <record id="view_library_book_list" model="ir.ui.view">
+        <field name="name">library.book.list</field>
+        <field name="model">library.book</field>
+        <field name="arch" type="xml">
+            <list string="Danh sách sách">
+                <field name="code"/>
+                <field name="name"/>
+                <field name="author_ids" widget="many2many_tags"/>
+                <field name="publisher_id"/>
+                <field name="publication_year"/>
+                <field name="language_id"/>
+                <field name="location_id"/>
+                <field name="state" widget="badge" decoration-success="state == 'available'" decoration-warning="state in ('borrowed', 'reserved')" decoration-danger="state in ('lost', 'damaged')"/>
+                <field name="registration_date"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Form View -->
+    <record id="view_library_book_form" model="ir.ui.view">
+        <field name="name">library.book.form</field>
+        <field name="model">library.book</field>
+        <field name="arch" type="xml">
+            <form string="Thông tin sách">
+                <sheet>
+                    <field name="image_1920" widget="image" class="oe_avatar" options="{'preview_image': 'image_128', 'size': [90, 90]}"/>
+                    <div class="oe_button_box" name="button_box">
+                    </div>
+                    <div class="oe_title">
+                        <label for="name" string="Tác phẩm"/>
+                        <h1>
+                            <field name="name" placeholder="Nhập tên tác phẩm..."/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group name="basic_info" string="Thông tin cơ bản">
+                            <field name="subtitle"/>
+                            <field name="parallel_title"/>
+                            <field name="volume_title"/>
+                            <field name="category_id" options="{'no_create_edit': False}"/>
+                        </group>
+                        <group name="registration_info" string="Thông tin đăng ký">
+                            <field name="registration_date"/>
+                            <field name="code"/>
+                            <field name="registration_number"/>
+                            <field name="ddc_number"/>
+                            <field name="series_id" options="{'no_create_edit': False}"/>
+                            <field name="cutter_number" readonly="1"/>
+                            <field name="keywords" placeholder="Nhập từ khóa, phân cách bằng dấu phẩy..."/>
+                        </group>
+                    </group>
+
+                    <group>
+                        <group name="author_info" string="Thông tin tác giả">
+                            <field name="author_ids" widget="many2many_tags" options="{'color_field': 'color', 'no_create_edit': False}"/>
+                            <field name="co_author_ids" widget="many2many_tags" options="{'color_field': 'color', 'no_create_edit': False}"/>
+                        </group>
+                        <group name="publication_info" string="Thông tin xuất bản">
+                            <field name="publisher_id" options="{'no_create_edit': False}"/>
+                            <field name="publication_place"/>
+                            <field name="publication_year"/>
+                            <field name="language_id" options="{'no_create_edit': False}"/>
+                            <field name="page_count"/>
+                            <field name="length"/>
+                            <field name="reprint_count"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="Tóm tắt nội dung" name="content">
+                            <field name="summary" placeholder="Nhập tóm tắt nội dung..." nolable="1"/>
+                        </page>
+                        <page string="Vị trí &amp; Trạng thái" name="location">
+                            <group>
+                                <group>
+                                    <field name="location_id" options="{'no_create_edit': False}"/>
+                                    <field name="state" widget="radio"/>
+                                </group>
+                            </group>
+                        </page>
+
+                        <page string="Ghi chú" name="notes">
+                            <field name="note" placeholder="Nhập ghi chú..."/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- Search View -->
+    <record id="view_library_book_search" model="ir.ui.view">
+        <field name="name">library.book.search</field>
+        <field name="model">library.book</field>
+        <field name="arch" type="xml">
+            <search string="Tìm kiếm sách">
+                <field name="name" string="Tên sách" filter_domain="['|', ('name', 'ilike', self), ('subtitle', 'ilike', self)]"/>
+                <field name="code"/>
+                <field name="author_ids"/>
+                <field name="publisher_id"/>
+                <field name="keywords"/>
+                <field name="ddc_number"/>
+                <separator/>
+                <filter string="Hoạt động" name="active" domain="[('active', '=', True)]"/>
+                <filter string="Đã lưu trữ" name="inactive" domain="[('active', '=', False)]"/>
+                <separator/>
+                <group expand="0" string="Nhóm theo">
+                    <filter string="Nhà xuất bản" name="group_publisher" context="{'group_by': 'publisher_id'}"/>
+                    <filter string="Ngôn ngữ" name="group_language" context="{'group_by': 'language_id'}"/>
+                    <filter string="Năm xuất bản" name="group_year" context="{'group_by': 'publication_year'}"/>
+                    <filter string="Tùng thư" name="group_series" context="{'group_by': 'series_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_library_book" model="ir.actions.act_window">
+        <field name="name">Sách</field>
+        <field name="res_model">library.book</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_library_book_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Tạo sách mới
+            </p>
+            <p>
+                Nhấn vào nút "Tạo" để thêm sách mới vào thư viện.
+            </p>
+        </field>
+    </record>
+</odoo>

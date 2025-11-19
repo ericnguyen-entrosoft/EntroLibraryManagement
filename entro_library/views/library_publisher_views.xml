@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- List View -->
+    <record id="view_library_publisher_list" model="ir.ui.view">
+        <field name="name">library.publisher.list</field>
+        <field name="model">library.publisher</field>
+        <field name="arch" type="xml">
+            <list string="Danh sách nhà xuất bản">
+                <field name="code"/>
+                <field name="name"/>
+                <field name="country"/>
+                <field name="phone"/>
+                <field name="email"/>
+                <field name="book_count"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Form View -->
+    <record id="view_library_publisher_form" model="ir.ui.view">
+        <field name="name">library.publisher.form</field>
+        <field name="model">library.publisher</field>
+        <field name="arch" type="xml">
+            <form string="Thông tin nhà xuất bản">
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button class="oe_stat_button" name="toggle_active" type="object" icon="fa-archive">
+                            <field name="active" widget="boolean_button" options='{"terminology": "archive"}'/>
+                        </button>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="code"/>
+                            <field name="country"/>
+                        </group>
+                        <group>
+                            <field name="phone"/>
+                            <field name="email" widget="email"/>
+                            <field name="website" widget="url"/>
+                            <field name="book_count"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="address" placeholder="Nhập địa chỉ..."/>
+                    </group>
+                    <notebook>
+                        <page string="Sách xuất bản" name="books">
+                            <field name="book_ids" nolabel="1">
+                                <list string="Sách">
+                                    <field name="name"/>
+                                    <field name="author_ids" widget="many2many_tags"/>
+                                    <field name="publication_year"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Ghi chú" name="notes">
+                            <field name="note" placeholder="Nhập ghi chú..."/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_library_publisher" model="ir.actions.act_window">
+        <field name="name">Nhà xuất bản</field>
+        <field name="res_model">library.publisher</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Tạo nhà xuất bản mới
+            </p>
+            <p>
+                Nhấn vào nút "Tạo" để thêm nhà xuất bản mới.
+            </p>
+        </field>
+    </record>
+</odoo>

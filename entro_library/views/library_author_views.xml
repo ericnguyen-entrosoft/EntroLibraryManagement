@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- List View -->
+    <record id="view_library_author_list" model="ir.ui.view">
+        <field name="name">library.author.list</field>
+        <field name="model">library.author</field>
+        <field name="arch" type="xml">
+            <list string="Danh sách tác giả">
+                <field name="code"/>
+                <field name="name"/>
+                <field name="nationality"/>
+                <field name="birth_year"/>
+                <field name="death_year"/>
+                <field name="book_count"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Form View -->
+    <record id="view_library_author_form" model="ir.ui.view">
+        <field name="name">library.author.form</field>
+        <field name="model">library.author</field>
+        <field name="arch" type="xml">
+            <form string="Thông tin tác giả">
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button class="oe_stat_button" name="toggle_active" type="object" icon="fa-archive">
+                            <field name="active" widget="boolean_button" options='{"terminology": "archive"}'/>
+                        </button>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="code"/>
+                            <field name="nationality"/>
+                        </group>
+                        <group>
+                            <field name="birth_year"/>
+                            <field name="death_year"/>
+                            <field name="book_count"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Tiểu sử" name="biography">
+                            <field name="biography" placeholder="Nhập tiểu sử tác giả..."/>
+                        </page>
+                        <page string="Sách" name="books">
+                            <group>
+                                <field name="book_ids" nolabel="1">
+                                    <list string="Sách chính">
+                                        <field name="name"/>
+                                        <field name="publication_year"/>
+                                        <field name="publisher_id"/>
+                                    </list>
+                                </field>
+                                <field name="co_book_ids" nolabel="1">
+                                    <list string="Sách đồng tác giả">
+                                        <field name="name"/>
+                                        <field name="publication_year"/>
+                                        <field name="publisher_id"/>
+                                    </list>
+                                </field>
+                            </group>
+                        </page>
+                        <page string="Ghi chú" name="notes">
+                            <field name="note" placeholder="Nhập ghi chú..."/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_library_author" model="ir.actions.act_window">
+        <field name="name">Tác giả</field>
+        <field name="res_model">library.author</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Tạo tác giả mới
+            </p>
+            <p>
+                Nhấn vào nút "Tạo" để thêm tác giả mới.
+            </p>
+        </field>
+    </record>
+</odoo>

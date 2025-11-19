@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- List View -->
+    <record id="view_library_location_list" model="ir.ui.view">
+        <field name="name">library.location.list</field>
+        <field name="model">library.location</field>
+        <field name="arch" type="xml">
+            <list string="Danh sách vị trí">
+                <field name="code"/>
+                <field name="complete_name"/>
+                <field name="location_type"/>
+                <field name="responsible_id" widget="many2one_avatar_user"/>
+                <field name="capacity"/>
+                <field name="book_count"/>
+                <field name="book_available_count"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Form View -->
+    <record id="view_library_location_form" model="ir.ui.view">
+        <field name="name">library.location.form</field>
+        <field name="model">library.location</field>
+        <field name="arch" type="xml">
+            <form string="Vị trí lưu trữ">
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button class="oe_stat_button" name="toggle_active" type="object" icon="fa-archive">
+                            <field name="active" widget="boolean_button" options='{"terminology": "archive"}'/>
+                        </button>
+                        <button class="oe_stat_button" type="object" name="action_view_books" icon="fa-book">
+                            <field name="book_count" widget="statinfo" string="Sách"/>
+                        </button>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="code"/>
+                            <field name="location_type"/>
+                            <field name="parent_id"/>
+                        </group>
+                        <group>
+                            <field name="responsible_id" widget="many2one_avatar_user"/>
+                            <field name="capacity"/>
+                            <field name="book_count"/>
+                            <field name="book_available_count"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="address" placeholder="Nhập địa chỉ..."/>
+                        <field name="description" placeholder="Nhập mô tả vị trí..."/>
+                    </group>
+                    <notebook>
+                        <page string="Vị trí con" name="children">
+                            <field name="child_ids" nolabel="1">
+                                <list string="Vị trí con">
+                                    <field name="code"/>
+                                    <field name="name"/>
+                                    <field name="location_type"/>
+                                    <field name="book_count"/>
+                                    <field name="capacity"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Sách tại vị trí này" name="books">
+                            <field name="book_ids" nolabel="1">
+                                <list string="Sách">
+                                    <field name="code"/>
+                                    <field name="name"/>
+                                    <field name="author_ids" widget="many2many_tags"/>
+                                    <field name="state" widget="badge" decoration-success="state == 'available'" decoration-warning="state in ('borrowed', 'reserved')" decoration-danger="state in ('lost', 'damaged')"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Ghi chú" name="notes">
+                            <field name="note" placeholder="Nhập ghi chú..."/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Search View -->
+    <record id="view_library_location_search" model="ir.ui.view">
+        <field name="name">library.location.search</field>
+        <field name="model">library.location</field>
+        <field name="arch" type="xml">
+            <search string="Tìm kiếm vị trí">
+                <field name="name" string="Tên vị trí" filter_domain="['|', ('name', 'ilike', self), ('complete_name', 'ilike', self)]"/>
+                <field name="code"/>
+                <field name="location_type"/>
+                <field name="responsible_id"/>
+                <separator/>
+                <filter string="Hoạt động" name="active" domain="[('active', '=', True)]"/>
+                <filter string="Đã lưu trữ" name="inactive" domain="[('active', '=', False)]"/>
+                <separator/>
+                <filter string="Kho" name="type_warehouse" domain="[('location_type', '=', 'warehouse')]"/>
+                <filter string="Giá sách" name="type_shelf" domain="[('location_type', '=', 'shelf')]"/>
+                <filter string="Vị trí cụ thể" name="type_position" domain="[('location_type', '=', 'position')]"/>
+                <separator/>
+                <group expand="0" string="Nhóm theo">
+                    <filter string="Loại vị trí" name="group_type" context="{'group_by': 'location_type'}"/>
+                    <filter string="Vị trí cha" name="group_parent" context="{'group_by': 'parent_id'}"/>
+                    <filter string="Người phụ trách" name="group_responsible" context="{'group_by': 'responsible_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_library_location" model="ir.actions.act_window">
+        <field name="name">Vị trí lưu trữ</field>
+        <field name="res_model">library.location</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_library_location_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Tạo vị trí lưu trữ mới
+            </p>
+            <p>
+                Nhấn vào nút "Tạo" để thêm vị trí lưu trữ mới cho thư viện.
+            </p>
+        </field>
+    </record>
+</odoo>
