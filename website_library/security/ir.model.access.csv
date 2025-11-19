@@ -1,5 +1,0 @@
-id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_library_return_book_wizard_user,library.return.book.wizard user,model_library_return_book_wizard,base.group_user,1,1,1,1
-access_library_return_book_line_user,library.return.book.line user,model_library_return_book_line,base.group_user,1,1,1,1
-access_library_return_book_wizard_portal,library.return.book.wizard portal,model_library_return_book_wizard,base.group_portal,1,1,1,0
-access_library_return_book_line_portal,library.return.book.line portal,model_library_return_book_line,base.group_portal,1,1,1,0
