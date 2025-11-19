@@ -1,5 +1,5 @@
 {
-    'name': 'Entro Library Management V2',
+    'name': 'Entro: Quản lý Thư Viện Pháp Đăng',
     'version': '18.0.1.0.0',
     'category': 'Library',
     'summary': 'Quản lý thư viện sách',
