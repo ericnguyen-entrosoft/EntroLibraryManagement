@@ -13,13 +13,19 @@ class LibraryBorrowing(models.Model):
                        copy=False, readonly=True, default='New')
     borrower_id = fields.Many2one(
         'res.partner', string='Người mượn', required=True, tracking=True)
+
+    # Keep for backward compatibility, but make it optional
     book_id = fields.Many2one(
-        'library.book', string='Sách', required=True, tracking=True)
+        'library.book', string='Sách', tracking=True)
+
+    # Book lines for multiple books
+    borrowing_line_ids = fields.One2many(
+        'library.borrowing.line', 'borrowing_id', string='Danh sách sách')
 
     # Dates
     borrow_date = fields.Date(
         string='Ngày mượn', default=fields.Date.today, required=True, tracking=True)
-    due_date = fields.Date(string='Ngày hạn trả', required=True, tracking=True)
+    due_date = fields.Date(string='Ngày hạn trả')
     return_date = fields.Date(string='Ngày trả thực tế', tracking=True)
 
     # State
@@ -40,18 +46,20 @@ class LibraryBorrowing(models.Model):
     fine_amount = fields.Float(
         string='Tiền phạt', compute='_compute_fine_amount', store=True)
 
+    # Count fields
+    book_count = fields.Integer(
+        string='Số sách', compute='_compute_book_count', store=True)
+
     # Additional info
     notes = fields.Text(string='Ghi chú')
     librarian_id = fields.Many2one(
         'res.users', string='Thủ thư', default=lambda self: self.env.user)
 
-    # Book info (related fields for quick access)
+    # Book info (related fields for quick access) - kept for backward compatibility
     book_code = fields.Char(related='book_id.code',
                             string='Mã sách', store=True)
     book_name = fields.Char(related='book_id.name',
                             string='Tên sách', store=True)
-    book_location = fields.Char(
-        related='book_id.location_id.complete_name', string='Vị trí sách')
 
     # Borrower info
     borrower_email = fields.Char(
@@ -68,131 +76,126 @@ class LibraryBorrowing(models.Model):
                 'library.borrowing') or 'New'
         return super(LibraryBorrowing, self).create(vals)
 
-    @api.depends('due_date', 'return_date', 'state')
+    @api.depends('borrowing_line_ids.late_days', 'borrowing_line_ids.is_overdue', 'state')
     def _compute_late_info(self):
-        today = fields.Date.today()
+        """Compute late days and overdue status from lines"""
         for record in self:
-            if record.state in ('returned', 'cancelled', 'draft'):
-                record.late_days = 0
-                record.is_overdue = False
-            elif record.state == 'borrowed':
-                if record.due_date and today > record.due_date:
-                    record.late_days = (today - record.due_date).days
-                    record.is_overdue = True
-                else:
-                    record.late_days = 0
-                    record.is_overdue = False
-            elif record.state == 'overdue':
-                if record.due_date:
-                    record.late_days = (today - record.due_date).days
-                    record.is_overdue = True
-                else:
-                    record.late_days = 0
-                    record.is_overdue = False
+            if record.borrowing_line_ids:
+                # Get the maximum late days from all lines
+                max_late_days = max(record.borrowing_line_ids.mapped('late_days') or [0])
+                record.late_days = max_late_days
+                record.is_overdue = any(record.borrowing_line_ids.mapped('is_overdue'))
             else:
                 record.late_days = 0
                 record.is_overdue = False
 
-    @api.depends('late_days')
+    @api.depends('borrowing_line_ids.fine_amount')
     def _compute_fine_amount(self):
-        config = self.env['ir.config_parameter'].sudo()
-        fine_rate = float(config.get_param(
-            'library.fine_rate_per_day', default=5000))
-        grace_period = int(config.get_param(
-            'library.grace_period_days', default=0))
-
+        """Compute total fine amount from all lines"""
         for record in self:
-            if record.late_days > grace_period:
-                record.fine_amount = (
-                    record.late_days - grace_period) * fine_rate
-            else:
-                record.fine_amount = 0
+            record.fine_amount = sum(record.borrowing_line_ids.mapped('fine_amount'))
+
+    @api.depends('borrowing_line_ids')
+    def _compute_book_count(self):
+        """Count number of books in this borrowing"""
+        for record in self:
+            record.book_count = len(record.borrowing_line_ids)
 
     @api.onchange('borrow_date')
     def _onchange_borrow_date(self):
+        """Update due dates for all lines when borrow date changes"""
         if self.borrow_date:
             config = self.env['ir.config_parameter'].sudo()
             default_days = int(config.get_param(
                 'library.default_borrowing_days', default=14))
-            self.due_date = self.borrow_date + timedelta(days=default_days)
+            default_due_date = self.borrow_date + timedelta(days=default_days)
+            self.due_date = default_due_date
+            # Update all lines
+            for line in self.borrowing_line_ids:
+                if not line.due_date:
+                    line.due_date = default_due_date
 
-    @api.constrains('borrower_id', 'book_id', 'borrow_date')
+    @api.constrains('borrower_id', 'borrowing_line_ids')
     def _check_borrowing_constraints(self):
+        """Check borrower's total book limit"""
         for record in self:
             if record.state == 'draft':
                 continue
-
-            # Check if book is available
-            if record.book_id.state != 'available' and record.state in ('draft', 'borrowed'):
-                active_borrowing = self.search([
-                    ('book_id', '=', record.book_id.id),
-                    ('state', 'in', ('borrowed', 'overdue')),
-                    ('id', '!=', record.id)
-                ], limit=1)
-                if active_borrowing:
-                    raise exceptions.ValidationError(
-                        f'Sách "{record.book_id.name}" hiện đang được mượn bởi {active_borrowing.borrower_id.name}.'
-                    )
 
             # Check borrower's current borrowing limit
             config = self.env['ir.config_parameter'].sudo()
             max_books = int(config.get_param(
                 'library.max_books_per_borrower', default=5))
 
-            current_borrowings = self.search_count([
+            # Count books in current borrowing lines
+            current_line_count = len(record.borrowing_line_ids.filtered(
+                lambda l: l.state in ('borrowed', 'overdue')
+            ))
+
+            # Count books in other borrowings
+            other_borrowings = self.search([
                 ('borrower_id', '=', record.borrower_id.id),
                 ('state', 'in', ('borrowed', 'overdue')),
                 ('id', '!=', record.id)
             ])
+            other_book_count = sum(len(b.borrowing_line_ids.filtered(
+                lambda l: l.state in ('borrowed', 'overdue')
+            )) for b in other_borrowings)
 
-            if current_borrowings >= max_books:
+            total_books = current_line_count + other_book_count
+
+            if total_books > max_books:
                 raise exceptions.ValidationError(
-                    f'Người mượn đã đạt giới hạn {max_books} quyển sách.'
+                    f'Người mượn đã đạt giới hạn {max_books} quyển sách. Hiện tại: {total_books} quyển.'
                 )
 
     def action_confirm(self):
         """Xác nhận phiếu mượn"""
         for record in self:
+            if not record.borrowing_line_ids:
+                raise exceptions.ValidationError('Vui lòng thêm ít nhất một cuốn sách vào phiếu mượn.')
+
             record.state = 'borrowed'
-            record.book_id.write({
-                'state': 'borrowed',
-                'current_borrowing_id': record.id
-            })
+            # Confirm all lines
+            for line in record.borrowing_line_ids:
+                line.state = 'borrowed'
+                line.book_id.write({
+                    'state': 'borrowed',
+                    'current_borrowing_id': record.id
+                })
             # Send notification email
             if record.borrower_email:
                 self._send_borrowing_email()
 
     def action_return(self):
-        """Trả sách"""
+        """Trả tất cả sách"""
         for record in self:
             record.return_date = fields.Date.today()
-            record.state = 'returned'
-            record.book_id.write({
-                'state': 'available',
-                'current_borrowing_id': False
-            })
-            # Check for reservations
-            reservation = self.env['library.reservation'].search([
-                ('book_id', '=', record.book_id.id),
-                ('state', '=', 'active')
-            ], order='reservation_date', limit=1)
-            if reservation:
-                reservation.action_notify_available()
+            # Return all lines
+            for line in record.borrowing_line_ids.filtered(lambda l: l.state in ('borrowed', 'overdue')):
+                line.action_return()
+            # Update borrowing state if all lines are returned
+            if all(line.state in ('returned', 'cancelled') for line in record.borrowing_line_ids):
+                record.state = 'returned'
 
     def action_mark_lost(self):
-        """Đánh dấu sách mất"""
+        """Đánh dấu tất cả sách mất"""
         for record in self:
             record.state = 'lost'
-            record.book_id.write({'state': 'lost'})
+            for line in record.borrowing_line_ids:
+                line.action_mark_lost()
 
     def action_cancel(self):
         """Hủy phiếu mượn"""
         for record in self:
-            if record.state == 'borrowed':
-                record.book_id.write({
-                    'state': 'available',
-                    'current_borrowing_id': False
-                })
+            # Cancel all lines
+            for line in record.borrowing_line_ids:
+                if line.state == 'borrowed':
+                    line.book_id.write({
+                        'state': 'available',
+                        'current_borrowing_id': False
+                    })
+                line.state = 'cancelled'
             record.state = 'cancelled'
 
     def action_set_to_draft(self):
@@ -226,18 +229,25 @@ class LibraryBorrowing(models.Model):
 
     @api.model
     def _cron_update_overdue_status(self):
-        """Scheduled action to update overdue borrowings"""
+        """Scheduled action to update overdue borrowing lines"""
         today = fields.Date.today()
-        overdue_borrowings = self.search([
+
+        # Update overdue lines
+        BorrowingLine = self.env['library.borrowing.line']
+        overdue_lines = BorrowingLine.search([
             ('state', '=', 'borrowed'),
             ('due_date', '<', today)
         ])
-        overdue_borrowings.write({'state': 'overdue'})
+        overdue_lines.write({'state': 'overdue'})
 
-        # Send overdue notifications
-        for borrowing in overdue_borrowings:
-            if borrowing.borrower_email:
-                borrowing._send_overdue_email()
+        # Update borrowing state if any line is overdue
+        borrowings_to_update = overdue_lines.mapped('borrowing_id')
+        for borrowing in borrowings_to_update:
+            if borrowing.state == 'borrowed' and any(line.state == 'overdue' for line in borrowing.borrowing_line_ids):
+                borrowing.state = 'overdue'
+                # Send overdue notification
+                if borrowing.borrower_email:
+                    borrowing._send_overdue_email()
 
     @api.model
     def _cron_send_due_reminders(self):
@@ -247,11 +257,16 @@ class LibraryBorrowing(models.Model):
             'library.reminder_days_before', default=2))
 
         reminder_date = fields.Date.today() + timedelta(days=reminder_days)
-        borrowings = self.search([
+
+        # Find borrowing lines with upcoming due dates
+        BorrowingLine = self.env['library.borrowing.line']
+        upcoming_lines = BorrowingLine.search([
             ('state', '=', 'borrowed'),
             ('due_date', '=', reminder_date)
         ])
 
+        # Send reminders per borrowing (not per line)
+        borrowings = upcoming_lines.mapped('borrowing_id')
         for borrowing in borrowings:
             if borrowing.borrower_email:
                 borrowing._send_due_reminder_email()

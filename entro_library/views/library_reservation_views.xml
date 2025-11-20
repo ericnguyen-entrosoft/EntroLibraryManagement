@@ -62,7 +62,9 @@
                         <group>
                             <field name="book_id" options="{'no_create': True}"/>
                             <field name="book_code" readonly="1"/>
-                            <field name="book_state" readonly="1"/>
+                            <field name="quant_id" options="{'no_create': True}"/>
+                            <field name="registration_number" readonly="1"/>
+                            <field name="quant_state" readonly="1"/>
                         </group>
                     </group>
                     <group>

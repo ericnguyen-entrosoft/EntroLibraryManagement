@@ -1,0 +1,265 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Book Label Report Template - Base -->
+    <template id="report_book_label_base">
+        <t t-call="web.basic_layout">
+            <t t-set="quant_quantities" t-value="data.get('quant_quantities', {})"/>
+            <t t-foreach="quant_quantities.items()" t-as="item">
+                <t t-set="quant_id" t-value="item[0]"/>
+                <t t-set="quantity" t-value="item[1]"/>
+                <t t-set="quant" t-value="env['library.book.quant'].browse(quant_id)"/>
+                <t t-foreach="range(int(quantity))" t-as="i">
+                    <div class="page">
+                        <t t-call="entro_library.report_book_label_content"/>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+    <!-- Book Label Content - 4x12 Format -->
+    <template id="report_book_label_content">
+        <div class="book-label" style="width: 4in; height: 1in; border: 1px solid #ccc; padding: 8px; page-break-after: always;">
+            <div style="display: flex; align-items: center; height: 100%;">
+                <div style="flex: 1;">
+                    <div style="font-weight: bold; font-size: 14pt; margin-bottom: 4px;">
+                        <t t-esc="quant.registration_number"/>
+                    </div>
+                    <div style="font-size: 10pt; margin-bottom: 2px;">
+                        <t t-esc="quant.book_id.name"/>
+                    </div>
+                    <div style="font-size: 9pt; color: #666;">
+                        <t t-if="quant.book_id.code">
+                            <span>Mã: <t t-esc="quant.book_id.code"/></span>
+                        </t>
+                        <t t-if="quant.book_id.author_ids">
+                            <span style="margin-left: 10px;">
+                                Tác giả: <t t-esc="', '.join(quant.book_id.author_ids.mapped('name')[:2])"/>
+                            </span>
+                        </t>
+                    </div>
+                    <div style="font-size: 8pt; color: #999; margin-top: 2px;">
+                        <t t-if="quant.location_id">
+                            Vị trí: <t t-esc="quant.location_id.complete_name"/>
+                        </t>
+                    </div>
+                </div>
+                <div style="margin-left: 10px;">
+                    <img t-if="quant.book_id.image_128"
+                         t-att-src="image_data_uri(quant.book_id.image_128)"
+                         style="max-width: 60px; max-height: 80px;"/>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <!-- Book Label Content - 4x12 with Price -->
+    <template id="report_book_label_content_price">
+        <div class="book-label" style="width: 4in; height: 1in; border: 1px solid #ccc; padding: 8px; page-break-after: always;">
+            <div style="display: flex; align-items: center; height: 100%;">
+                <div style="flex: 1;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                        <div style="font-weight: bold; font-size: 14pt;">
+                            <t t-esc="quant.registration_number"/>
+                        </div>
+                        <div style="font-weight: bold; font-size: 14pt; color: #e74c3c;">
+                            <!-- Price placeholder - can be added as field later -->
+                            <span>₫</span>
+                        </div>
+                    </div>
+                    <div style="font-size: 10pt; margin-bottom: 2px;">
+                        <t t-esc="quant.book_id.name"/>
+                    </div>
+                    <div style="font-size: 9pt; color: #666;">
+                        <t t-if="quant.book_id.code">
+                            <span>Mã: <t t-esc="quant.book_id.code"/></span>
+                        </t>
+                        <t t-if="quant.book_id.author_ids">
+                            <span style="margin-left: 10px;">
+                                Tác giả: <t t-esc="', '.join(quant.book_id.author_ids.mapped('name')[:2])"/>
+                            </span>
+                        </t>
+                    </div>
+                    <div style="font-size: 8pt; color: #999; margin-top: 2px;">
+                        <t t-if="quant.location_id">
+                            Vị trí: <t t-esc="quant.location_id.complete_name"/>
+                        </t>
+                    </div>
+                </div>
+                <div style="margin-left: 10px;">
+                    <img t-if="quant.book_id.image_128"
+                         t-att-src="image_data_uri(quant.book_id.image_128)"
+                         style="max-width: 60px; max-height: 80px;"/>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <!-- Book Label Content - 4x7 with Price -->
+    <template id="report_book_label_content_4x7_price">
+        <div class="book-label" style="width: 4in; height: 0.7in; border: 1px solid #ccc; padding: 4px; page-break-after: always;">
+            <div style="display: flex; align-items: center; height: 100%;">
+                <div style="flex: 1;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 2px;">
+                        <div style="font-weight: bold; font-size: 11pt;">
+                            <t t-esc="quant.registration_number"/>
+                        </div>
+                        <div style="font-weight: bold; font-size: 11pt; color: #e74c3c;">
+                            ₫
+                        </div>
+                    </div>
+                    <div style="font-size: 9pt; margin-bottom: 1px;">
+                        <t t-esc="quant.book_id.name[:50]"/>
+                    </div>
+                    <div style="font-size: 8pt; color: #666;">
+                        <t t-if="quant.book_id.code">
+                            <span>Mã: <t t-esc="quant.book_id.code"/></span>
+                        </t>
+                    </div>
+                </div>
+                <div style="margin-left: 8px;">
+                    <img t-if="quant.book_id.image_128"
+                         t-att-src="image_data_uri(quant.book_id.image_128)"
+                         style="max-width: 40px; max-height: 50px;"/>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <!-- Book Label Content - 2x7 with Price -->
+    <template id="report_book_label_content_2x7_price">
+        <div class="book-label" style="width: 2in; height: 0.7in; border: 1px solid #ccc; padding: 4px; page-break-after: always;">
+            <div style="display: flex; flex-direction: column; height: 100%;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 2px;">
+                    <div style="font-weight: bold; font-size: 10pt;">
+                        <t t-esc="quant.registration_number"/>
+                    </div>
+                    <div style="font-weight: bold; font-size: 10pt; color: #e74c3c;">
+                        ₫
+                    </div>
+                </div>
+                <div style="font-size: 8pt; margin-bottom: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                    <t t-esc="quant.book_id.name[:30]"/>
+                </div>
+                <div style="font-size: 7pt; color: #666;">
+                    <t t-if="quant.book_id.code">
+                        <span>Mã: <t t-esc="quant.book_id.code"/></span>
+                    </t>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <!-- Report Actions -->
+    <!-- 4x12 Format (no price) -->
+    <record id="action_report_book_label_4_12" model="ir.actions.report">
+        <field name="name">Nhãn sách 4x12</field>
+        <field name="model">library.book.label.wizard</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">entro_library.report_book_label_4_12</field>
+        <field name="report_file">entro_library.report_book_label_4_12</field>
+        <field name="print_report_name">'Nhãn sách'</field>
+        <field name="binding_model_id" ref="model_library_book_label_wizard"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <template id="report_book_label_4_12">
+        <t t-call="web.basic_layout">
+            <t t-set="quant_quantities" t-value="data.get('quant_quantities', {})"/>
+            <div class="page">
+                <t t-foreach="quant_quantities.items()" t-as="item">
+                    <t t-set="quant_id" t-value="item[0]"/>
+                    <t t-set="quantity" t-value="item[1]"/>
+                    <t t-set="quant" t-value="env['library.book.quant'].browse(quant_id)"/>
+                    <t t-foreach="range(int(quantity))" t-as="i">
+                        <t t-call="entro_library.report_book_label_content"/>
+                    </t>
+                </t>
+            </div>
+        </t>
+    </template>
+
+    <!-- 4x12 with Price -->
+    <record id="action_report_book_label_4_12_price" model="ir.actions.report">
+        <field name="name">Nhãn sách 4x12 (có giá)</field>
+        <field name="model">library.book.label.wizard</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">entro_library.report_book_label_4_12_price</field>
+        <field name="report_file">entro_library.report_book_label_4_12_price</field>
+        <field name="print_report_name">'Nhãn sách'</field>
+        <field name="binding_model_id" ref="model_library_book_label_wizard"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <template id="report_book_label_4_12_price">
+        <t t-call="web.basic_layout">
+            <t t-set="quant_quantities" t-value="data.get('quant_quantities', {})"/>
+            <div class="page">
+                <t t-foreach="quant_quantities.items()" t-as="item">
+                    <t t-set="quant_id" t-value="item[0]"/>
+                    <t t-set="quantity" t-value="item[1]"/>
+                    <t t-set="quant" t-value="env['library.book.quant'].browse(quant_id)"/>
+                    <t t-foreach="range(int(quantity))" t-as="i">
+                        <t t-call="entro_library.report_book_label_content_price"/>
+                    </t>
+                </t>
+            </div>
+        </t>
+    </template>
+
+    <!-- 4x7 with Price -->
+    <record id="action_report_book_label_4_7_price" model="ir.actions.report">
+        <field name="name">Nhãn sách 4x7 (có giá)</field>
+        <field name="model">library.book.label.wizard</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">entro_library.report_book_label_4_7_price</field>
+        <field name="report_file">entro_library.report_book_label_4_7_price</field>
+        <field name="print_report_name">'Nhãn sách'</field>
+        <field name="binding_model_id" ref="model_library_book_label_wizard"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <template id="report_book_label_4_7_price">
+        <t t-call="web.basic_layout">
+            <t t-set="quant_quantities" t-value="data.get('quant_quantities', {})"/>
+            <div class="page">
+                <t t-foreach="quant_quantities.items()" t-as="item">
+                    <t t-set="quant_id" t-value="item[0]"/>
+                    <t t-set="quantity" t-value="item[1]"/>
+                    <t t-set="quant" t-value="env['library.book.quant'].browse(quant_id)"/>
+                    <t t-foreach="range(int(quantity))" t-as="i">
+                        <t t-call="entro_library.report_book_label_content_4x7_price"/>
+                    </t>
+                </t>
+            </div>
+        </t>
+    </template>
+
+    <!-- 2x7 with Price -->
+    <record id="action_report_book_label_2_7_price" model="ir.actions.report">
+        <field name="name">Nhãn sách 2x7 (có giá)</field>
+        <field name="model">library.book.label.wizard</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">entro_library.report_book_label_2_7_price</field>
+        <field name="report_file">entro_library.report_book_label_2_7_price</field>
+        <field name="print_report_name">'Nhãn sách'</field>
+        <field name="binding_model_id" ref="model_library_book_label_wizard"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <template id="report_book_label_2_7_price">
+        <t t-call="web.basic_layout">
+            <t t-set="quant_quantities" t-value="data.get('quant_quantities', {})"/>
+            <div class="page">
+                <t t-foreach="quant_quantities.items()" t-as="item">
+                    <t t-set="quant_id" t-value="item[0]"/>
+                    <t t-set="quantity" t-value="item[1]"/>
+                    <t t-set="quant" t-value="env['library.book.quant'].browse(quant_id)"/>
+                    <t t-foreach="range(int(quantity))" t-as="i">
+                        <t t-call="entro_library.report_book_label_content_2x7_price"/>
+                    </t>
+                </t>
+            </div>
+        </t>
+    </template>
+</odoo>

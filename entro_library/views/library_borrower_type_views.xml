@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Borrower Type List View -->
+    <record id="view_library_borrower_type_list" model="ir.ui.view">
+        <field name="name">library.borrower.type.list</field>
+        <field name="model">library.borrower.type</field>
+        <field name="arch" type="xml">
+            <list string="Loại độc giả">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="code"/>
+                <field name="max_books"/>
+                <field name="max_days"/>
+                <field name="daily_fine_amount"/>
+                <field name="can_reserve"/>
+                <field name="can_extend"/>
+                <field name="borrower_count"/>
+                <field name="active" widget="boolean_toggle"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Borrower Type Form View -->
+    <record id="view_library_borrower_type_form" model="ir.ui.view">
+        <field name="name">library.borrower.type.form</field>
+        <field name="model">library.borrower.type</field>
+        <field name="arch" type="xml">
+            <form string="Loại độc giả">
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="%(action_library_borrowers)d" type="action"
+                                class="oe_stat_button" icon="fa-users"
+                                context="{'default_is_borrower': True}">
+                            <field name="borrower_count" widget="statinfo" string="Độc giả"/>
+                        </button>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="code"/>
+                            <field name="sequence"/>
+                            <field name="active"/>
+                        </group>
+                        <group>
+                            <field name="max_books"/>
+                            <field name="max_days"/>
+                            <field name="daily_fine_amount"/>
+                        </group>
+                    </group>
+                    <group string="Quyền hạn">
+                        <group>
+                            <field name="can_reserve"/>
+                            <field name="can_extend"/>
+                            <field name="max_extensions" invisible="not can_extend"/>
+                        </group>
+                    </group>
+                    <group string="Mô tả">
+                        <field name="description" nolabel="1"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Borrower Type Search View -->
+    <record id="view_library_borrower_type_search" model="ir.ui.view">
+        <field name="name">library.borrower.type.search</field>
+        <field name="model">library.borrower.type</field>
+        <field name="arch" type="xml">
+            <search string="Tìm kiếm loại độc giả">
+                <field name="name"/>
+                <field name="code"/>
+                <filter string="Hoạt động" name="active" domain="[('active', '=', True)]"/>
+                <filter string="Không hoạt động" name="inactive" domain="[('active', '=', False)]"/>
+            </search>
+        </field>
+    </record>
+
+    <!-- Borrower Type Action -->
+    <record id="action_library_borrower_type" model="ir.actions.act_window">
+        <field name="name">Loại độc giả</field>
+        <field name="res_model">library.borrower.type</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_library_borrower_type_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Tạo loại độc giả mới
+            </p>
+            <p>
+                Cấu hình các loại độc giả với các giới hạn và quyền hạn khác nhau.
+            </p>
+        </field>
+    </record>
+</odoo>

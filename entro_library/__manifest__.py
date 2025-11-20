@@ -28,8 +28,22 @@
         # Security
         'security/ir.model.access.csv',
 
+        # Wizards
+        'wizards/library_book_create_quant_wizard_views.xml',
+        'wizards/library_book_label_wizard_views.xml',
+
+        # Reports (must be loaded before views that reference them)
+        'reports/library_card_report.xml',
+        'reports/library_book_label_reports.xml',
+
         # Views
+        'views/res_partner_views.xml',
+        'views/library_book_image_views.xml',
         'views/library_book_views.xml',
+        'views/library_book_quant_views.xml',
+        'views/library_book_statistics_views.xml',
+        'views/library_borrower_type_views.xml',
+        'views/library_management_views.xml',
         'views/library_author_views.xml',
         'views/library_publisher_views.xml',
         'views/library_category_views.xml',
@@ -38,7 +52,6 @@
         'views/character_mapping_views.xml',
         'views/library_borrowing_views.xml',
         'views/library_reservation_views.xml',
-        'views/res_partner_views.xml',
         'views/res_config_settings_views.xml',
 
         # Menus (must be loaded before dashboard)

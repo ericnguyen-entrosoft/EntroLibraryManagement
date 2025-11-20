@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Book Label Wizard Form View -->
+    <record id="view_library_book_label_wizard_form" model="ir.ui.view">
+        <field name="name">library.book.label.wizard.form</field>
+        <field name="model">library.book.label.wizard</field>
+        <field name="arch" type="xml">
+            <form string="In nhãn sách">
+                <group>
+                    <group>
+                        <field name="print_format"/>
+                    </group>
+                    <group>
+                        <field name="custom_quantity"
+                               help="Nếu đặt giá trị này, tất cả các bản sao sẽ in với số lượng này"/>
+                    </group>
+                </group>
+                <separator string="Bản sao sách"/>
+                <field name="quant_line_ids" nolabel="1">
+                    <list string="Bản sao" editable="bottom" delete="true">
+                        <field name="registration_number"/>
+                        <field name="book_code"/>
+                        <field name="book_name"/>
+                        <field name="quant_id" invisible="1"/>
+                        <field name="quantity"/>
+                    </list>
+                </field>
+                <footer>
+                    <button name="process" string="In nhãn" type="object" class="btn-primary"/>
+                    <button string="Hủy" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <!-- Book Label Action -->
+    <record id="action_library_book_label_wizard" model="ir.actions.act_window">
+        <field name="name">In nhãn sách</field>
+        <field name="res_model">library.book.label.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="binding_model_id" ref="model_library_book_quant"/>
+        <field name="binding_view_types">list,form</field>
+    </record>
+</odoo>

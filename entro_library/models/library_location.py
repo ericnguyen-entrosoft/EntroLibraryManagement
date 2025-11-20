@@ -44,12 +44,14 @@ class LibraryLocation(models.Model):
     responsible_id = fields.Many2one('res.users', string='Người phụ trách')
 
     # Thống kê
-    book_ids = fields.One2many('library.book', 'location_id', string='Sách')
-    book_count = fields.Integer(string='Số sách', compute='_compute_book_count')
-    book_available_count = fields.Integer(
-        string='Số sách có sẵn',
-        compute='_compute_book_count'
+    quant_ids = fields.One2many('library.book.quant', 'location_id', string='Bản sao sách')
+    quant_count = fields.Integer(string='Số bản sao', compute='_compute_quant_count')
+    quant_available_count = fields.Integer(
+        string='Số bản sao có sẵn',
+        compute='_compute_quant_count'
     )
+    book_count = fields.Integer(string='Số đầu sách', compute='_compute_quant_count',
+                                help='Số lượng tác phẩm khác nhau (không tính bản sao)')
 
     note = fields.Text(string='Ghi chú')
     active = fields.Boolean(string='Hoạt động', default=True)
@@ -62,13 +64,15 @@ class LibraryLocation(models.Model):
             else:
                 location.complete_name = location.name
 
-    @api.depends('book_ids')
-    def _compute_book_count(self):
+    @api.depends('quant_ids', 'quant_ids.state', 'quant_ids.book_id')
+    def _compute_quant_count(self):
         for location in self:
-            location.book_count = len(location.book_ids)
-            location.book_available_count = len(
-                location.book_ids.filtered(lambda b: b.state == 'available')
+            location.quant_count = len(location.quant_ids)
+            location.quant_available_count = len(
+                location.quant_ids.filtered(lambda q: q.state == 'available')
             )
+            # Count unique books
+            location.book_count = len(location.quant_ids.mapped('book_id'))
 
     @api.constrains('parent_id')
     def _check_parent_id(self):
@@ -79,16 +83,28 @@ class LibraryLocation(models.Model):
         ('code_unique', 'unique(code)', 'Mã vị trí phải duy nhất!')
     ]
 
-    def action_view_books(self):
-        """View books at this location"""
+    def action_view_quants(self):
+        """View book quants at this location"""
         self.ensure_one()
         return {
-            'name': 'Sách tại vị trí này',
+            'name': 'Bản sao sách tại vị trí này',
             'type': 'ir.actions.act_window',
-            'res_model': 'library.book',
+            'res_model': 'library.book.quant',
             'view_mode': 'list,form',
             'domain': [('location_id', '=', self.id)],
             'context': {'default_location_id': self.id}
+        }
+
+    def action_view_books(self):
+        """View unique books at this location"""
+        self.ensure_one()
+        book_ids = self.quant_ids.mapped('book_id').ids
+        return {
+            'name': 'Đầu sách tại vị trí này',
+            'type': 'ir.actions.act_window',
+            'res_model': 'library.book',
+            'view_mode': 'list,form',
+            'domain': [('id', 'in', book_ids)],
         }
 
     def name_get(self):

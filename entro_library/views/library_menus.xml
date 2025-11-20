@@ -13,6 +13,13 @@
               action="action_library_book"
               sequence="10"/>
 
+    <!-- Book Quants Menu -->
+    <menuitem id="menu_library_book_quants"
+              name="Bản sao sách"
+              parent="menu_library_root"
+              action="action_library_book_quant"
+              sequence="15"/>
+
     <!-- Borrowing Management Menu -->
     <menuitem id="menu_library_borrowing_management"
               name="Mượn/Trả"
@@ -33,12 +40,32 @@
               action="action_library_reservation"
               sequence="20"/>
 
-    <!-- Borrowers Menu -->
+    <!-- Management Menu -->
+    <menuitem id="menu_library_management"
+              name="Quản lý"
+              parent="menu_library_root"
+              sequence="40"/>
+
+    <!-- Borrowers Menu (under Management) -->
     <menuitem id="menu_library_borrowers"
               name="Độc giả"
-              parent="menu_library_borrowing_management"
+              parent="menu_library_management"
               action="action_library_borrowers"
-              sequence="30"/>
+              sequence="5"/>
+
+    <!-- Storage Location Menu (under Management) -->
+    <menuitem id="menu_library_storage_location"
+              name="Vị trí lưu trữ"
+              parent="menu_library_management"
+              action="action_library_storage_location"
+              sequence="10"/>
+
+    <!-- Statistics Menu (under Management) -->
+    <menuitem id="menu_library_statistics"
+              name="Thống kê"
+              parent="menu_library_management"
+              action="action_library_statistics"
+              sequence="20"/>
 
     <!-- Reports Menu -->
     <menuitem id="menu_library_reports"
@@ -58,6 +85,13 @@
               name="Cấu hình"
               parent="menu_library_root"
               sequence="100"/>
+
+    <!-- Borrower Types Menu -->
+    <menuitem id="menu_library_borrower_types"
+              name="Loại độc giả"
+              parent="menu_library_config"
+              action="action_library_borrower_type"
+              sequence="3"/>
 
     <!-- Locations Menu -->
     <menuitem id="menu_library_locations"

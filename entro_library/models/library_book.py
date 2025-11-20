@@ -15,7 +15,6 @@ class LibraryBook(models.Model):
 
     # Thông tin trách nhiệm
     code = fields.Char(string='Mã', index=True)
-    registration_number = fields.Char(string='Số ĐKCB', index=True)
 
     # Tác giả
     author_ids = fields.Many2many(
@@ -68,65 +67,76 @@ class LibraryBook(models.Model):
     )
     category_id = fields.Many2one('library.category', string='Nhóm')
 
-    # Vị trí lưu trữ
-    location_id = fields.Many2one('library.location', string='Vị trí lưu trữ', index=True)
-    state = fields.Selection([
-        ('available', 'Có sẵn'),
-        ('borrowed', 'Đang mượn'),
-        ('reserved', 'Đã đặt trước'),
-        ('maintenance', 'Bảo trì'),
-        ('lost', 'Mất'),
-        ('damaged', 'Hư hỏng')
-    ], string='Trạng thái', default='available', required=True, tracking=True)
-
-    # Borrowing information
-    current_borrowing_id = fields.Many2one('library.borrowing', string='Phiếu mượn hiện tại', readonly=True)
-    current_borrower_id = fields.Many2one(
-        related='current_borrowing_id.borrower_id',
-        string='Người đang mượn',
+    # Quants (Physical copies)
+    quant_ids = fields.One2many('library.book.quant', 'book_id', string='Bản sao vật lý')
+    quant_count = fields.Integer(string='Số lượng bản sao', compute='_compute_quant_count', store=True)
+    available_quant_count = fields.Integer(
+        string='Số lượng có sẵn',
+        compute='_compute_quant_count',
         store=True
     )
-    borrowing_ids = fields.One2many('library.borrowing', 'book_id', string='Lịch sử mượn')
-    reservation_ids = fields.One2many('library.reservation', 'book_id', string='Đặt trước')
 
-    # Statistics
-    times_borrowed = fields.Integer(string='Số lần được mượn', compute='_compute_borrowing_stats', store=True)
-    current_reservation_count = fields.Integer(
-        string='Số người đang đặt trước',
-        compute='_compute_borrowing_stats',
+    # Statistics from quants
+    total_times_borrowed = fields.Integer(
+        string='Tổng số lần được mượn',
+        compute='_compute_book_stats',
+        store=True
+    )
+    total_reservation_count = fields.Integer(
+        string='Tổng số người đang đặt trước',
+        compute='_compute_book_stats',
         store=True
     )
 
     # Ghi chú
     note = fields.Text(string='Phụ chú')
 
+    # Images
+    book_image_ids = fields.One2many('library.book.image', 'book_id', string='Hình ảnh')
+
     # Trạng thái
     active = fields.Boolean(string='Hoạt động', default=True)
 
-    @api.depends('borrowing_ids.state', 'reservation_ids.state')
-    def _compute_borrowing_stats(self):
+    @api.depends('quant_ids', 'quant_ids.state')
+    def _compute_quant_count(self):
         for book in self:
-            book.times_borrowed = len(book.borrowing_ids.filtered(
-                lambda b: b.state in ('borrowed', 'returned', 'overdue')
-            ))
-            book.current_reservation_count = len(book.reservation_ids.filtered(
-                lambda r: r.state in ('active', 'available')
+            book.quant_count = len(book.quant_ids)
+            book.available_quant_count = len(book.quant_ids.filtered(
+                lambda q: q.state == 'available'
             ))
 
+    @api.depends('quant_ids.times_borrowed', 'quant_ids.current_reservation_count')
+    def _compute_book_stats(self):
+        for book in self:
+            book.total_times_borrowed = sum(book.quant_ids.mapped('times_borrowed'))
+            book.total_reservation_count = sum(book.quant_ids.mapped('current_reservation_count'))
+
+    def action_view_quants(self):
+        """View book's physical copies (quants)"""
+        self.ensure_one()
+        return {
+            'name': 'Bản sao vật lý',
+            'type': 'ir.actions.act_window',
+            'res_model': 'library.book.quant',
+            'view_mode': 'list,form',
+            'domain': [('book_id', '=', self.id)],
+            'context': {'default_book_id': self.id}
+        }
+
     def action_view_borrowings(self):
-        """View book's borrowing history"""
+        """View all borrowing history for this book's quants"""
         self.ensure_one()
         return {
             'name': 'Lịch sử mượn',
             'type': 'ir.actions.act_window',
-            'res_model': 'library.borrowing',
+            'res_model': 'library.borrowing.line',
             'view_mode': 'list,form',
             'domain': [('book_id', '=', self.id)],
             'context': {'default_book_id': self.id}
         }
 
     def action_view_reservations(self):
-        """View book's reservations"""
+        """View all reservations for this book's quants"""
         self.ensure_one()
         return {
             'name': 'Đặt trước',
@@ -216,6 +226,21 @@ class LibraryBook(models.Model):
                 cutter += second_letter
 
             record.cutter_number = cutter
+
+    def action_create_quants(self):
+        """Open wizard to create multiple book quants"""
+        self.ensure_one()
+        return {
+            'name': 'Tạo bản sao sách',
+            'type': 'ir.actions.act_window',
+            'res_model': 'library.book.create.quant.wizard',
+            'view_mode': 'form',
+            'target': 'new',
+            'context': {
+                'default_book_id': self.id,
+                'default_quantity': 1,
+            }
+        }
 
     @api.depends('name', 'code')
     def _compute_display_name(self):

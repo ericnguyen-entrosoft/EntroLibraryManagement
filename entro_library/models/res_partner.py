@@ -7,13 +7,7 @@ class ResPartner(models.Model):
 
     # Borrower information
     is_borrower = fields.Boolean(string='Là độc giả', default=False)
-    borrower_type = fields.Selection([
-        ('student', 'Sinh viên'),
-        ('teacher', 'Giáo viên'),
-        ('staff', 'Nhân viên'),
-        ('public', 'Công chúng'),
-        ('other', 'Khác')
-    ], string='Loại độc giả')
+    borrower_type = fields.Many2one('library.borrower.type', string='Loại độc giả')
 
     borrower_code = fields.Char(string='Mã độc giả', copy=False)
     membership_date = fields.Date(string='Ngày đăng ký')
@@ -39,9 +33,9 @@ class ResPartner(models.Model):
     reservation_ids = fields.One2many('library.reservation', 'borrower_id', string='Đặt trước')
 
     # Statistics
-    borrowing_count = fields.Integer(string='Tổng số lần mượn', compute='_compute_borrowing_stats', store=True)
-    current_borrowing_count = fields.Integer(string='Đang mượn', compute='_compute_borrowing_stats', store=True)
-    overdue_count = fields.Integer(string='Quá hạn', compute='_compute_borrowing_stats', store=True)
+    borrowing_count = fields.Integer(string='Tổng số phiếu mượn', compute='_compute_borrowing_stats', store=True)
+    current_borrowing_count = fields.Integer(string='Đang mượn (số sách)', compute='_compute_borrowing_stats', store=True)
+    overdue_count = fields.Integer(string='Quá hạn (số sách)', compute='_compute_borrowing_stats', store=True)
     total_fine = fields.Float(string='Tổng tiền phạt', compute='_compute_borrowing_stats', store=True)
     reservation_count = fields.Integer(string='Đang đặt trước', compute='_compute_borrowing_stats', store=True)
 
@@ -57,15 +51,26 @@ class ResPartner(models.Model):
             else:
                 record.is_membership_active = False
 
-    @api.depends('borrowing_ids.state', 'borrowing_ids.fine_amount', 'reservation_ids.state')
+    @api.depends('borrowing_ids.state', 'borrowing_ids.fine_amount',
+                 'borrowing_ids.borrowing_line_ids.state', 'reservation_ids.state')
     def _compute_borrowing_stats(self):
         for partner in self:
             all_borrowings = partner.borrowing_ids
             partner.borrowing_count = len(all_borrowings)
-            partner.current_borrowing_count = len(all_borrowings.filtered(
-                lambda b: b.state in ('borrowed', 'overdue')
-            ))
-            partner.overdue_count = len(all_borrowings.filtered(lambda b: b.state == 'overdue'))
+
+            # Count books from borrowing lines instead of borrowings
+            current_books = 0
+            overdue_books = 0
+            for borrowing in all_borrowings:
+                current_books += len(borrowing.borrowing_line_ids.filtered(
+                    lambda l: l.state in ('borrowed', 'overdue')
+                ))
+                overdue_books += len(borrowing.borrowing_line_ids.filtered(
+                    lambda l: l.state == 'overdue'
+                ))
+
+            partner.current_borrowing_count = current_books
+            partner.overdue_count = overdue_books
             partner.total_fine = sum(all_borrowings.filtered(
                 lambda b: b.state in ('borrowed', 'overdue')
             ).mapped('fine_amount'))

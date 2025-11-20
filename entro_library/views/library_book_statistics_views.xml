@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Statistics List View -->
+    <record id="view_library_book_statistics_list" model="ir.ui.view">
+        <field name="name">library.book.statistics.list</field>
+        <field name="model">library.book.statistics</field>
+        <field name="arch" type="xml">
+            <list string="Thống kê sách" create="false" edit="false" delete="false">
+                <field name="name"/>
+                <field name="code"/>
+                <field name="author_names"/>
+                <field name="category_id"/>
+                <field name="number_available_qty"/>
+                <field name="number_borrowed_qty"/>
+                <field name="total_qty"/>
+                <button name="action_view_books" type="object" string="Xem chi tiết" class="btn-link"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Statistics Search View -->
+    <record id="view_library_book_statistics_search" model="ir.ui.view">
+        <field name="name">library.book.statistics.search</field>
+        <field name="model">library.book.statistics</field>
+        <field name="arch" type="xml">
+            <search string="Tìm kiếm thống kê">
+                <field name="name"/>
+                <field name="code"/>
+                <field name="author_names"/>
+                <field name="category_id"/>
+                <group expand="0" string="Group By">
+                    <filter string="Nhóm" name="group_by_category" context="{'group_by': 'category_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Statistics Action -->
+    <record id="action_library_statistics" model="ir.actions.act_window">
+        <field name="name">Thống kê</field>
+        <field name="res_model">library.book.statistics</field>
+        <field name="view_mode">list</field>
+        <field name="search_view_id" ref="view_library_book_statistics_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Thống kê sách theo mã
+            </p>
+            <p>
+                Báo cáo này hiển thị số lượng sách có sẵn, đang mượn và tổng số lượng theo từng mã sách.
+            </p>
+        </field>
+    </record>
+</odoo>

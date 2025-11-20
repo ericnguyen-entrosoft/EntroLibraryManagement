@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Storage Location List View - Now showing book quants (physical copies) -->
+    <record id="view_library_storage_location_list" model="ir.ui.view">
+        <field name="name">library.storage.location.list</field>
+        <field name="model">library.book.quant</field>
+        <field name="arch" type="xml">
+            <list string="Vị trí lưu trữ">
+                <field name="book_id"/>
+                <field name="registration_number"/>
+                <field name="location_id"/>
+                <field name="state" widget="badge"
+                       decoration-success="state == 'available'"
+                       decoration-warning="state in ('borrowed', 'reserved')"
+                       decoration-danger="state in ('lost', 'damaged')"/>
+                <field name="times_borrowed"/>
+                <field name="current_borrower_id"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Storage Location Action -->
+    <record id="action_library_storage_location" model="ir.actions.act_window">
+        <field name="name">Vị trí lưu trữ</field>
+        <field name="res_model">library.book.quant</field>
+        <field name="view_mode">list,form</field>
+        <field name="view_id" ref="view_library_storage_location_list"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Danh sách bản sao sách theo vị trí lưu trữ
+            </p>
+        </field>
+    </record>
+</odoo>

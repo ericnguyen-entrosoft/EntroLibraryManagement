@@ -1,5 +1,9 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_library_book_user,library.book.user,model_library_book,base.group_user,1,1,1,1
+access_library_book_quant_user,library.book.quant.user,model_library_book_quant,base.group_user,1,1,1,1
+access_library_book_image_user,library.book.image.user,model_library_book_image,base.group_user,1,1,1,1
+access_library_book_statistics_user,library.book.statistics.user,model_library_book_statistics,base.group_user,1,0,0,0
+access_library_borrower_type_user,library.borrower.type.user,model_library_borrower_type,base.group_user,1,1,1,1
 access_library_author_user,library.author.user,model_library_author,base.group_user,1,1,1,1
 access_library_publisher_user,library.publisher.user,model_library_publisher,base.group_user,1,1,1,1
 access_library_category_user,library.category.user,model_library_category,base.group_user,1,1,1,1
@@ -7,6 +11,14 @@ access_library_series_user,library.series.user,model_library_series,base.group_u
 access_library_location_user,library.location.user,model_library_location,base.group_user,1,1,1,1
 access_character_mapping_user,character.mapping.user,model_character_mapping,base.group_user,1,1,1,1
 access_library_borrowing_user,library.borrowing.user,model_library_borrowing,base.group_user,1,1,1,1
+access_library_borrowing_line_user,library.borrowing.line.user,model_library_borrowing_line,base.group_user,1,1,1,1
+access_library_borrowing_system,library.borrowing.system,model_library_borrowing,base.group_system,1,1,1,1
+access_library_borrowing_line_system,library.borrowing.line.system,model_library_borrowing_line,base.group_system,1,1,1,1
 access_library_borrowing_portal,library.borrowing.portal,model_library_borrowing,base.group_portal,1,0,0,0
+access_library_borrowing_line_portal,library.borrowing.line.portal,model_library_borrowing_line,base.group_portal,1,0,0,0
 access_library_reservation_user,library.reservation.user,model_library_reservation,base.group_user,1,1,1,1
 access_library_reservation_portal,library.reservation.portal,model_library_reservation,base.group_portal,1,0,0,0
+access_library_book_create_quant_wizard_user,library.book.create.quant.wizard.user,model_library_book_create_quant_wizard,base.group_user,1,1,1,1
+access_library_book_create_quant_wizard_line_user,library.book.create.quant.wizard.line.user,model_library_book_create_quant_wizard_line,base.group_user,1,1,1,1
+access_library_book_label_wizard_user,library.book.label.wizard.user,model_library_book_label_wizard,base.group_user,1,1,1,1
+access_library_book_label_line_user,library.book.label.line.user,model_library_book_label_line,base.group_user,1,1,1,1

@@ -13,6 +13,8 @@ class LibraryReservation(models.Model):
                        copy=False, readonly=True, default='New')
     borrower_id = fields.Many2one(
         'res.partner', string='Người đặt', required=True, tracking=True)
+    quant_id = fields.Many2one(
+        'library.book.quant', string='Bản sao sách', tracking=True)
     book_id = fields.Many2one(
         'library.book', string='Sách', required=True, tracking=True)
 
@@ -47,8 +49,12 @@ class LibraryReservation(models.Model):
                             string='Mã sách', store=True)
     book_name = fields.Char(related='book_id.name',
                             string='Tên sách', store=True)
-    book_state = fields.Selection(
-        related='book_id.state', string='Trạng thái sách')
+
+    # Quant info
+    registration_number = fields.Char(
+        related='quant_id.registration_number', string='Số ĐKCB', store=True)
+    quant_state = fields.Selection(
+        related='quant_id.state', string='Trạng thái bản sao')
 
     # Borrower info
     borrower_email = fields.Char(related='borrower_id.email', string='Email')
@@ -73,30 +79,33 @@ class LibraryReservation(models.Model):
             self.expiry_date = self.reservation_date + \
                 timedelta(days=hold_days)
 
-    @api.constrains('borrower_id', 'book_id')
+    @api.constrains('borrower_id', 'quant_id')
     def _check_reservation_constraints(self):
         for record in self:
-            # Check if borrower already has active reservation for this book
+            if not record.quant_id:
+                continue
+
+            # Check if borrower already has active reservation for this quant
             existing = self.search([
                 ('borrower_id', '=', record.borrower_id.id),
-                ('book_id', '=', record.book_id.id),
+                ('quant_id', '=', record.quant_id.id),
                 ('state', 'in', ('draft', 'active', 'available')),
                 ('id', '!=', record.id)
             ])
             if existing:
                 raise exceptions.ValidationError(
-                    f'Bạn đã có đặt trước cho sách "{record.book_id.name}" rồi!'
+                    f'Bạn đã có đặt trước cho bản sao sách [{record.quant_id.registration_number}] "{record.book_id.name}" rồi!'
                 )
 
-            # Check if borrower is currently borrowing this book
-            current_borrowing = self.env['library.borrowing'].search([
-                ('borrower_id', '=', record.borrower_id.id),
-                ('book_id', '=', record.book_id.id),
+            # Check if borrower is currently borrowing this quant
+            current_borrowing = self.env['library.borrowing.line'].search([
+                ('borrowing_id.borrower_id', '=', record.borrower_id.id),
+                ('quant_id', '=', record.quant_id.id),
                 ('state', 'in', ('borrowed', 'overdue'))
             ], limit=1)
             if current_borrowing:
                 raise exceptions.ValidationError(
-                    f'Bạn đang mượn sách "{record.book_id.name}"!'
+                    f'Bạn đang mượn bản sao sách [{record.quant_id.registration_number}] "{record.book_id.name}"!'
                 )
 
     def action_confirm(self):
@@ -105,33 +114,34 @@ class LibraryReservation(models.Model):
             record.state = 'active'
 
     def action_notify_available(self):
-        """Notify borrower that book is available"""
+        """Notify borrower that quant is available"""
         for record in self:
             record.state = 'available'
             record.notification_date = fields.Date.today()
-            record.book_id.write({'state': 'reserved'})
+            if record.quant_id:
+                record.quant_id.write({'state': 'reserved'})
             # Send email notification
             if record.borrower_email:
                 record._send_available_email()
 
     def action_fulfill(self):
-        """Mark reservation as fulfilled (book borrowed)"""
+        """Mark reservation as fulfilled (quant borrowed)"""
         for record in self:
             record.state = 'fulfilled'
-            # Create borrowing record
-            borrowing = self.env['library.borrowing'].create({
-                'borrower_id': record.borrower_id.id,
-                'book_id': record.book_id.id,
-                'borrow_date': fields.Date.today(),
-                'notes': f'Từ đặt trước: {record.name}'
-            })
-            borrowing.action_confirm()
+            # Create borrowing record with quant
+            if record.quant_id:
+                borrowing = self.env['library.borrowing'].create({
+                    'borrower_id': record.borrower_id.id,
+                    'borrow_date': fields.Date.today(),
+                    'notes': f'Từ đặt trước: {record.name}'
+                })
+                borrowing.action_confirm()
 
     def action_cancel(self):
         """Hủy đặt trước"""
         for record in self:
-            if record.state == 'available':
-                record.book_id.write({'state': 'available'})
+            if record.state == 'available' and record.quant_id:
+                record.quant_id.write({'state': 'available'})
             record.state = 'cancelled'
 
     def action_set_to_draft(self):
@@ -157,12 +167,20 @@ class LibraryReservation(models.Model):
         ])
         for reservation in expired:
             reservation.state = 'expired'
-            reservation.book_id.write({'state': 'available'})
+            if reservation.quant_id:
+                reservation.quant_id.write({'state': 'available'})
 
-            # Notify next person in queue
-            next_reservation = self.search([
-                ('book_id', '=', reservation.book_id.id),
-                ('state', '=', 'active')
-            ], order='priority desc, reservation_date', limit=1)
+            # Notify next person in queue for same quant or book
+            if reservation.quant_id:
+                next_reservation = self.search([
+                    ('quant_id', '=', reservation.quant_id.id),
+                    ('state', '=', 'active')
+                ], order='priority desc, reservation_date', limit=1)
+            else:
+                next_reservation = self.search([
+                    ('book_id', '=', reservation.book_id.id),
+                    ('state', '=', 'active')
+                ], order='priority desc, reservation_date', limit=1)
+
             if next_reservation:
                 next_reservation.action_notify_available()

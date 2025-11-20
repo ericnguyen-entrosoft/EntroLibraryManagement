@@ -1,4 +1,7 @@
 from . import library_book
+from . import library_book_quant
+from . import library_book_image
+from . import library_borrower_type
 from . import library_author
 from . import library_publisher
 from . import library_category
@@ -6,7 +9,9 @@ from . import library_series
 from . import library_location
 from . import character_mapping
 from . import library_borrowing
+from . import library_borrowing_line
 from . import library_reservation
 from . import res_partner
 from . import res_config_settings
 from . import library_dashboard
+from . import library_book_statistics

@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Wizard Line Tree View -->
+    <record id="view_library_book_create_quant_wizard_line_list" model="ir.ui.view">
+        <field name="name">library.book.create.quant.wizard.line.list</field>
+        <field name="model">library.book.create.quant.wizard.line</field>
+        <field name="arch" type="xml">
+            <list string="Bản sao" editable="bottom" create="true" delete="true">
+                <field name="registration_number" required="True"/>
+                <field name="location_id" optional="show"/>
+                <field name="note" optional="show"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Wizard Form View -->
+    <record id="view_library_book_create_quant_wizard_form" model="ir.ui.view">
+        <field name="name">library.book.create.quant.wizard.form</field>
+        <field name="model">library.book.create.quant.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Tạo bản sao sách">
+                <group>
+                    <group>
+                        <field name="book_id" readonly="1"/>
+                        <field name="quantity"/>
+                    </group>
+                    <group>
+                        <field name="location_id" placeholder="Chọn vị trí mặc định (tùy chọn)"/>
+                    </group>
+                </group>
+                <separator string="Danh sách bản sao sẽ tạo"/>
+                <field name="line_ids" nolabel="1"/>
+                <footer>
+                    <button name="action_create_quants" string="Tạo bản sao" type="object" class="btn-primary"/>
+                    <button string="Hủy" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <!-- Wizard Action -->
+    <record id="action_library_book_create_quant_wizard" model="ir.actions.act_window">
+        <field name="name">Tạo bản sao sách</field>
+        <field name="res_model">library.book.create.quant.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="binding_model_id" ref="model_library_book"/>
+        <field name="binding_view_types">form</field>
+    </record>
+</odoo>

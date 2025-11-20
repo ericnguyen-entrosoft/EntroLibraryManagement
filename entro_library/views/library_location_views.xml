@@ -11,8 +11,9 @@
                 <field name="location_type"/>
                 <field name="responsible_id" widget="many2one_avatar_user"/>
                 <field name="capacity"/>
-                <field name="book_count"/>
-                <field name="book_available_count"/>
+                <field name="book_count" string="Đầu sách"/>
+                <field name="quant_count" string="Bản sao"/>
+                <field name="quant_available_count" string="Có sẵn"/>
             </list>
         </field>
     </record>
@@ -29,7 +30,15 @@
                             <field name="active" widget="boolean_button" options='{"terminology": "archive"}'/>
                         </button>
                         <button class="oe_stat_button" type="object" name="action_view_books" icon="fa-book">
-                            <field name="book_count" widget="statinfo" string="Sách"/>
+                            <field name="book_count" widget="statinfo" string="Đầu sách"/>
+                        </button>
+                        <button class="oe_stat_button" type="object" name="action_view_quants" icon="fa-cubes">
+                            <div class="o_field_widget o_stat_info">
+                                <span class="o_stat_value">
+                                    <field name="quant_available_count"/> / <field name="quant_count"/>
+                                </span>
+                                <span class="o_stat_text">Bản sao</span>
+                            </div>
                         </button>
                     </div>
                     <group>
@@ -42,8 +51,6 @@
                         <group>
                             <field name="responsible_id" widget="many2one_avatar_user"/>
                             <field name="capacity"/>
-                            <field name="book_count"/>
-                            <field name="book_available_count"/>
                         </group>
                     </group>
                     <group>
@@ -62,13 +69,17 @@
                                 </list>
                             </field>
                         </page>
-                        <page string="Sách tại vị trí này" name="books">
-                            <field name="book_ids" nolabel="1">
-                                <list string="Sách">
-                                    <field name="code"/>
-                                    <field name="name"/>
-                                    <field name="author_ids" widget="many2many_tags"/>
-                                    <field name="state" widget="badge" decoration-success="state == 'available'" decoration-warning="state in ('borrowed', 'reserved')" decoration-danger="state in ('lost', 'damaged')"/>
+                        <page string="Bản sao sách" name="quants">
+                            <field name="quant_ids" nolabel="1">
+                                <list string="Bản sao sách">
+                                    <field name="registration_number"/>
+                                    <field name="book_id"/>
+                                    <field name="state" widget="badge"
+                                           decoration-success="state == 'available'"
+                                           decoration-warning="state in ('borrowed', 'reserved')"
+                                           decoration-danger="state in ('lost', 'damaged')"/>
+                                    <field name="times_borrowed"/>
+                                    <field name="current_borrower_id"/>
                                 </list>
                             </field>
                         </page>
