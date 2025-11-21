@@ -53,13 +53,6 @@
               action="action_library_storage_location"
               sequence="10"/>
 
-    <!-- Statistics Menu (under Management) -->
-    <menuitem id="menu_library_statistics"
-              name="Thống kê"
-              parent="menu_library_management"
-              action="action_library_statistics"
-              sequence="20"/>
-
     <!-- Reports Menu -->
     <menuitem id="menu_library_reports"
               name="Báo cáo"
@@ -72,6 +65,13 @@
               parent="menu_library_reports"
               action="action_library_borrowing_line_report"
               sequence="5"/>
+
+    <!-- Statistics Menu -->
+    <menuitem id="menu_library_statistics"
+              name="Thống kê"
+              parent="menu_library_reports"
+              action="action_library_statistics"
+              sequence="10"/>
 
     <!-- Overdue Books Report -->
     <menuitem id="menu_library_overdue_report"

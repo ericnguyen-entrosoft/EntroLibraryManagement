@@ -2,7 +2,6 @@ id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_library_book_user,library.book.user,model_library_book,base.group_user,1,1,1,1
 access_library_book_quant_user,library.book.quant.user,model_library_book_quant,base.group_user,1,1,1,1
 access_library_book_image_user,library.book.image.user,model_library_book_image,base.group_user,1,1,1,1
-access_library_book_statistics_user,library.book.statistics.user,model_library_book_statistics,base.group_user,1,0,0,0
 access_library_borrower_type_user,library.borrower.type.user,model_library_borrower_type,base.group_user,1,1,1,1
 access_library_author_user,library.author.user,model_library_author,base.group_user,1,1,1,1
 access_library_publisher_user,library.publisher.user,model_library_publisher,base.group_user,1,1,1,1

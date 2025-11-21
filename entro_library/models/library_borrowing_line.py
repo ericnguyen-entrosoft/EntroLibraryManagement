@@ -22,8 +22,8 @@ class LibraryBorrowingLine(models.Model):
         domain="[('id', 'in', available_quant_ids)]", ondelete='restrict')
 
     # Dates
-    due_date = fields.Date(string='Ngày hạn trả', required=True)
-    return_date = fields.Date(string='Ngày trả thực tế')
+    due_date = fields.Date(string='Hạn trả', required=True)
+    return_date = fields.Date(string='Ngày trả')
 
     # State
     state = fields.Selection([

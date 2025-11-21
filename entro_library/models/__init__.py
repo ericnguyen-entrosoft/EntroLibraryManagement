@@ -16,4 +16,3 @@ from . import library_reservation
 from . import res_partner
 from . import res_config_settings
 from . import library_dashboard
-from . import library_book_statistics

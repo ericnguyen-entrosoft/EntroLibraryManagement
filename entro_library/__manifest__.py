@@ -20,7 +20,7 @@
     """,
     'author': 'Entro',
     'website': 'https://www.entro.vn',
-    'depends': ['base', 'mail'],
+    'depends': ['base', 'mail', 'barcodes'],
     'data': [
         # Data
         'data/library_data.xml',

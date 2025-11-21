@@ -45,6 +45,7 @@
                            statusbar_visible="draft,borrowed,returned"/>
                 </header>
                 <sheet>
+                    <field name="_barcode_scanned" widget="barcode_handler" invisible="1"/>
                     <div class="oe_title">
                         <h1>
                             <field name="name" readonly="1"/>
@@ -228,15 +229,14 @@
                 <field name="borrowing_id" string="Phiếu mượn"/>
                 <field name="borrower_id"/>
                 <field name="borrow_date"/>
-                <field name="quant_id"/>
-                <field name="registration_number"/>
+                <field name="quant_id" column_invisible="1"/>
                 <field name="book_id"/>
-                <field name="book_name" optional="hide"/>
-                <field name="quant_location" optional="show"/>
+                <field name="registration_number"/>
+                <field name="quant_location" optional="hide"/>
                 <field name="due_date"/>
                 <field name="return_date" optional="show"/>
-                <field name="late_days" optional="show"/>
-                <field name="fine_amount" widget="monetary" optional="show"/>
+                <field name="late_days" column_invisible="1"/>
+                <field name="fine_amount" widget="monetary" optional="hide"/>
                 <field name="state" widget="badge"
                        decoration-info="state == 'draft'"
                        decoration-primary="state == 'borrowed'"

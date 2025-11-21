@@ -7,7 +7,7 @@ class LibraryBorrowing(models.Model):
     _name = 'library.borrowing'
     _description = 'Quản lý mượn sách'
     _order = 'borrow_date desc, id desc'
-    _inherit = ['mail.thread', 'mail.activity.mixin', 'library.sequence.mixin']
+    _inherit = ['mail.thread', 'mail.activity.mixin', 'library.sequence.mixin', 'barcodes.barcode_events_mixin']
 
     # Override sequence.mixin settings
     _sequence_field = "name"
@@ -394,3 +394,56 @@ class LibraryBorrowing(models.Model):
         for borrowing in borrowings:
             if borrowing.borrower_email:
                 borrowing._send_due_reminder_email()
+
+    def on_barcode_scanned(self, barcode):
+        """Handle barcode scanning event"""
+        # Search for quant with matching registration_number
+        quant = self.env['library.book.quant'].search([
+            ('registration_number', '=', barcode),
+            ('state', '=', 'available'),
+            ('quant_type', '=', 'can_borrow')
+        ], limit=1)
+
+        if not quant:
+            return {
+                'warning': {
+                    'title': 'Không tìm thấy',
+                    'message': f'Không tìm thấy sách có số ĐKCB "{barcode}" hoặc sách không khả dụng để mượn.'
+                }
+            }
+
+        # Check if quant already exists in current borrowing lines
+        existing_line = self.borrowing_line_ids.filtered(
+            lambda l: l.quant_id.id == quant.id and l.state == 'draft'
+        )
+        if existing_line:
+            return {
+                'warning': {
+                    'title': 'Đã tồn tại',
+                    'message': f'Sách [{quant.registration_number}] "{quant.book_id.name}" đã có trong danh sách.'
+                }
+            }
+
+        # Calculate default due date
+        config = self.env['ir.config_parameter'].sudo()
+        default_days = int(config.get_param('library.default_borrowing_days', default=14))
+        due_date = self.borrow_date + timedelta(days=default_days)
+
+        # Add new borrowing line
+        self.borrowing_line_ids = [(0, 0, {
+            'book_id': quant.book_id.id,
+            'quant_id': quant.id,
+            'due_date': due_date,
+            'state': 'draft'
+        })]
+
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'title': 'Thành công',
+                'message': f'Đã thêm [{quant.registration_number}] "{quant.book_id.name}"',
+                'type': 'success',
+                'sticky': False,
+            }
+        }

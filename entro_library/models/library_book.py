@@ -73,13 +73,13 @@ class LibraryBook(models.Model):
     quant_ids = fields.One2many(
         'library.book.quant', 'book_id', string='Bản sao vật lý')
     quant_count = fields.Integer(
-        string='Số lượng bản sao',
+        string='Số lượng',
         compute='_compute_quantities',
         compute_sudo=False,
         help='Tổng số bản sao vật lý của sách này'
     )
     available_quant_count = fields.Integer(
-        string='Số lượng có sẵn',
+        string='Có sẵn',
         compute='_compute_quantities',
         compute_sudo=False,
         help='Số lượng bản sao đã có số ĐKCB và có sẵn để mượn'
@@ -91,7 +91,7 @@ class LibraryBook(models.Model):
         help='Số lượng bản sao đang được mượn'
     )
     total_reservation_count = fields.Integer(
-        string='Tổng số người đang đặt trước',
+        string='Đặt trước',
         compute='_compute_quantities',
         compute_sudo=False,
         help='Tổng số người đang đặt trước sách này'
