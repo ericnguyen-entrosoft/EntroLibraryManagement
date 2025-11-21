@@ -6,8 +6,8 @@
         <field name="model">library.book.statistics</field>
         <field name="arch" type="xml">
             <list string="Thống kê sách" create="false" edit="false" delete="false">
+                <field name="book_id"/>
                 <field name="name"/>
-                <field name="code"/>
                 <field name="author_names"/>
                 <field name="category_id"/>
                 <field name="number_available_qty"/>
@@ -25,7 +25,7 @@
         <field name="arch" type="xml">
             <search string="Tìm kiếm thống kê">
                 <field name="name"/>
-                <field name="code"/>
+                <field name="book_id"/>
                 <field name="author_names"/>
                 <field name="category_id"/>
                 <group expand="0" string="Group By">
@@ -43,10 +43,10 @@
         <field name="search_view_id" ref="view_library_book_statistics_search"/>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
-                Thống kê sách theo mã
+                Thống kê sách
             </p>
             <p>
-                Báo cáo này hiển thị số lượng sách có sẵn, đang mượn và tổng số lượng theo từng mã sách.
+                Báo cáo này hiển thị số lượng sách có sẵn, đang mượn và tổng số lượng theo từng đầu sách.
             </p>
         </field>
     </record>

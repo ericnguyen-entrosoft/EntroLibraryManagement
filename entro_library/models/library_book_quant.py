@@ -7,6 +7,7 @@ class LibraryBookQuant(models.Model):
     _description = 'Quản lý bản sao sách vật lý'
     _inherit = ['mail.thread', 'mail.activity.mixin']
     _order = 'registration_number'
+    _rec_name = 'registration_number'
 
     name = fields.Char(
         string='Tên',
@@ -83,14 +84,8 @@ class LibraryBookQuant(models.Model):
         string='Đặt trước'
     )
 
-    # Statistics
-    times_borrowed = fields.Integer(
-        string='Số lần được mượn',
-        compute='_compute_borrowing_stats',
-        store=True
-    )
     current_reservation_count = fields.Integer(
-        string='Số người đang đặt trước',
+        string='Đặt trước',
         compute='_compute_borrowing_stats',
         store=True
     )
@@ -122,12 +117,9 @@ class LibraryBookQuant(models.Model):
             else:
                 quant.name = 'Bản sao mới'
 
-    @api.depends('borrowing_line_ids.state', 'reservation_ids.state')
+    @api.depends('reservation_ids.state')
     def _compute_borrowing_stats(self):
         for quant in self:
-            quant.times_borrowed = len(quant.borrowing_line_ids.filtered(
-                lambda b: b.state in ('borrowed', 'returned', 'overdue')
-            ))
             quant.current_reservation_count = len(quant.reservation_ids.filtered(
                 lambda r: r.state in ('active', 'available')
             ))

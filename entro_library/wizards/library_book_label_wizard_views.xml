@@ -19,7 +19,6 @@
                 <field name="quant_line_ids" nolabel="1">
                     <list string="Bản sao" editable="bottom" delete="true">
                         <field name="registration_number"/>
-                        <field name="book_code"/>
                         <field name="book_name"/>
                         <field name="quant_id" invisible="1"/>
                         <field name="quantity"/>

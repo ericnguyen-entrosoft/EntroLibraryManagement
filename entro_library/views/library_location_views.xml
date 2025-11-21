@@ -26,19 +26,16 @@
             <form string="Vị trí lưu trữ">
                 <sheet>
                     <div class="oe_button_box" name="button_box">
-                        <button class="oe_stat_button" name="toggle_active" type="object" icon="fa-archive">
-                            <field name="active" widget="boolean_button" options='{"terminology": "archive"}'/>
-                        </button>
-                        <button class="oe_stat_button" type="object" name="action_view_books" icon="fa-book">
-                            <field name="book_count" widget="statinfo" string="Đầu sách"/>
-                        </button>
                         <button class="oe_stat_button" type="object" name="action_view_quants" icon="fa-cubes">
                             <div class="o_field_widget o_stat_info">
                                 <span class="o_stat_value">
-                                    <field name="quant_available_count"/> / <field name="quant_count"/>
+                                    <field name="quant_count"/>
                                 </span>
-                                <span class="o_stat_text">Bản sao</span>
+                                <span class="o_stat_text">Sách</span>
                             </div>
+                        </button>
+                        <button class="oe_stat_button" type="object" name="action_view_children" icon="fa-sitemap">
+                            <field name="child_count" widget="statinfo" string="Vị trí con"/>
                         </button>
                     </div>
                     <group>
@@ -51,38 +48,13 @@
                         <group>
                             <field name="responsible_id" widget="many2one_avatar_user"/>
                             <field name="capacity"/>
+                            <field name="skip_register_number"/>
                         </group>
                     </group>
                     <group>
-                        <field name="address" placeholder="Nhập địa chỉ..."/>
                         <field name="description" placeholder="Nhập mô tả vị trí..."/>
                     </group>
                     <notebook>
-                        <page string="Vị trí con" name="children">
-                            <field name="child_ids" nolabel="1">
-                                <list string="Vị trí con">
-                                    <field name="code"/>
-                                    <field name="name"/>
-                                    <field name="location_type"/>
-                                    <field name="book_count"/>
-                                    <field name="capacity"/>
-                                </list>
-                            </field>
-                        </page>
-                        <page string="Bản sao sách" name="quants">
-                            <field name="quant_ids" nolabel="1">
-                                <list string="Bản sao sách">
-                                    <field name="registration_number"/>
-                                    <field name="book_id"/>
-                                    <field name="state" widget="badge"
-                                           decoration-success="state == 'available'"
-                                           decoration-warning="state in ('borrowed', 'reserved')"
-                                           decoration-danger="state in ('lost', 'damaged')"/>
-                                    <field name="times_borrowed"/>
-                                    <field name="current_borrower_id"/>
-                                </list>
-                            </field>
-                        </page>
                         <page string="Ghi chú" name="notes">
                             <field name="note" placeholder="Nhập ghi chú..."/>
                         </page>
@@ -106,9 +78,10 @@
                 <filter string="Hoạt động" name="active" domain="[('active', '=', True)]"/>
                 <filter string="Đã lưu trữ" name="inactive" domain="[('active', '=', False)]"/>
                 <separator/>
-                <filter string="Kho" name="type_warehouse" domain="[('location_type', '=', 'warehouse')]"/>
-                <filter string="Giá sách" name="type_shelf" domain="[('location_type', '=', 'shelf')]"/>
-                <filter string="Vị trí cụ thể" name="type_position" domain="[('location_type', '=', 'position')]"/>
+                <filter string="Khu vực" name="type_area" domain="[('location_type', '=', 'area')]"/>
+                <filter string="Lưu trữ" name="type_storage" domain="[('location_type', '=', 'storage')]"/>
+                <filter string="Hủy" name="type_destroy" domain="[('location_type', '=', 'destroy')]"/>
+                <filter string="Độc giả" name="type_reader" domain="[('location_type', '=', 'reader')]"/>
                 <separator/>
                 <group expand="0" string="Nhóm theo">
                     <filter string="Loại vị trí" name="group_type" context="{'group_by': 'location_type'}"/>

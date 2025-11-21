@@ -52,23 +52,24 @@
                     </div>
                     <group>
                         <group string="Thông tin độc giả">
-                            <field name="borrower_id" options="{'no_create': True}"/>
+                            <field name="borrower_id" options="{'no_create': True}" readonly="state != 'draft'"/>
                             <field name="borrower_email" readonly="1"/>
                             <field name="borrower_phone" readonly="1"/>
                         </group>
                         <group string="Thông tin mượn">
-                            <field name="borrow_date"/>
-                            <field name="librarian_id"/>
+                            <field name="borrow_date" readonly="state != 'draft'"/>
+                            <field name="librarian_id" readonly="state != 'draft'"/>
                             <field name="book_count" readonly="1"/>
                         </group>
                     </group>
                     <notebook>
-                        <page string="Danh sách sách" name="books">
-                            <field name="borrowing_line_ids">
+                        <page string="Chi tiết" name="books">
+                            <field name="borrowing_line_ids" readonly="state != 'draft'">
                                 <list editable="bottom" decoration-danger="is_overdue == True" decoration-success="state == 'returned'">
                                     <field name="sequence" widget="handle"/>
+                                    <field name="book_id" options="{'no_create': True}"/>
+                                    <field name="available_quant_ids" column_invisible="1"/>
                                     <field name="quant_id" options="{'no_create': True}" string="Số ĐKCB"/>
-                                    <field name="book_id" readonly="1" optional="show"/>
                                     <field name="quant_location" readonly="1" optional="show"/>
                                     <field name="due_date"/>
                                     <field name="return_date" readonly="1" optional="hide"/>
@@ -97,7 +98,7 @@
                             </group>
                         </page>
                         <page string="Ghi chú" name="notes">
-                            <field name="notes" placeholder="Nhập ghi chú..."/>
+                            <field name="notes" placeholder="Nhập ghi chú..." readonly="state not in ('draft', 'borrowed', 'overdue')"/>
                         </page>
                     </notebook>
                 </sheet>
@@ -170,7 +171,7 @@
             <search string="Tìm kiếm phiếu mượn">
                 <field name="name"/>
                 <field name="borrower_id"/>
-                <field name="borrowing_line_ids" string="Sách" filter_domain="['|', ('borrowing_line_ids.book_id.name', 'ilike', self), ('borrowing_line_ids.book_code', 'ilike', self)]"/>
+                <field name="borrowing_line_ids" string="Sách" filter_domain="[('borrowing_line_ids.book_id.name', 'ilike', self)]"/>
                 <separator/>
                 <filter string="Nháp" name="draft" domain="[('state', '=', 'draft')]"/>
                 <filter string="Đang mượn" name="borrowed" domain="[('state', '=', 'borrowed')]"/>

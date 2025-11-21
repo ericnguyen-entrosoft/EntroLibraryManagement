@@ -23,3 +23,5 @@ access_library_book_update_quantity_line_user,library.book.update.quantity.line.
 access_library_book_update_quantity_allocation_user,library.book.update.quantity.allocation.user,model_library_book_update_quantity_allocation,base.group_user,1,1,1,1
 access_library_book_label_wizard_user,library.book.label.wizard.user,model_library_book_label_wizard,base.group_user,1,1,1,1
 access_library_book_label_line_user,library.book.label.line.user,model_library_book_label_line,base.group_user,1,1,1,1
+access_library_return_confirmation_user,library.return.confirmation.user,model_library_return_confirmation,base.group_user,1,1,1,1
+access_library_return_confirmation_line_user,library.return.confirmation.line.user,model_library_return_confirmation_line,base.group_user,1,1,1,1

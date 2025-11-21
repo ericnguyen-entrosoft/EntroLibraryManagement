@@ -20,7 +20,7 @@ class LibraryBookUpdateQuantity(models.TransientModel):
     location_id = fields.Many2one(
         'library.location',
         string='Vị trí lưu trữ mặc định',
-        domain=[('location_category', '=', 'storage')]
+        domain=[('location_type', '=', 'storage')]
     )
     line_ids = fields.One2many(
         'library.book.update.quantity.line',
@@ -51,7 +51,7 @@ class LibraryBookUpdateQuantity(models.TransientModel):
         if self.book_id:
             # Get storage locations that are NOT skip_register_number
             storage_locations = self.env['library.location'].search([
-                ('location_category', '=', 'storage'),
+                ('location_type', '=', 'storage'),
                 ('skip_register_number', '=', False)
             ])
 
@@ -142,7 +142,7 @@ class LibraryBookUpdateQuantity(models.TransientModel):
 
         # Get storage locations that are NOT skip_register_number
         storage_locations = self.env['library.location'].search([
-            ('location_category', '=', 'storage'),
+            ('location_type', '=', 'storage'),
             ('skip_register_number', '=', False)
         ])
 
@@ -192,7 +192,7 @@ class LibraryBookUpdateQuantity(models.TransientModel):
         # Check if this book already has quants in storage locations (excluding skip_register_number)
         # Get storage locations that are NOT skip_register_number
         storage_locations = self.env['library.location'].search([
-            ('location_category', '=', 'storage'),
+            ('location_type', '=', 'storage'),
             ('skip_register_number', '=', False)
         ])
 
@@ -208,7 +208,7 @@ class LibraryBookUpdateQuantity(models.TransientModel):
         for line in self.line_ids:
             # Check if registration number is required (only if location doesn't skip it)
             location_skip_reg = line.location_id.skip_register_number if line.location_id else False
-            location_is_storage = line.location_id.location_category == 'storage' if line.location_id else False
+            location_is_storage = line.location_id.location_type == 'storage' if line.location_id else False
 
             if not line.registration_number and not location_skip_reg:
                 raise exceptions.UserError('Vui lòng nhập Số ĐKCB cho tất cả các bản sao (trừ vị trí không yêu cầu).')
@@ -264,7 +264,7 @@ class LibraryBookUpdateQuantityLine(models.TransientModel):
     location_id = fields.Many2one(
         'library.location',
         string='Vị trí lưu trữ',
-        domain=[('location_category', '=', 'storage')]
+        domain=[('location_type', '=', 'storage')]
     )
     quantity = fields.Integer(
         string='Số lượng',
@@ -289,7 +289,7 @@ class LibraryBookUpdateQuantityAllocation(models.TransientModel):
         'library.location',
         string='Vị trí lưu trữ',
         required=True,
-        domain=[('location_category', '=', 'storage')]
+        domain=[('location_type', '=', 'storage')]
     )
     quantity = fields.Integer(
         string='Số lượng',

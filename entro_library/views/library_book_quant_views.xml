@@ -5,15 +5,15 @@
         <field name="name">library.book.quant.list</field>
         <field name="model">library.book.quant</field>
         <field name="arch" type="xml">
-            <list string="Danh sách bản sao sách">
+            <list string="Danh sách bản sao sách" editable="bottom" create="0" delete="0">
+                <field name="book_id" readonly="1"/>
                 <field name="registration_number"/>
-                <field name="book_id"/>
                 <field name="location_id"/>
+                <field name="quantity" />
                 <field name="state" widget="badge"
                        decoration-success="state == 'available'"
                        decoration-warning="state in ('borrowed', 'reserved')"
                        decoration-danger="state in ('lost', 'damaged')"/>
-                <field name="times_borrowed"/>
                 <field name="current_reservation_count"/>
                 <field name="current_borrower_id"/>
             </list>
@@ -40,8 +40,7 @@
                     </div>
                     <div class="oe_button_box" name="button_box">
                         <button name="action_view_borrowings" type="object"
-                                class="oe_stat_button" icon="fa-history">
-                            <field name="times_borrowed" widget="statinfo" string="Lần mượn"/>
+                                class="oe_stat_button" icon="fa-history" string="Lịch sử mượn">
                         </button>
                         <button name="action_view_reservations" type="object"
                                 class="oe_stat_button" icon="fa-bookmark">
@@ -68,7 +67,6 @@
                         <field name="current_borrower_id"/>
                     </group>
                     <group name="statistics" string="Thống kê">
-                        <field name="times_borrowed"/>
                         <field name="current_reservation_count"/>
                     </group>
                     <notebook>
@@ -109,33 +107,56 @@
         <field name="name">library.book.quant.kanban</field>
         <field name="model">library.book.quant</field>
         <field name="arch" type="xml">
-            <kanban class="o_kanban_mobile">
+            <kanban sample="1">
                 <field name="registration_number"/>
                 <field name="book_id"/>
                 <field name="state"/>
                 <field name="location_id"/>
+                <field name="current_borrower_id"/>
+                <field name="current_reservation_count"/>
                 <templates>
-                    <t t-name="kanban-box">
-                        <div class="oe_kanban_global_click">
-                            <div class="row mb4">
-                                <div class="col-12">
-                                    <strong><field name="registration_number"/></strong>
-                                    <span class="float-end badge" t-att-class="{'text-bg-success': record.state.raw_value == 'available', 'text-bg-warning': ['borrowed', 'reserved'].includes(record.state.raw_value), 'text-bg-danger': ['lost', 'damaged'].includes(record.state.raw_value)}">
-                                        <field name="state"/>
-                                    </span>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-12">
-                                    <field name="book_id"/>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-12 text-muted">
-                                    <i class="fa fa-map-marker"/> <field name="location_id"/>
-                                </div>
-                            </div>
+                    <t t-name="card">
+                        <div class="fw-bold mb-1">
+                            <field name="registration_number"/>
                         </div>
+                        <div class="mb-2">
+                            <field name="book_id" class="text-muted"/>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="text-muted small">
+                                <i class="fa fa-map-marker"/> <field name="location_id"/>
+                            </span>
+                        </div>
+                        <div class="mb-2">
+                            <span class="badge w-100"
+                                  t-att-class="{
+                                      'text-bg-success': record.state.raw_value == 'available',
+                                      'text-bg-warning': ['borrowed', 'reserved'].includes(record.state.raw_value),
+                                      'text-bg-info': record.state.raw_value == 'maintenance',
+                                      'text-bg-danger': ['lost', 'damaged'].includes(record.state.raw_value)
+                                  }">
+                                <i class="fa" t-att-class="{
+                                    'fa-check-circle': record.state.raw_value == 'available',
+                                    'fa-user': record.state.raw_value == 'borrowed',
+                                    'fa-bookmark': record.state.raw_value == 'reserved',
+                                    'fa-wrench': record.state.raw_value == 'maintenance',
+                                    'fa-exclamation-triangle': ['lost', 'damaged'].includes(record.state.raw_value)
+                                }"/>
+                                <field name="state"/>
+                            </span>
+                        </div>
+                        <t t-if="record.current_borrower_id.raw_value">
+                            <div class="text-muted small">
+                                <i class="fa fa-user"/> <field name="current_borrower_id"/>
+                            </div>
+                        </t>
+                        <t t-if="record.current_reservation_count.raw_value > 0">
+                            <div class="mt-1">
+                                <span class="badge text-bg-warning w-100">
+                                    <i class="fa fa-bookmark"/> <field name="current_reservation_count"/> Đặt trước
+                                </span>
+                            </div>
+                        </t>
                     </t>
                 </templates>
             </kanban>

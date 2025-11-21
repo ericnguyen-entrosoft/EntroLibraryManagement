@@ -121,18 +121,37 @@ class LibraryDashboard(models.Model):
         }
 
     def _get_popular_books(self, limit=5):
-        """Get most borrowed books"""
-        books = self.env['library.book'].sudo().search([('total_times_borrowed', '>', 0)], order='total_times_borrowed desc', limit=limit)
+        """Get most borrowed books - calculate from borrowing lines"""
+        query = """
+            SELECT
+                b.id,
+                b.name,
+                COUNT(bl.id) as times_borrowed
+            FROM library_book b
+            JOIN library_borrowing_line bl ON bl.book_id = b.id
+            WHERE b.active = true
+            GROUP BY b.id, b.name
+            HAVING COUNT(bl.id) > 0
+            ORDER BY times_borrowed DESC
+            LIMIT %s
+        """
+        self.env.cr.execute(query, (limit,))
+        results = self.env.cr.dictfetchall()
 
-        return [{
-            'id': book.id,
-            'name': book.name,
-            'code': book.code,
-            'author': ', '.join(book.author_ids.mapped('name')[:2]) if book.author_ids else 'N/A',
-            'times_borrowed': book.total_times_borrowed,
-            'quant_count': book.quant_count,
-            'available_count': book.available_quant_count,
-        } for book in books]
+        # Get additional book details
+        popular_books = []
+        for result in results:
+            book = self.env['library.book'].sudo().browse(result['id'])
+            popular_books.append({
+                'id': book.id,
+                'name': book.name,
+                'author': ', '.join(book.author_ids.mapped('name')[:2]) if book.author_ids else 'N/A',
+                'times_borrowed': result['times_borrowed'],
+                'quant_count': book.quant_count,
+                'available_count': book.available_quant_count,
+            })
+
+        return popular_books
 
     def _get_category_distribution(self):
         """Get book distribution by category"""
@@ -281,7 +300,6 @@ class LibraryDashboard(models.Model):
         return [{
             'id': book.id,
             'name': book.name,
-            'code': book.code,
             'author': ', '.join(book.author_ids.mapped('name')) if book.author_ids else 'N/A',
             'category': book.category_id.name if book.category_id else 'N/A',
             'registration_date': book.registration_date.strftime('%Y-%m-%d') if book.registration_date else '',

@@ -11,11 +11,15 @@ class LibraryBorrowingLine(models.Model):
     sequence = fields.Integer(string='Thứ tự', default=10)
     borrowing_id = fields.Many2one(
         'library.borrowing', string='Phiếu mượn', required=True, ondelete='cascade')
+    book_id = fields.Many2one(
+        'library.book', string='Sách', required=True,
+        domain="[('can_borrow', '=', True)]")
+    available_quant_ids = fields.Many2many(
+        'library.book.quant', string='Bản sao có sẵn',
+        compute='_compute_available_quant_ids')
     quant_id = fields.Many2one(
         'library.book.quant', string='Bản sao sách', required=True,
-        domain="[('state', '=', 'available'), ('quant_type', '=', 'can_borrow')]", ondelete='restrict')
-    book_id = fields.Many2one(
-        related='quant_id.book_id', string='Sách', store=True, readonly=True)
+        domain="[('id', 'in', available_quant_ids)]", ondelete='restrict')
 
     # Dates
     due_date = fields.Date(string='Ngày hạn trả', required=True)
@@ -46,7 +50,6 @@ class LibraryBorrowingLine(models.Model):
         related='quant_id.location_id.complete_name', string='Vị trí sách')
 
     # Book info (related fields for quick access)
-    book_code = fields.Char(related='book_id.code', string='Mã sách', store=True)
     book_name = fields.Char(related='book_id.name', string='Tên sách', store=True)
 
     # Borrowing info (related fields for reports)
@@ -97,6 +100,28 @@ class LibraryBorrowingLine(models.Model):
             else:
                 line.fine_amount = 0
 
+    @api.depends('book_id')
+    def _compute_available_quant_ids(self):
+        """Compute available quants for the selected book"""
+        for line in self:
+            if line.book_id:
+                # Find available quants for this book that can be borrowed
+                available_quants = self.env['library.book.quant'].search([
+                    ('book_id', '=', line.book_id.id),
+                    ('state', '=', 'available'),
+                    ('quant_type', '=', 'can_borrow'),
+                    ('registration_number', '!=', False)
+                ])
+                line.available_quant_ids = available_quants
+            else:
+                line.available_quant_ids = False
+
+    @api.onchange('book_id')
+    def _onchange_book_id(self):
+        """Clear quant_id when book changes"""
+        if self.book_id:
+            self.quant_id = False
+
     @api.onchange('quant_id')
     def _onchange_quant_id(self):
         """Set default due date when quant is selected"""
@@ -106,17 +131,11 @@ class LibraryBorrowingLine(models.Model):
                 'library.default_borrowing_days', default=14))
             self.due_date = self.borrowing_id.borrow_date + timedelta(days=default_days)
 
-    @api.constrains('quant_id', 'borrowing_id', 'state')
+    @api.constrains('quant_id', 'state')
     def _check_quant_availability(self):
-        """Check if quant is available for borrowing"""
+        """Check if quant is not currently borrowed by another borrowing"""
         for line in self:
             if line.state in ('draft', 'borrowed') and line.quant_id:
-                # Check if quant type allows borrowing
-                if line.quant_id.quant_type == 'no_borrow':
-                    raise exceptions.ValidationError(
-                        f'Bản sao sách [{line.quant_id.registration_number}] "{line.book_id.name}" chỉ được đọc tại chỗ, không thể mượn về.'
-                    )
-
                 # Check if quant is currently borrowed by another borrowing
                 active_borrowing_line = self.search([
                     ('quant_id', '=', line.quant_id.id),

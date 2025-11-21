@@ -27,21 +27,11 @@ class LibraryLocation(models.Model):
 
     # Thông tin vị trí
     location_type = fields.Selection([
-        ('warehouse', 'Kho'),
-        ('building', 'Tòa nhà'),
-        ('floor', 'Tầng'),
-        ('room', 'Phòng'),
-        ('shelf', 'Giá sách'),
-        ('row', 'Kệ'),
-        ('position', 'Vị trí cụ thể')
-    ], string='Loại vị trí', required=True, default='shelf')
-
-    location_category = fields.Selection([
         ('area', 'Khu vực'),
         ('storage', 'Lưu trữ'),
         ('destroy', 'Hủy'),
         ('reader', 'Độc giả')
-    ], string='Phân loại vị trí', help='Phân loại chức năng của vị trí')
+    ], string='Loại vị trí', required=True, default='storage', help='Phân loại chức năng của vị trí')
 
     skip_register_number = fields.Boolean(
         string='Không tạo số ĐKCB',
@@ -65,6 +55,7 @@ class LibraryLocation(models.Model):
     )
     book_count = fields.Integer(string='Số đầu sách', compute='_compute_quant_count',
                                 help='Số lượng tác phẩm khác nhau (không tính bản sao)')
+    child_count = fields.Integer(string='Số vị trí con', compute='_compute_child_count')
 
     note = fields.Text(string='Ghi chú')
     active = fields.Boolean(string='Hoạt động', default=True)
@@ -86,6 +77,11 @@ class LibraryLocation(models.Model):
             )
             # Count unique books
             location.book_count = len(location.quant_ids.mapped('book_id'))
+
+    @api.depends('child_ids')
+    def _compute_child_count(self):
+        for location in self:
+            location.child_count = len(location.child_ids)
 
     @api.constrains('parent_id')
     def _check_parent_id(self):
@@ -118,6 +114,18 @@ class LibraryLocation(models.Model):
             'res_model': 'library.book',
             'view_mode': 'list,form',
             'domain': [('id', 'in', book_ids)],
+        }
+
+    def action_view_children(self):
+        """View child locations"""
+        self.ensure_one()
+        return {
+            'name': 'Vị trí con',
+            'type': 'ir.actions.act_window',
+            'res_model': 'library.location',
+            'view_mode': 'list,form',
+            'domain': [('parent_id', '=', self.id)],
+            'context': {'default_parent_id': self.id}
         }
 
     def name_get(self):

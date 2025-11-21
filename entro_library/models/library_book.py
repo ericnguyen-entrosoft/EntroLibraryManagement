@@ -11,10 +11,10 @@ class LibraryBook(models.Model):
     _order = 'registration_date desc, name'
 
     name = fields.Char(string='Tác phẩm (Nhan đề)', required=True, index=True)
-    registration_date = fields.Date(string='Ngày ĐKTQ', default=fields.Date.today, required=True)
+    registration_date = fields.Date(
+        string='Ngày ĐKTQ', default=fields.Date.today, required=True)
 
     # Thông tin trách nhiệm
-    code = fields.Char(string='Mã', index=True, required=True)
 
     # Tác giả
     author_ids = fields.Many2many(
@@ -22,7 +22,8 @@ class LibraryBook(models.Model):
         'library_book_author_rel',
         'book_id',
         'author_id',
-        string='Tác giả'
+        string='Tác giả',
+        required=True
     )
     co_author_ids = fields.Many2many(
         'library.author',
@@ -31,13 +32,12 @@ class LibraryBook(models.Model):
         'author_id',
         string='Đồng tác giả'
     )
-    author_name_for_cutter = fields.Char(
-        string='Tên tác giả (cho Mã Cutter)',
-        help='Nhập tên tác giả để tính Mã Cutter. VD: Nguyen Van A'
-    )
 
     # Thông tin xuất bản
-    publication_place = fields.Char(string='Nơi xuất bản')
+    publication_country_id = fields.Many2one(
+        'res.country', string='Quốc gia xuất bản')
+    publication_city_id = fields.Many2one(
+        'res.country.state', string='Thành phố xuất bản')
     publisher_id = fields.Many2one('library.publisher', string='Nhà xuất bản')
     publication_year = fields.Integer(string='Năm')
 
@@ -58,41 +58,51 @@ class LibraryBook(models.Model):
 
     # Phân loại
     series_id = fields.Many2one('library.series', string='Tùng thư')
-    ddc_number = fields.Char(string='Số DDC', help='Dewey Decimal Classification')
+    ddc_number = fields.Char(
+        string='Số DDC', help='Dewey Decimal Classification')
     cutter_number = fields.Char(
         string='Mã Cutter',
         compute='_compute_cutter_number',
         store=True,
         help='Mã Cutter được tính tự động từ tên tác giả'
     )
-    category_id = fields.Many2one('library.category', string='Nhóm', required=True)
+    category_id = fields.Many2one(
+        'library.category', string='Nhóm', required=True)
 
     # Quants (Physical copies)
-    quant_ids = fields.One2many('library.book.quant', 'book_id', string='Bản sao vật lý')
-    quant_count = fields.Integer(string='Số lượng bản sao', compute='_compute_quant_count', store=True)
+    quant_ids = fields.One2many(
+        'library.book.quant', 'book_id', string='Bản sao vật lý')
+    quant_count = fields.Integer(
+        string='Số lượng bản sao',
+        compute='_compute_quantities',
+        compute_sudo=False,
+        help='Tổng số bản sao vật lý của sách này'
+    )
     available_quant_count = fields.Integer(
         string='Số lượng có sẵn',
-        compute='_compute_quant_count',
-        store=True
+        compute='_compute_quantities',
+        compute_sudo=False,
+        help='Số lượng bản sao đã có số ĐKCB và có sẵn để mượn'
     )
-
-    # Statistics from quants
-    total_times_borrowed = fields.Integer(
-        string='Tổng số lần được mượn',
-        compute='_compute_book_stats',
-        store=True
+    borrowed_quant_count = fields.Integer(
+        string='Đang mượn',
+        compute='_compute_quantities',
+        compute_sudo=False,
+        help='Số lượng bản sao đang được mượn'
     )
     total_reservation_count = fields.Integer(
         string='Tổng số người đang đặt trước',
-        compute='_compute_book_stats',
-        store=True
+        compute='_compute_quantities',
+        compute_sudo=False,
+        help='Tổng số người đang đặt trước sách này'
     )
 
     # Ghi chú
     note = fields.Text(string='Phụ chú')
 
     # Images
-    book_image_ids = fields.One2many('library.book.image', 'book_id', string='Hình ảnh')
+    book_image_ids = fields.One2many(
+        'library.book.image', 'book_id', string='Hình ảnh')
 
     # Soft copy
     soft_copy = fields.Binary(string='Bản mềm', attachment=True)
@@ -100,20 +110,64 @@ class LibraryBook(models.Model):
 
     # Trạng thái
     active = fields.Boolean(string='Hoạt động', default=True)
+    can_borrow = fields.Boolean(string='Có thể mượn', default=True, help='Cho phép mượn sách này về nhà')
 
-    @api.depends('quant_ids', 'quant_ids.state')
-    def _compute_quant_count(self):
-        for book in self:
-            book.quant_count = len(book.quant_ids)
-            book.available_quant_count = len(book.quant_ids.filtered(
-                lambda q: q.state == 'available'
-            ))
+    def _compute_quantities(self):
+        """
+        Compute quantities using _read_group for better performance.
+        Similar to Odoo's stock.quant approach for product.product
+        """
+        # Get total quantity (sum of all quant quantities) grouped by book_id
+        quants_sum_data = self.env['library.book.quant']._read_group(
+            [('book_id', 'in', self.ids)],
+            ['book_id'],
+            ['quantity:sum']
+        )
 
-    @api.depends('quant_ids.times_borrowed', 'quant_ids.current_reservation_count')
-    def _compute_book_stats(self):
+        # Get quants count by state and registration_number for available/borrowed
+        quants_data = self.env['library.book.quant']._read_group(
+            [('book_id', 'in', self.ids)],
+            ['book_id', 'state', 'registration_number'],
+            ['__count']
+        )
+
+        # Get reservation counts grouped by book_id
+        reservations_data = self.env['library.reservation']._read_group(
+            [
+                ('book_id', 'in', self.ids),
+                ('state', 'in', ['active', 'available'])
+            ],
+            ['book_id'],
+            ['__count']
+        )
+
+        # Build dictionaries for quick lookup
+        quant_counts = {book.id: quantity_sum for book,
+                        quantity_sum in quants_sum_data}
+        available_counts = {}
+        borrowed_counts = {}
+
+        for book, state, registration_number, count in quants_data:
+            book_id = book.id
+            if book_id not in available_counts:
+                available_counts[book_id] = 0
+                borrowed_counts[book_id] = 0
+
+            # Only count as available if has registration_number and state is available
+            if state == 'available' and registration_number:
+                available_counts[book_id] += count
+            elif state == 'borrowed':
+                borrowed_counts[book_id] += count
+
+        reservation_counts = {
+            book.id: count for book, count in reservations_data}
+
+        # Update all books
         for book in self:
-            book.total_times_borrowed = sum(book.quant_ids.mapped('times_borrowed'))
-            book.total_reservation_count = sum(book.quant_ids.mapped('current_reservation_count'))
+            book.quant_count = quant_counts.get(book.id, 0)
+            book.available_quant_count = available_counts.get(book.id, 0)
+            book.borrowed_quant_count = borrowed_counts.get(book.id, 0)
+            book.total_reservation_count = reservation_counts.get(book.id, 0)
 
     def action_view_quants(self):
         """View book's physical copies (quants)"""
@@ -158,7 +212,8 @@ class LibraryBook(models.Model):
         # Normalize unicode characters
         nfd = unicodedata.normalize('NFD', text)
         # Remove combining characters (accents)
-        without_accents = ''.join(char for char in nfd if unicodedata.category(char) != 'Mn')
+        without_accents = ''.join(
+            char for char in nfd if unicodedata.category(char) != 'Mn')
         # Replace Đ/đ specifically
         without_accents = without_accents.replace('Đ', 'D').replace('đ', 'd')
         return without_accents
@@ -177,15 +232,15 @@ class LibraryBook(models.Model):
         normalized = self._remove_accents(first_word).lower()
         return normalized
 
-    @api.depends('author_name_for_cutter', 'language_id')
+    @api.depends('name', 'language_id')
     def _compute_cutter_number(self):
         for record in self:
-            if not record.author_name_for_cutter:
+            if not record.name:
                 record.cutter_number = ''
                 continue
 
-            author_name = record.author_name_for_cutter.strip()
-            words = author_name.split()
+            book_name = record.name.strip()
+            words = book_name.split()
 
             if not words:
                 record.cutter_number = ''
@@ -196,33 +251,45 @@ class LibraryBook(models.Model):
             first_letter = first_word[0].upper()
 
             # Bước 2: Lấy vần đầu từ từ đầu tiên
-            first_syllable = self._get_first_syllable(author_name)
+            # Ví dụ: "Rộng" -> remove accents -> "rong" -> remove first consonant(s) -> "ong"
+            # But we need the full syllable with accent for mapping lookup
+            # So we keep the original first word and extract vần (everything after first consonant cluster)
+            first_word_normalized = self._remove_accents(first_word).lower()
+
+            # Extract vần (rhyme) by removing initial consonant cluster
+            # For "rộng" -> normalized "rong" -> extract "ong"
+            # But we need the accented version for mapping
+            # So we find where the vần starts in normalized, then take from original
+            consonant_match = re.match(
+                r'^[bcdfghjklmnpqrstvwxyz]+', first_word_normalized)
+            consonant_len = len(consonant_match.group(0)
+                                ) if consonant_match else 0
+
+            # Get the vần (with accents) from original word
+            van = first_word[consonant_len:].lower() if consonant_len < len(
+                first_word) else first_word.lower()
 
             # Tìm mã vần từ character.mapping
             van_code = ''
-            if first_syllable and record.language_id:
-                # Remove the first consonant to get the rhyme (vần)
-                # For example: "nguyen" -> "uyen", "van" -> "an"
-                rhyme = re.sub(r'^[bcdfghjklmnpqrstvwxyz]+', '', first_syllable)
+            if van and record.language_id:
+                # Search in character.mapping with the accented vần
+                mapping = self.env['character.mapping'].search([
+                    ('van', '=', van),
+                    ('language_id', '=', record.language_id.id)
+                ], limit=1)
 
-                if rhyme:
-                    # Search in character.mapping
-                    mapping = self.env['character.mapping'].search([
-                        ('van', '=', rhyme),
-                        ('language_id', '=', record.language_id.id)
-                    ], limit=1)
+                if mapping:
+                    van_code = mapping.ma_so
 
-                    if mapping:
-                        van_code = mapping.ma_so
-
-            # Bước 3: Lấy chữ cái đầu của từ thứ 2 (nếu có)
+            # Bước 3: Lấy chữ cái đầu của từ thứ 2 (viết hoa)
             second_letter = ''
             if len(words) > 1:
                 second_word = words[1]
                 if second_word:
-                    second_letter = second_word[0].lower()
+                    second_letter = second_word[0].upper()
 
-            # Tạo mã Cutter
+            # Tạo mã Cutter: Chữ cái đầu + mã vần + chữ cái đầu từ 2
+            # Ví dụ: "Rộng mở cửa trái tim" -> R + 100 + M = R100M
             cutter = first_letter
             if van_code:
                 cutter += van_code
@@ -231,7 +298,7 @@ class LibraryBook(models.Model):
 
             record.cutter_number = cutter
 
-    def action_create_quants(self):
+    def action_update_quantity(self):
         """Open wizard to create multiple book quants"""
         self.ensure_one()
         return {
@@ -245,11 +312,3 @@ class LibraryBook(models.Model):
                 'default_quantity': 1,
             }
         }
-
-    @api.depends('name', 'code')
-    def _compute_display_name(self):
-        for record in self:
-            if record.code:
-                record.display_name = f"[{record.code}] {record.name}"
-            else:
-                record.display_name = record.name

@@ -116,8 +116,3 @@ class LibraryBookLabelLine(models.TransientModel):
         string='Tên sách',
         readonly=True
     )
-    book_code = fields.Char(
-        related='quant_id.book_id.code',
-        string='Mã sách',
-        readonly=True
-    )

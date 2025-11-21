@@ -7,10 +7,24 @@ class LibraryBorrowing(models.Model):
     _name = 'library.borrowing'
     _description = 'Quản lý mượn sách'
     _order = 'borrow_date desc, id desc'
-    _inherit = ['mail.thread', 'mail.activity.mixin']
+    _inherit = ['mail.thread', 'mail.activity.mixin', 'library.sequence.mixin']
 
-    name = fields.Char(string='Mã phiếu mượn', required=True,
-                       copy=False, readonly=True, default='New')
+    # Override sequence.mixin settings
+    _sequence_field = "name"
+    _sequence_date_field = "borrow_date"
+    _sequence_index = False
+
+    name = fields.Char(
+        string='Mã phiếu mượn',
+        compute='_compute_name', inverse='_inverse_name', readonly=False, store=True,
+        copy=False, tracking=True, default='/'
+    )
+    posted_before = fields.Boolean(
+        string='Posted Before',
+        default=False,
+        copy=False,
+        help="Technical field to track if borrowing was ever confirmed"
+    )
     borrower_id = fields.Many2one(
         'res.partner', string='Người mượn', required=True, tracking=True)
 
@@ -36,7 +50,8 @@ class LibraryBorrowing(models.Model):
         ('overdue', 'Quá hạn'),
         ('lost', 'Mất sách'),
         ('cancelled', 'Hủy')
-    ], string='Trạng thái', default='draft', required=True, tracking=True)
+    ], string='Trạng thái', compute='_compute_state', store=True,
+       default='draft', required=True, tracking=True)
 
     # Computed fields
     late_days = fields.Integer(
@@ -56,8 +71,6 @@ class LibraryBorrowing(models.Model):
         'res.users', string='Thủ thư', default=lambda self: self.env.user)
 
     # Book info (related fields for quick access) - kept for backward compatibility
-    book_code = fields.Char(related='book_id.code',
-                            string='Mã sách', store=True)
     book_name = fields.Char(related='book_id.name',
                             string='Tên sách', store=True)
 
@@ -69,12 +82,77 @@ class LibraryBorrowing(models.Model):
 
     active = fields.Boolean(string='Hoạt động', default=True)
 
-    @api.model
-    def create(self, vals):
-        if vals.get('name', 'New') == 'New':
-            vals['name'] = self.env['ir.sequence'].next_by_code(
-                'library.borrowing') or 'New'
-        return super(LibraryBorrowing, self).create(vals)
+    @api.depends('state', 'borrow_date', 'posted_before', 'sequence_number', 'sequence_prefix')
+    def _compute_name(self):
+        """Compute name based on state - similar to account.move"""
+        self = self.sorted(lambda m: m.borrow_date)
+
+        for record in self:
+            # Skip cancelled records
+            if record.state == 'cancelled':
+                continue
+
+            has_name = record.name and record.name != '/'
+
+            # Reset name if date doesn't match sequence
+            if not record.posted_before and not record._sequence_matches_date():
+                record.name = False
+                continue
+
+            # Assign sequence when confirmed (not draft or cancelled)
+            if record.borrow_date and not has_name and record.state not in ('draft', 'cancelled'):
+                record._set_next_sequence()
+
+        self._inverse_name()
+
+    def _inverse_name(self):
+        """Allow manual name setting - called after _compute_name"""
+        # Parse sequence prefix and number from name
+        to_write = []
+        for record in self:
+            if record.name and record.name != '/':
+                # Use sequence.mixin's parsing logic
+                format_values = record._get_sequence_format_param(record.name)[1]
+                if format_values.get('seq'):
+                    to_write.append({
+                        'id': record.id,
+                        'sequence_number': format_values['seq'],
+                        'sequence_prefix': format_values.get('prefix1', ''),
+                    })
+        if to_write:
+            self.env['library.borrowing'].browse([x['id'] for x in to_write]).write({
+                'sequence_number': False,
+                'sequence_prefix': False,
+            })
+
+    def _set_next_sequence(self):
+        """Set the next sequence number - uses sequence.mixin logic"""
+        self.ensure_one()
+        # Call the parent mixin's _set_next_sequence which handles everything
+        super(LibraryBorrowing, self)._set_next_sequence()
+
+    def _get_last_sequence_domain(self, relaxed=False):
+        """Get the SQL domain to retrieve the previous sequence number."""
+        self.ensure_one()
+        where_string = "WHERE state != 'cancelled'"
+        where_params = {}
+
+        if self.borrow_date:
+            date_start, date_end, *_ = self._get_sequence_date_range(
+                self._deduce_sequence_number_reset(self.name or '')
+            )
+            where_string += " AND borrow_date >= %(date_from)s AND borrow_date <= %(date_to)s"
+            where_params['date_from'] = date_start
+            where_params['date_to'] = date_end
+
+        return where_string, where_params
+
+    def _get_starting_sequence(self):
+        """Get the starting sequence when no previous sequence exists."""
+        self.ensure_one()
+        if self.borrow_date:
+            return f'PM/{self.borrow_date.year}/{self.borrow_date.month:02d}/00000'
+        return 'PM/00000'
 
     @api.depends('borrowing_line_ids.due_date')
     def _compute_due_date(self):
@@ -110,6 +188,30 @@ class LibraryBorrowing(models.Model):
         """Count number of books in this borrowing"""
         for record in self:
             record.book_count = len(record.borrowing_line_ids)
+
+    @api.depends('borrowing_line_ids.state')
+    def _compute_state(self):
+        """Compute borrowing state based on line states"""
+        for record in self:
+            if not record.borrowing_line_ids:
+                # No lines yet, keep current state (draft by default)
+                continue
+
+            line_states = record.borrowing_line_ids.mapped('state')
+
+            # If all lines are cancelled
+            if all(state == 'cancelled' for state in line_states):
+                record.state = 'cancelled'
+            # If all lines are returned or cancelled
+            elif all(state in ('returned', 'cancelled') for state in line_states):
+                record.state = 'returned'
+            # If any line is overdue
+            elif 'overdue' in line_states:
+                record.state = 'overdue'
+            # If any line is borrowed
+            elif 'borrowed' in line_states:
+                record.state = 'borrowed'
+
 
     @api.onchange('borrow_date')
     def _onchange_borrow_date(self):
@@ -164,8 +266,10 @@ class LibraryBorrowing(models.Model):
             if not record.borrowing_line_ids:
                 raise exceptions.ValidationError('Vui lòng thêm ít nhất một cuốn sách vào phiếu mượn.')
 
-            record.state = 'borrowed'
-            # Confirm all lines
+            # Mark as posted before (for sequence logic)
+            record.posted_before = True
+
+            # Confirm all lines - borrowing state will be computed automatically
             for line in record.borrowing_line_ids:
                 line.state = 'borrowed'
                 line.quant_id.write({
@@ -177,27 +281,40 @@ class LibraryBorrowing(models.Model):
                 self._send_borrowing_email()
 
     def action_return(self):
-        """Trả tất cả sách"""
+        """Trả sách - always show wizard for flexibility"""
         for record in self:
-            record.return_date = fields.Date.today()
-            # Return all lines
-            for line in record.borrowing_line_ids.filtered(lambda l: l.state in ('borrowed', 'overdue')):
-                line.action_return()
-            # Update borrowing state if all lines are returned
-            if all(line.state in ('returned', 'cancelled') for line in record.borrowing_line_ids):
-                record.state = 'returned'
+            # All lines in borrowed/overdue state
+            lines_to_return = record.borrowing_line_ids.filtered(
+                lambda l: l.state in ('borrowed', 'overdue')
+            )
+
+            if not lines_to_return:
+                raise exceptions.ValidationError('Không có sách nào để trả.')
+
+            # Always show wizard to allow user to select which books to return
+            return {
+                'name': 'Xác nhận trả sách',
+                'type': 'ir.actions.act_window',
+                'res_model': 'library.return.confirmation',
+                'view_mode': 'form',
+                'target': 'new',
+                'context': {
+                    'default_borrowing_id': record.id,
+                    'button_validate_borrowing_ids': [record.id],
+                }
+            }
 
     def action_mark_lost(self):
         """Đánh dấu tất cả sách mất"""
         for record in self:
-            record.state = 'lost'
+            # Mark all borrowed/overdue lines as lost - borrowing state will be computed
             for line in record.borrowing_line_ids.filtered(lambda l: l.state in ('borrowed', 'overdue')):
                 line.action_mark_lost()
 
     def action_cancel(self):
         """Hủy phiếu mượn"""
         for record in self:
-            # Cancel all lines
+            # Cancel all lines - borrowing state will be computed
             for line in record.borrowing_line_ids:
                 if line.state == 'borrowed':
                     line.quant_id.write({
@@ -205,12 +322,13 @@ class LibraryBorrowing(models.Model):
                         'current_borrowing_id': False
                     })
                 line.state = 'cancelled'
-            record.state = 'cancelled'
 
     def action_set_to_draft(self):
         """Chuyển về nháp"""
         for record in self:
-            record.state = 'draft'
+            # Set all lines to draft - borrowing state will be computed
+            for line in record.borrowing_line_ids:
+                line.state = 'draft'
 
     def _send_borrowing_email(self):
         """Send email notification to borrower"""
@@ -249,14 +367,11 @@ class LibraryBorrowing(models.Model):
         ])
         overdue_lines.write({'state': 'overdue'})
 
-        # Update borrowing state if any line is overdue
-        borrowings_to_update = overdue_lines.mapped('borrowing_id')
-        for borrowing in borrowings_to_update:
-            if borrowing.state == 'borrowed' and any(line.state == 'overdue' for line in borrowing.borrowing_line_ids):
-                borrowing.state = 'overdue'
-                # Send overdue notification
-                if borrowing.borrower_email:
-                    borrowing._send_overdue_email()
+        # Send overdue notification (borrowing state will be computed automatically)
+        borrowings_to_notify = overdue_lines.mapped('borrowing_id')
+        for borrowing in borrowings_to_notify:
+            if borrowing.borrower_email and borrowing.state == 'overdue':
+                borrowing._send_overdue_email()
 
     @api.model
     def _cron_send_due_reminders(self):

@@ -45,8 +45,6 @@ class LibraryReservation(models.Model):
     ], string='Độ ưu tiên', default='1')
 
     # Book info
-    book_code = fields.Char(related='book_id.code',
-                            string='Mã sách', store=True)
     book_name = fields.Char(related='book_id.name',
                             string='Tên sách', store=True)
 

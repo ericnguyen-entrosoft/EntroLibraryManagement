@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Return Confirmation Wizard Form -->
+    <record id="view_library_return_confirmation" model="ir.ui.view">
+        <field name="name">library.return.confirmation.form</field>
+        <field name="model">library.return.confirmation</field>
+        <field name="arch" type="xml">
+            <form string="Xác nhận trả sách">
+                <group>
+                    <group>
+                        <div colspan="2">
+                            <p name="explanation-text">
+                                Có một số sách chưa được đánh dấu để trả.
+                            </p>
+                        </div>
+                    </group>
+                    <group>
+                        <div colspan="2" class="text-muted">
+                            Tạo phiếu mượn mới nếu bạn muốn tiếp tục mượn những sách chưa trả.
+                            Không tạo phiếu mượn mới nếu bạn muốn trả tất cả.
+                        </div>
+                    </group>
+                </group>
+
+                <field name="borrowing_id" invisible="1"/>
+
+                <field name="return_confirmation_line_ids" nolabel="1">
+                    <list create="0" delete="0" editable="top" decoration-danger="late_days > 0">
+                        <field name="borrowing_line_id" force_save="1" column_invisible="1"/>
+                        <field name="to_return" widget="boolean_toggle"/>
+                        <field name="book_id" readonly="1"/>
+                        <field name="registration_number" readonly="1"/>
+                        <field name="due_date" readonly="1"/>
+                        <field name="line_state" column_invisible="1"/>
+                    </list>
+                </field>
+
+                <footer>
+                    <button name="process" string="Tạo phiếu mượn mới" type="object" class="oe_highlight" data-hotkey="q"/>
+                    <button name="process_cancel_new_borrowing" string="Trả tất cả" type="object" class="btn-secondary" data-hotkey="w"/>
+                    <button string="Hủy" class="btn-secondary" special="cancel" data-hotkey="x"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

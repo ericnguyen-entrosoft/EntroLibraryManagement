@@ -31,6 +31,7 @@
         # Wizards
         'wizards/library_book_update_quantity_views.xml',
         'wizards/library_book_label_wizard_views.xml',
+        'wizards/library_return_confirmation_views.xml',
 
         # Reports (must be loaded before views that reference them)
         'reports/library_card_report.xml',

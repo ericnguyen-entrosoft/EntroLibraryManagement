@@ -9,6 +9,7 @@ from . import library_category
 from . import library_series
 from . import library_location
 from . import character_mapping
+from . import library_sequence_mixin
 from . import library_borrowing
 from . import library_borrowing_line
 from . import library_reservation
