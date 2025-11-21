@@ -46,6 +46,9 @@ class LibraryDashboard(models.Model):
         # Get top borrowers
         top_borrowers = self._get_top_borrowers(limit=5)
 
+        # Get new books this month
+        new_books_this_month = self._get_new_books_this_month(limit=10)
+
         return {
             'statistics': statistics,
             'popular_books': popular_books,
@@ -54,6 +57,7 @@ class LibraryDashboard(models.Model):
             'overdue_borrowings': overdue_borrowings,
             'borrowing_trends': borrowing_trends,
             'top_borrowers': top_borrowers,
+            'new_books_this_month': new_books_this_month,
         }
 
     def _get_statistics(self, date_from, date_to):
@@ -118,7 +122,7 @@ class LibraryDashboard(models.Model):
 
     def _get_popular_books(self, limit=5):
         """Get most borrowed books"""
-        books = self.env['library.book'].sudo().search([], order='total_times_borrowed desc', limit=limit)
+        books = self.env['library.book'].sudo().search([('total_times_borrowed', '>', 0)], order='total_times_borrowed desc', limit=limit)
 
         return [{
             'id': book.id,
@@ -145,27 +149,12 @@ class LibraryDashboard(models.Model):
         """
         self.env.cr.execute(query)
         results = self.env.cr.dictfetchall()
-
-        # If no categories, group by quant state instead
-        if not results:
-            query = """
-                SELECT
-                    lbq.state as category,
-                    COUNT(*) as count
-                FROM library_book_quant lbq
-                WHERE lbq.state IS NOT NULL
-                GROUP BY lbq.state
-                ORDER BY count DESC
-            """
-            self.env.cr.execute(query)
-            results = self.env.cr.dictfetchall()
-
         return results
 
     def _get_recent_borrowings(self, limit=10):
         """Get recent borrowing transactions"""
         borrowings = self.env['library.borrowing'].search(
-            [],
+            [('state', 'not in', ('draft', 'cancelled'))],
             order='borrow_date desc, id desc',
             limit=limit
         )
@@ -185,7 +174,7 @@ class LibraryDashboard(models.Model):
                 'book_titles': book_titles,
                 'borrower': b.borrower_id.name,
                 'borrow_date': b.borrow_date.strftime('%Y-%m-%d') if b.borrow_date else '',
-                'return_date': b.return_date.strftime('%Y-%m-%d') if b.return_date else '',
+                'return_date': b.due_date.strftime('%Y-%m-%d') if b.due_date else '',
                 'state': b.state,
                 'late_days': b.late_days,
                 'fine_amount': b.fine_amount,
@@ -274,3 +263,29 @@ class LibraryDashboard(models.Model):
         results = self.env.cr.dictfetchall()
 
         return results
+
+    def _get_new_books_this_month(self, limit=10):
+        """Get books created in the current month"""
+        from datetime import date
+
+        # Get first day of current month
+        today = date.today()
+        first_day = date(today.year, today.month, 1)
+
+        # Search for books created this month
+        books = self.env['library.book'].sudo().search([
+            ('create_date', '>=', first_day),
+            ('active', '=', True)
+        ], order='create_date desc', limit=limit)
+
+        return [{
+            'id': book.id,
+            'name': book.name,
+            'code': book.code,
+            'author': ', '.join(book.author_ids.mapped('name')) if book.author_ids else 'N/A',
+            'category': book.category_id.name if book.category_id else 'N/A',
+            'registration_date': book.registration_date.strftime('%Y-%m-%d') if book.registration_date else '',
+            'create_date': book.create_date.strftime('%Y-%m-%d') if book.create_date else '',
+            'quant_count': book.quant_count,
+            'available_count': book.available_quant_count,
+        } for book in books]

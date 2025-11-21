@@ -13,13 +13,6 @@
               action="action_library_book"
               sequence="10"/>
 
-    <!-- Book Quants Menu -->
-    <menuitem id="menu_library_book_quants"
-              name="Bản sao sách"
-              parent="menu_library_root"
-              action="action_library_book_quant"
-              sequence="15"/>
-
     <!-- Borrowing Management Menu -->
     <menuitem id="menu_library_borrowing_management"
               name="Mượn/Trả"
@@ -72,6 +65,13 @@
               name="Báo cáo"
               parent="menu_library_root"
               sequence="90"/>
+
+    <!-- Borrowing Line Report -->
+    <menuitem id="menu_library_borrowing_line_report"
+              name="Chi tiết mượn/trả"
+              parent="menu_library_reports"
+              action="action_library_borrowing_line_report"
+              sequence="5"/>
 
     <!-- Overdue Books Report -->
     <menuitem id="menu_library_overdue_report"

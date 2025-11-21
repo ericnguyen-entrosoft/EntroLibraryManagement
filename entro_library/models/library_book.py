@@ -11,10 +11,10 @@ class LibraryBook(models.Model):
     _order = 'registration_date desc, name'
 
     name = fields.Char(string='Tác phẩm (Nhan đề)', required=True, index=True)
-    registration_date = fields.Date(string='Ngày ĐKTQ', default=fields.Date.today)
+    registration_date = fields.Date(string='Ngày ĐKTQ', default=fields.Date.today, required=True)
 
     # Thông tin trách nhiệm
-    code = fields.Char(string='Mã', index=True)
+    code = fields.Char(string='Mã', index=True, required=True)
 
     # Tác giả
     author_ids = fields.Many2many(
@@ -65,7 +65,7 @@ class LibraryBook(models.Model):
         store=True,
         help='Mã Cutter được tính tự động từ tên tác giả'
     )
-    category_id = fields.Many2one('library.category', string='Nhóm')
+    category_id = fields.Many2one('library.category', string='Nhóm', required=True)
 
     # Quants (Physical copies)
     quant_ids = fields.One2many('library.book.quant', 'book_id', string='Bản sao vật lý')
@@ -93,6 +93,10 @@ class LibraryBook(models.Model):
 
     # Images
     book_image_ids = fields.One2many('library.book.image', 'book_id', string='Hình ảnh')
+
+    # Soft copy
+    soft_copy = fields.Binary(string='Bản mềm', attachment=True)
+    soft_copy_filename = fields.Char(string='Tên file bản mềm')
 
     # Trạng thái
     active = fields.Boolean(string='Hoạt động', default=True)
@@ -231,9 +235,9 @@ class LibraryBook(models.Model):
         """Open wizard to create multiple book quants"""
         self.ensure_one()
         return {
-            'name': 'Tạo bản sao sách',
+            'name': 'Thêm số lượng',
             'type': 'ir.actions.act_window',
-            'res_model': 'library.book.create.quant.wizard',
+            'res_model': 'library.book.update.quantity',
             'view_mode': 'form',
             'target': 'new',
             'context': {

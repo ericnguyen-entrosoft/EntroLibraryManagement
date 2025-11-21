@@ -4,12 +4,12 @@ from odoo import models, fields
 
 class LibraryCategory(models.Model):
     _name = 'library.category'
-    _description = 'Danh mục sách'
+    _description = 'Nhóm'
     _order = 'name'
     _parent_store = True
 
     name = fields.Char(string='Tên danh mục', required=True, index=True)
-    code = fields.Char(string='Mã danh mục', index=True)
+    code = fields.Char(string='Mã danh mục', index=True, required=True)
     parent_id = fields.Many2one('library.category', string='Danh mục cha', ondelete='restrict')
     parent_path = fields.Char(index=True, unaccent=False)
     child_ids = fields.One2many('library.category', 'parent_id', string='Danh mục con')

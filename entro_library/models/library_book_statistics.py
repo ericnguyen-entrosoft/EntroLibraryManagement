@@ -9,7 +9,7 @@ class LibraryBookStatistics(models.Model):
     _order = 'code'
 
     code = fields.Char(string='Mã', readonly=True)
-    name = fields.Char(string='Tên sách', readonly=True)
+    name = fields.Char(string='Sách', readonly=True)
     author_ids = fields.Many2many(
         'library.author',
         string='Tác giả',
@@ -18,9 +18,9 @@ class LibraryBookStatistics(models.Model):
     )
     author_names = fields.Char(string='Tác giả', readonly=True)
     category_id = fields.Many2one('library.category', string='Nhóm', readonly=True)
-    number_available_qty = fields.Integer(string='Số lượng có sẵn', readonly=True)
-    number_borrowed_qty = fields.Integer(string='Số lượng đang mượn', readonly=True)
-    total_qty = fields.Integer(string='Tổng số lượng', readonly=True)
+    number_available_qty = fields.Integer(string='Có sẵn', readonly=True)
+    number_borrowed_qty = fields.Integer(string='Đang mượn', readonly=True)
+    total_qty = fields.Integer(string='Tổng', readonly=True)
 
     def init(self):
         """Create the view - now using library_book_quant for quantities"""

@@ -187,8 +187,62 @@
                     </div>
                 </div>
 
+                <!-- New Books This Month -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0" style="color:#8c675a">
+                            <i class="fa fa-star me-2" style="color:#591202"/>
+                            Sách mới trong tháng
+                        </h5>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Mã sách</th>
+                                        <th>Tên sách</th>
+                                        <th>Tác giả</th>
+                                        <th>Nhóm</th>
+                                        <th>Ngày ĐKTQ</th>
+                                        <th>Số lượng</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <t t-if="state.data.new_books_this_month.length">
+                                        <t t-foreach="state.data.new_books_this_month" t-as="book" t-key="book.id">
+                                            <tr class="cursor-pointer" t-on-click="() => this.openBook(book.id)">
+                                                <td><strong t-esc="book.code"/></td>
+                                                <td>
+                                                    <div t-esc="book.name" class="text-primary"/>
+                                                </td>
+                                                <td t-esc="book.author"/>
+                                                <td t-esc="book.category"/>
+                                                <td t-esc="formatDate(book.registration_date)"/>
+                                                <td>
+                                                    <span class="badge bg-info" style="color:white">
+                                                        <t t-esc="book.available_count"/> / <t t-esc="book.quant_count"/>
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                        </t>
+                                    </t>
+                                    <t t-else="">
+                                        <tr>
+                                            <td colspan="6" class="text-center text-muted py-5">
+                                                <i class="fa fa-book fa-3x mb-3 opacity-25"/>
+                                                <p>Chưa có sách mới trong tháng này</p>
+                                            </td>
+                                        </tr>
+                                    </t>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Recent Borrowings Table -->
-                <div class="card">
+                <!-- <div class="card">
                     <div class="card-header">
                         <h5 class="mb-0" style="color:#8c675a">
                             <i class="fa fa-calendar me-2" style="color:#591202"/>
@@ -214,14 +268,13 @@
                                             <tr class="cursor-pointer" t-on-click="() => this.openBorrowing(borrowing.id)">
                                                 <td><strong t-esc="borrowing.name"/></td>
                                                 <td>
-                                                    <div t-esc="borrowing.book_title"/>
-                                                    <small class="text-muted" t-esc="borrowing.book_code"/>
+                                                    <div t-esc="borrowing.book_titles"/>
                                                 </td>
                                                 <td t-esc="borrowing.borrower"/>
                                                 <td t-esc="formatDate(borrowing.borrow_date)"/>
                                                 <td t-esc="formatDate(borrowing.due_date)"/>
                                                 <td>
-                                                    <span class="badge" t-att-class="'bg-' + getStateColor(borrowing.state)" t-esc="getStateLabel(borrowing.state)"/>
+                                                    <span style="color:white" class="badge" t-att-class="'bg-' + getStateColor(borrowing.state)" t-esc="getStateLabel(borrowing.state)"/>
                                                 </td>
                                             </tr>
                                         </t>
@@ -238,7 +291,7 @@
                             </table>
                         </div>
                     </div>
-                </div>
+                </div> -->
             </t>
         </div>
     </t>

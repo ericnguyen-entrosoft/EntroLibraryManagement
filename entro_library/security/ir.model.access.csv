@@ -18,7 +18,8 @@ access_library_borrowing_portal,library.borrowing.portal,model_library_borrowing
 access_library_borrowing_line_portal,library.borrowing.line.portal,model_library_borrowing_line,base.group_portal,1,0,0,0
 access_library_reservation_user,library.reservation.user,model_library_reservation,base.group_user,1,1,1,1
 access_library_reservation_portal,library.reservation.portal,model_library_reservation,base.group_portal,1,0,0,0
-access_library_book_create_quant_wizard_user,library.book.create.quant.wizard.user,model_library_book_create_quant_wizard,base.group_user,1,1,1,1
-access_library_book_create_quant_wizard_line_user,library.book.create.quant.wizard.line.user,model_library_book_create_quant_wizard_line,base.group_user,1,1,1,1
+access_library_book_update_quantity_user,library.book.update.quantity.user,model_library_book_update_quantity,base.group_user,1,1,1,1
+access_library_book_update_quantity_line_user,library.book.update.quantity.line.user,model_library_book_update_quantity_line,base.group_user,1,1,1,1
+access_library_book_update_quantity_allocation_user,library.book.update.quantity.allocation.user,model_library_book_update_quantity_allocation,base.group_user,1,1,1,1
 access_library_book_label_wizard_user,library.book.label.wizard.user,model_library_book_label_wizard,base.group_user,1,1,1,1
 access_library_book_label_line_user,library.book.label.line.user,model_library_book_label_line,base.group_user,1,1,1,1

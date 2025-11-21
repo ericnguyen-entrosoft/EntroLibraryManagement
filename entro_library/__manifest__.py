@@ -29,7 +29,7 @@
         'security/ir.model.access.csv',
 
         # Wizards
-        'wizards/library_book_create_quant_wizard_views.xml',
+        'wizards/library_book_update_quantity_views.xml',
         'wizards/library_book_label_wizard_views.xml',
 
         # Reports (must be loaded before views that reference them)

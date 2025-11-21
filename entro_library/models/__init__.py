@@ -1,6 +1,7 @@
 from . import library_book
 from . import library_book_quant
 from . import library_book_image
+from . import library_book_label_report
 from . import library_borrower_type
 from . import library_author
 from . import library_publisher

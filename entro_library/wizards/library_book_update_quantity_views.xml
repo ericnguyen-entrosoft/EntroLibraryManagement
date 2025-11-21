@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Wizard Allocation Line Tree View -->
+    <record id="view_library_book_update_quantity_allocation_list" model="ir.ui.view">
+        <field name="name">library.book.update.quantity.allocation.list</field>
+        <field name="model">library.book.update.quantity.allocation</field>
+        <field name="arch" type="xml">
+            <list string="Phân bổ vị trí" editable="bottom">
+                <field name="sequence" widget="handle"/>
+                <field name="location_id" required="True"/>
+                <field name="quantity" required="True"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Wizard Line Tree View -->
+    <record id="view_library_book_update_quantity_line_list" model="ir.ui.view">
+        <field name="name">library.book.update.quantity.line.list</field>
+        <field name="model">library.book.update.quantity.line</field>
+        <field name="arch" type="xml">
+            <list string="Bản sao" editable="bottom" create="false" delete="false">
+                <field name="registration_number" required="True"/>
+                <field name="code_registration_number" optional="hide"/>
+                <field name="location_id" optional="show"/>
+                <field name="quantity"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Wizard Form View -->
+    <record id="view_library_book_update_quantity_form" model="ir.ui.view">
+        <field name="name">library.book.update.quantity.form</field>
+        <field name="model">library.book.update.quantity</field>
+        <field name="arch" type="xml">
+            <form string="Cập nhật số lượng bản sao sách">
+                <group>
+                    <group>
+                        <field name="book_id" readonly="1"/>
+                        <field name="quantity" invisible="use_multiple_locations"/>
+                        <field name="use_multiple_locations"/>
+                    </group>
+                    <group>
+                        <field name="location_id" placeholder="Chọn vị trí mặc định (tùy chọn)"
+                               invisible="use_multiple_locations"/>
+                    </group>
+                </group>
+                <notebook invisible="not use_multiple_locations">
+                    <page string="Phân bổ vị trí" name="allocation">
+                        <field name="allocation_ids" nolabel="1" widget="one2many">
+                            <list editable="bottom">
+                                <field name="location_id" required="True"/>
+                                <field name="quantity" required="True"/>
+                            </list>
+                        </field>
+                    </page>
+                </notebook>
+                <group string="Bản sao sẽ tạo">
+                    <field name="line_ids" nolabel="1" />
+                </group>
+                <footer>
+                    <button name="action_create_quants" string="Tạo bản sao" type="object" class="btn-primary"/>
+                    <button string="Hủy" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <!-- Wizard Action -->
+    <record id="action_library_book_update_quantity" model="ir.actions.act_window">
+        <field name="name">Cập nhật số lượng bản sao sách</field>
+        <field name="res_model">library.book.update.quantity</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="binding_model_id" ref="model_library_book"/>
+        <field name="binding_view_types">form</field>
+    </record>
+</odoo>

@@ -45,18 +45,13 @@
                            statusbar_visible="draft,borrowed,returned"/>
                 </header>
                 <sheet>
-                    <div class="oe_button_box" name="button_box">
-                        <button class="oe_stat_button" name="toggle_active" type="object" icon="fa-archive">
-                            <field name="active" widget="boolean_button" options='{"terminology": "archive"}'/>
-                        </button>
-                    </div>
                     <div class="oe_title">
                         <h1>
                             <field name="name" readonly="1"/>
                         </h1>
                     </div>
                     <group>
-                        <group>
+                        <group string="Thông tin độc giả">
                             <field name="borrower_id" options="{'no_create': True}"/>
                             <field name="borrower_email" readonly="1"/>
                             <field name="borrower_phone" readonly="1"/>
@@ -72,21 +67,20 @@
                             <field name="borrowing_line_ids">
                                 <list editable="bottom" decoration-danger="is_overdue == True" decoration-success="state == 'returned'">
                                     <field name="sequence" widget="handle"/>
-                                    <field name="quant_id" options="{'no_create': True}"/>
+                                    <field name="quant_id" options="{'no_create': True}" string="Số ĐKCB"/>
                                     <field name="book_id" readonly="1" optional="show"/>
-                                    <field name="registration_number" readonly="1" optional="show"/>
                                     <field name="quant_location" readonly="1" optional="show"/>
                                     <field name="due_date"/>
-                                    <field name="return_date" readonly="1"/>
-                                    <field name="late_days" readonly="1" optional="show"/>
-                                    <field name="fine_amount" widget="monetary" readonly="1"/>
-                                    <field name="is_overdue" column_invisible="1"/>
+                                    <field name="return_date" readonly="1" optional="hide"/>
+                                    <field name="late_days" readonly="1" optional="hide"/>
+                                    <field name="fine_amount" widget="monetary" readonly="1" optional="hide"/>
+                                    <field name="is_overdue" column_invisible="1" optional="hide"/>
                                     <field name="state" widget="badge"
                                            decoration-info="state == 'draft'"
                                            decoration-primary="state == 'borrowed'"
                                            decoration-success="state == 'returned'"
                                            decoration-danger="state == 'overdue'"
-                                           decoration-warning="state == 'cancelled'"/>
+                                           decoration-warning="state == 'cancelled'" />
                                     <button name="action_return" string="Trả sách" type="object"
                                             icon="fa-check"
                                             invisible="state not in ('borrowed', 'overdue')"/>
@@ -221,5 +215,74 @@
         <field name="view_mode">list,form</field>
         <field name="domain">[('state', '=', 'overdue')]</field>
         <field name="context">{'create': False}</field>
+    </record>
+
+    <!-- Borrowing Line List View (for Reports) -->
+    <record id="view_library_borrowing_line_report_list" model="ir.ui.view">
+        <field name="name">library.borrowing.line.report.list</field>
+        <field name="model">library.borrowing.line</field>
+        <field name="arch" type="xml">
+            <list string="Chi tiết mượn/trả" create="false" edit="false" delete="false"
+                  decoration-danger="state == 'overdue'" decoration-success="state == 'returned'">
+                <field name="borrowing_id" string="Phiếu mượn"/>
+                <field name="borrower_id"/>
+                <field name="borrow_date"/>
+                <field name="quant_id"/>
+                <field name="registration_number"/>
+                <field name="book_id"/>
+                <field name="book_name" optional="hide"/>
+                <field name="quant_location" optional="show"/>
+                <field name="due_date"/>
+                <field name="return_date" optional="show"/>
+                <field name="late_days" optional="show"/>
+                <field name="fine_amount" widget="monetary" optional="show"/>
+                <field name="state" widget="badge"
+                       decoration-info="state == 'draft'"
+                       decoration-primary="state == 'borrowed'"
+                       decoration-success="state == 'returned'"
+                       decoration-danger="state == 'overdue'"
+                       decoration-warning="state == 'cancelled'"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Borrowing Line Search View (for Reports) -->
+    <record id="view_library_borrowing_line_report_search" model="ir.ui.view">
+        <field name="name">library.borrowing.line.report.search</field>
+        <field name="model">library.borrowing.line</field>
+        <field name="arch" type="xml">
+            <search string="Tìm kiếm chi tiết mượn/trả">
+                <field name="borrowing_id"/>
+                <field name="borrower_id"/>
+                <field name="book_id"/>
+                <field name="quant_id"/>
+                <field name="registration_number"/>
+                <separator/>
+                <filter string="Đang mượn" name="borrowed" domain="[('state', '=', 'borrowed')]"/>
+                <filter string="Quá hạn" name="overdue" domain="[('state', '=', 'overdue')]"/>
+                <filter string="Đã trả" name="returned" domain="[('state', '=', 'returned')]"/>
+                <separator/>
+                <filter string="Hôm nay" name="today" domain="[('borrow_date', '=', context_today().strftime('%Y-%m-%d'))]"/>
+                <filter string="Tuần này" name="this_week" domain="[('borrow_date', '&gt;=', (context_today()-relativedelta(weeks=1)).strftime('%Y-%m-%d'))]"/>
+                <filter string="Tháng này" name="this_month" domain="[('borrow_date', '&gt;=', (context_today()-relativedelta(months=1)).strftime('%Y-%m-%d'))]"/>
+                <separator/>
+                <group expand="0" string="Nhóm theo">
+                    <filter string="Phiếu mượn" name="group_borrowing" context="{'group_by': 'borrowing_id'}"/>
+                    <filter string="Người mượn" name="group_borrower" context="{'group_by': 'borrower_id'}"/>
+                    <filter string="Sách" name="group_book" context="{'group_by': 'book_id'}"/>
+                    <filter string="Trạng thái" name="group_state" context="{'group_by': 'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Borrowing Line Report Action -->
+    <record id="action_library_borrowing_line_report" model="ir.actions.act_window">
+        <field name="name">Chi tiết mượn/trả</field>
+        <field name="res_model">library.borrowing.line</field>
+        <field name="view_mode">list</field>
+        <field name="search_view_id" ref="view_library_borrowing_line_report_search"/>
+        <field name="view_id" ref="view_library_borrowing_line_report_list"/>
+        <field name="context">{'create': False, 'edit': False, 'delete': False}</field>
     </record>
 </odoo>

@@ -13,7 +13,7 @@ class LibraryBorrowingLine(models.Model):
         'library.borrowing', string='Phiếu mượn', required=True, ondelete='cascade')
     quant_id = fields.Many2one(
         'library.book.quant', string='Bản sao sách', required=True,
-        domain="[('state', '=', 'available')]", ondelete='restrict')
+        domain="[('state', '=', 'available'), ('quant_type', '=', 'can_borrow')]", ondelete='restrict')
     book_id = fields.Many2one(
         related='quant_id.book_id', string='Sách', store=True, readonly=True)
 
@@ -48,6 +48,12 @@ class LibraryBorrowingLine(models.Model):
     # Book info (related fields for quick access)
     book_code = fields.Char(related='book_id.code', string='Mã sách', store=True)
     book_name = fields.Char(related='book_id.name', string='Tên sách', store=True)
+
+    # Borrowing info (related fields for reports)
+    borrower_id = fields.Many2one(
+        related='borrowing_id.borrower_id', string='Người mượn', store=True, readonly=True)
+    borrow_date = fields.Date(
+        related='borrowing_id.borrow_date', string='Ngày mượn', store=True, readonly=True)
 
     # Additional info
     notes = fields.Text(string='Ghi chú')
@@ -105,6 +111,12 @@ class LibraryBorrowingLine(models.Model):
         """Check if quant is available for borrowing"""
         for line in self:
             if line.state in ('draft', 'borrowed') and line.quant_id:
+                # Check if quant type allows borrowing
+                if line.quant_id.quant_type == 'no_borrow':
+                    raise exceptions.ValidationError(
+                        f'Bản sao sách [{line.quant_id.registration_number}] "{line.book_id.name}" chỉ được đọc tại chỗ, không thể mượn về.'
+                    )
+
                 # Check if quant is currently borrowed by another borrowing
                 active_borrowing_line = self.search([
                     ('quant_id', '=', line.quant_id.id),

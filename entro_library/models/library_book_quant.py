@@ -20,11 +20,28 @@ class LibraryBookQuant(models.Model):
         ondelete='cascade',
         index=True
     )
+
+    category_id = fields.Many2one(related='book_id.category_id')
+
     registration_number = fields.Char(
         string='Số ĐKCB',
-        required=True,
+        required=False,
         index=True,
         help='Số đăng ký cá biệt cho bản sao này'
+    )
+
+    code_registration_number = fields.Char(
+        string='Mã số ĐKCB',
+        required=False,
+        index=True,
+        help='Mã số đăng ký cá biệt cho bản sao này'
+    )
+
+    quantity = fields.Integer(
+        string='Số lượng',
+        default=1,
+        required=True,
+        help='Số lượng bản sao vật lý'
     )
 
     # Vị trí lưu trữ
@@ -83,10 +100,14 @@ class LibraryBookQuant(models.Model):
 
     # Trạng thái
     active = fields.Boolean(string='Hoạt động', default=True)
+    
+    quant_type = fields.Selection([('no_borrow', 'Đọc tại chỗ'),('can_borrow', 'Có thể mượn')], default='no_borrow')
 
     _sql_constraints = [
         ('registration_number_unique', 'UNIQUE(registration_number)',
-         'Số ĐKCB phải là duy nhất!')
+         'Số ĐKCB phải là duy nhất!'),
+        ('quantity_positive', 'CHECK(quantity > 0)',
+         'Số lượng phải lớn hơn 0!')
     ]
 
     @api.depends('book_id', 'registration_number')

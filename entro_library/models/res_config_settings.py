@@ -9,6 +9,7 @@ class ResConfigSettings(models.TransientModel):
     default_borrowing_days = fields.Integer(
         string='Số ngày mượn mặc định',
         default=14,
+        default_model='library.borrowing',
         config_parameter='library.default_borrowing_days',
         help='Số ngày mặc định cho một lần mượn sách'
     )
@@ -61,6 +62,7 @@ class ResConfigSettings(models.TransientModel):
     default_membership_months = fields.Integer(
         string='Thời hạn thẻ mặc định (tháng)',
         default=12,
+        default_model='library.membership',
         config_parameter='library.default_membership_months',
         help='Thời hạn thẻ độc giả mặc định tính bằng tháng'
     )

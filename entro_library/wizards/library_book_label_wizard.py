@@ -7,11 +7,9 @@ class LibraryBookLabelWizard(models.TransientModel):
     _description = 'In nhãn sách'
 
     print_format = fields.Selection([
-        ('2x7xprice', '2 x 7 with price'),
-        ('4x7xprice', '4 x 7 with price'),
-        ('4x12', '4 x 12'),
-        ('4x12xprice', '4 x 12 with price'),
-    ], string='Format', default='4x12', required=True)
+        ('custom', 'Nhãn ĐKCB'),
+        ('ddc', 'Nhãn DDC'),
+    ], string='Format', default='custom', required=True)
 
     quant_line_ids = fields.One2many(
         'library.book.label.line',
@@ -73,13 +71,11 @@ class LibraryBookLabelWizard(models.TransientModel):
 
         # Map print_format to report xml_id
         report_map = {
-            '2x7xprice': 'entro_library.action_report_book_label_2_7_price',
-            '4x7xprice': 'entro_library.action_report_book_label_4_7_price',
-            '4x12': 'entro_library.action_report_book_label_4_12',
-            '4x12xprice': 'entro_library.action_report_book_label_4_12_price',
+            'custom': 'entro_library.action_report_book_label_custom',
+            'ddc': 'entro_library.action_report_book_label_ddc',
         }
 
-        report_xml_id = report_map.get(self.print_format, 'entro_library.action_report_book_label_4_12')
+        report_xml_id = report_map.get(self.print_format, 'entro_library.action_report_book_label_custom')
 
         return self.env.ref(report_xml_id).report_action(
             self,

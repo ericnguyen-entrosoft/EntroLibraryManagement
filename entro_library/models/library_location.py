@@ -36,6 +36,19 @@ class LibraryLocation(models.Model):
         ('position', 'Vị trí cụ thể')
     ], string='Loại vị trí', required=True, default='shelf')
 
+    location_category = fields.Selection([
+        ('area', 'Khu vực'),
+        ('storage', 'Lưu trữ'),
+        ('destroy', 'Hủy'),
+        ('reader', 'Độc giả')
+    ], string='Phân loại vị trí', help='Phân loại chức năng của vị trí')
+
+    skip_register_number = fields.Boolean(
+        string='Không tạo số ĐKCB',
+        default=False,
+        help='Khi được chọn, hệ thống sẽ không tự động tạo số đăng ký cá biệt (ĐKCB) khi tạo bản sao sách tại vị trí này'
+    )
+
     description = fields.Text(string='Mô tả')
     capacity = fields.Integer(string='Sức chứa', help='Số lượng sách tối đa có thể lưu trữ')
 

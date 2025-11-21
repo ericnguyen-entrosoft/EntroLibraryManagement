@@ -25,7 +25,7 @@ class LibraryBorrowing(models.Model):
     # Dates
     borrow_date = fields.Date(
         string='Ngày mượn', default=fields.Date.today, required=True, tracking=True)
-    due_date = fields.Date(string='Ngày hạn trả')
+    due_date = fields.Date(string='Ngày hạn trả', compute='_compute_due_date', store=True)
     return_date = fields.Date(string='Ngày trả thực tế', tracking=True)
 
     # State
@@ -76,6 +76,16 @@ class LibraryBorrowing(models.Model):
                 'library.borrowing') or 'New'
         return super(LibraryBorrowing, self).create(vals)
 
+    @api.depends('borrowing_line_ids.due_date')
+    def _compute_due_date(self):
+        """Compute due date as max due date from all lines"""
+        for record in self:
+            if record.borrowing_line_ids:
+                due_dates = record.borrowing_line_ids.mapped('due_date')
+                record.due_date = max(due_dates) if due_dates else False
+            else:
+                record.due_date = False
+
     @api.depends('borrowing_line_ids.late_days', 'borrowing_line_ids.is_overdue', 'state')
     def _compute_late_info(self):
         """Compute late days and overdue status from lines"""
@@ -109,7 +119,6 @@ class LibraryBorrowing(models.Model):
             default_days = int(config.get_param(
                 'library.default_borrowing_days', default=14))
             default_due_date = self.borrow_date + timedelta(days=default_days)
-            self.due_date = default_due_date
             # Update all lines
             for line in self.borrowing_line_ids:
                 if not line.due_date:
@@ -159,7 +168,7 @@ class LibraryBorrowing(models.Model):
             # Confirm all lines
             for line in record.borrowing_line_ids:
                 line.state = 'borrowed'
-                line.book_id.write({
+                line.quant_id.write({
                     'state': 'borrowed',
                     'current_borrowing_id': record.id
                 })
@@ -182,7 +191,7 @@ class LibraryBorrowing(models.Model):
         """Đánh dấu tất cả sách mất"""
         for record in self:
             record.state = 'lost'
-            for line in record.borrowing_line_ids:
+            for line in record.borrowing_line_ids.filtered(lambda l: l.state in ('borrowed', 'overdue')):
                 line.action_mark_lost()
 
     def action_cancel(self):
@@ -191,7 +200,7 @@ class LibraryBorrowing(models.Model):
             # Cancel all lines
             for line in record.borrowing_line_ids:
                 if line.state == 'borrowed':
-                    line.book_id.write({
+                    line.quant_id.write({
                         'state': 'available',
                         'current_borrowing_id': False
                     })
