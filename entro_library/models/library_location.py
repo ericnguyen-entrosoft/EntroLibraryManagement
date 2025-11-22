@@ -39,6 +39,12 @@ class LibraryLocation(models.Model):
         help='Khi được chọn, hệ thống sẽ không tự động tạo số đăng ký cá biệt (ĐKCB) khi tạo bản sao sách tại vị trí này'
     )
 
+    is_borrow_location = fields.Boolean(
+        string='Vị trí cho mượn',
+        default=False,
+        help='Đánh dấu vị trí này là nơi có sách có thể mượn về'
+    )
+
     description = fields.Text(string='Mô tả')
     capacity = fields.Integer(string='Sức chứa', help='Số lượng sách tối đa có thể lưu trữ')
 

@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Form View -->
+    <record id="view_library_quant_type_form" model="ir.ui.view">
+        <field name="name">library.quant.type.form</field>
+        <field name="model">library.quant.type</field>
+        <field name="arch" type="xml">
+            <form string="Loại bản sao sách">
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name" string="Tên loại"/>
+                        <h1>
+                            <field name="name" placeholder="Nhập tên loại..."/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group name="basic_info" string="Thông tin cơ bản">
+                            <field name="code"/>
+                            <field name="color" widget="color_picker"/>
+                            <field name="can_borrow"/>
+                            <field name="active"/>
+                        </group>
+                        <group name="ordering" string="Sắp xếp">
+                            <field name="sequence"/>
+                        </group>
+                    </group>
+                    <group name="description_group" string="Mô tả">
+                        <field name="description" placeholder="Mô tả về loại bản sao này..." nolabel="1"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- List View -->
+    <record id="view_library_quant_type_list" model="ir.ui.view">
+        <field name="name">library.quant.type.list</field>
+        <field name="model">library.quant.type</field>
+        <field name="arch" type="xml">
+            <list string="Loại bản sao sách">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="code"/>
+                <field name="color" widget="color"/>
+                <field name="can_borrow" widget="boolean_toggle"/>
+                <field name="active" widget="boolean_toggle"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Kanban View -->
+    <record id="view_library_quant_type_kanban" model="ir.ui.view">
+        <field name="name">library.quant.type.kanban</field>
+        <field name="model">library.quant.type</field>
+        <field name="arch" type="xml">
+            <kanban>
+                <field name="name"/>
+                <field name="code"/>
+                <field name="color"/>
+                <field name="can_borrow"/>
+                <field name="sequence"/>
+                <templates>
+                    <t t-name="card">
+                        <div class="oe_kanban_content" t-attf-style="border-left: 4px solid {{record.color.raw_value}};">
+                            <div class="fw-bold mb-2">
+                                <field name="name"/>
+                            </div>
+                            <div class="text-muted small mb-2">
+                                <i class="fa fa-code"/> <field name="code"/>
+                            </div>
+                            <div class="mb-2">
+                                <span class="badge" t-attf-style="background-color: {{record.color.raw_value}}; color: white;">
+                                    <i class="fa fa-circle"/> Màu
+                                </span>
+                            </div>
+                            <div>
+                                <span t-if="record.can_borrow.raw_value" class="badge text-bg-success">
+                                    <i class="fa fa-check"/> Có thể mượn
+                                </span>
+                                <span t-else="" class="badge text-bg-danger">
+                                    <i class="fa fa-times"/> Đọc tại chỗ
+                                </span>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- Search View -->
+    <record id="view_library_quant_type_search" model="ir.ui.view">
+        <field name="name">library.quant.type.search</field>
+        <field name="model">library.quant.type</field>
+        <field name="arch" type="xml">
+            <search string="Tìm loại bản sao">
+                <field name="name"/>
+                <field name="code"/>
+                <filter string="Có thể mượn" name="can_borrow" domain="[('can_borrow', '=', True)]"/>
+                <filter string="Đọc tại chỗ" name="no_borrow" domain="[('can_borrow', '=', False)]"/>
+                <separator/>
+                <filter string="Đang hoạt động" name="active" domain="[('active', '=', True)]"/>
+                <group expand="0" string="Nhóm theo">
+                    <filter string="Có thể mượn" name="group_can_borrow" context="{'group_by': 'can_borrow'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_library_quant_type" model="ir.actions.act_window">
+        <field name="name">Loại bản sao</field>
+        <field name="res_model">library.quant.type</field>
+        <field name="view_mode">list,kanban,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Tạo loại bản sao mới
+            </p>
+            <p>
+                Quản lý các loại bản sao sách với màu sắc và quy tắc mượn riêng.
+            </p>
+        </field>
+    </record>
+</odoo>

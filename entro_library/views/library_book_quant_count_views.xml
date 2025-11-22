@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Form View -->
+    <record id="view_library_book_quant_count_form" model="ir.ui.view">
+        <field name="name">library.book.quant.count.form</field>
+        <field name="model">library.book.quant.count</field>
+        <field name="arch" type="xml">
+            <form string="Kiểm kê bản sao sách">
+                <header>
+                    <button name="action_start_count" type="object" string="Bắt đầu kiểm kê"
+                            class="oe_highlight" invisible="state != 'draft'"/>
+                    <button name="action_validate_count" type="object" string="Xác nhận"
+                            class="oe_highlight" invisible="state != 'in_progress'"
+                            confirm="Bạn có chắc chắn muốn xác nhận kiểm kê? Số lượng sẽ được cập nhật vào hệ thống."/>
+                    <button name="action_cancel" type="object" string="Hủy"
+                            invisible="state in ('done', 'cancelled')"/>
+                    <button name="action_reset_to_draft" type="object" string="Chuyển về Nháp"
+                            invisible="state not in ('in_progress', 'cancelled')"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,in_progress,done"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name" string="Số phiếu kiểm kê"/>
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group name="general_info" string="Thông tin chung">
+                            <field name="count_date"/>
+                            <field name="responsible_id"/>
+                        </group>
+                        <group name="filters" string="Bộ lọc" invisible="state != 'draft'">
+                            <field name="location_id"/>
+                            <field name="category_id"/>
+                            <field name="state_filter"/>
+                        </group>
+                    </group>
+                    <group name="note_group">
+                        <field name="note" placeholder="Ghi chú về phiếu kiểm kê..."/>
+                    </group>
+                    <notebook invisible="state == 'draft'">
+                        <page string="Chi tiết kiểm kê" name="lines">
+                            <field name="line_ids" readonly="state in ('done', 'cancelled')">
+                                <list string="Chi tiết kiểm kê" editable="bottom">
+                                    <field name="registration_number"/>
+                                    <field name="book_id"/>
+                                    <field name="location_id"/>
+                                    <field name="theory_qty"/>
+                                    <field name="counted_qty"/>
+                                    <field name="difference"
+                                           decoration-danger="difference &lt; 0"
+                                           decoration-success="difference &gt; 0"
+                                           decoration-muted="difference == 0"/>
+                                    <field name="note"/>
+                                    <field name="quant_id" column_invisible="1"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- List View -->
+    <record id="view_library_book_quant_count_list" model="ir.ui.view">
+        <field name="name">library.book.quant.count.list</field>
+        <field name="model">library.book.quant.count</field>
+        <field name="arch" type="xml">
+            <list string="Danh sách kiểm kê">
+                <field name="name"/>
+                <field name="count_date"/>
+                <field name="responsible_id" widget="many2one_avatar_user"/>
+                <field name="location_id"/>
+                <field name="category_id"/>
+                <field name="state" widget="badge"
+                       decoration-info="state == 'draft'"
+                       decoration-warning="state == 'in_progress'"
+                       decoration-success="state == 'done'"
+                       decoration-muted="state == 'cancelled'"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Search View -->
+    <record id="view_library_book_quant_count_search" model="ir.ui.view">
+        <field name="name">library.book.quant.count.search</field>
+        <field name="model">library.book.quant.count</field>
+        <field name="arch" type="xml">
+            <search string="Tìm phiếu kiểm kê">
+                <field name="name"/>
+                <field name="responsible_id"/>
+                <field name="location_id"/>
+                <field name="category_id"/>
+                <filter string="Nháp" name="draft" domain="[('state', '=', 'draft')]"/>
+                <filter string="Đang kiểm kê" name="in_progress" domain="[('state', '=', 'in_progress')]"/>
+                <filter string="Hoàn thành" name="done" domain="[('state', '=', 'done')]"/>
+                <separator/>
+                <filter string="Kiểm kê của tôi" name="my_counts"
+                        domain="[('responsible_id', '=', uid)]"/>
+                <separator/>
+                <filter string="Tháng này" name="this_month"
+                        domain="[('count_date', '&gt;=', (context_today() - relativedelta(day=1)).strftime('%Y-%m-%d')),
+                                 ('count_date', '&lt;=', (context_today() + relativedelta(day=31)).strftime('%Y-%m-%d'))]"/>
+                <group expand="0" string="Nhóm theo">
+                    <filter string="Trạng thái" name="group_state" context="{'group_by': 'state'}"/>
+                    <filter string="Người phụ trách" name="group_responsible" context="{'group_by': 'responsible_id'}"/>
+                    <filter string="Vị trí" name="group_location" context="{'group_by': 'location_id'}"/>
+                    <filter string="Ngày kiểm kê" name="group_date" context="{'group_by': 'count_date'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_library_book_quant_count" model="ir.actions.act_window">
+        <field name="name">Kiểm kê sách</field>
+        <field name="res_model">library.book.quant.count</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{'search_default_in_progress': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Tạo phiếu kiểm kê mới
+            </p>
+            <p>
+                Kiểm kê giúp bạn đối chiếu số lượng sách thực tế với số lượng trong hệ thống.
+            </p>
+        </field>
+    </record>
+</odoo>

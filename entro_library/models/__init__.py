@@ -1,5 +1,7 @@
 from . import library_book
 from . import library_book_quant
+from . import library_book_quant_count
+from . import library_book_quant_count_line
 from . import library_book_image
 from . import library_book_label_report
 from . import library_borrower_type
@@ -8,6 +10,7 @@ from . import library_publisher
 from . import library_category
 from . import library_series
 from . import library_location
+from . import library_quant_type
 from . import character_mapping
 from . import library_sequence_mixin
 from . import library_borrowing

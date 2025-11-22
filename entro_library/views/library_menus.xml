@@ -13,6 +13,18 @@
               action="action_library_book"
               sequence="10"/>
 
+    
+    <menuitem id="menu_library_book_root"
+            name="Sách"
+            web_icon="entro_library,static/description/book_icon.png"
+            sequence="15"/>
+
+    <menuitem id="menu_library_books_manage"
+              name="Sách"
+              parent="menu_library_book_root"
+              action="action_library_book"
+              sequence="10"/>
+
     <!-- Borrowing Management Menu -->
     <menuitem id="menu_library_borrowing_management"
               name="Mượn/Trả"
@@ -52,6 +64,13 @@
               parent="menu_library_management"
               action="action_library_storage_location"
               sequence="10"/>
+
+    <!-- Book Quant Count Menu (under Management) -->
+    <menuitem id="menu_library_book_quant_count"
+              name="Kiểm kê sách"
+              parent="menu_library_management"
+              action="action_library_book_quant_count"
+              sequence="15"/>
 
     <!-- Reports Menu -->
     <menuitem id="menu_library_reports"
@@ -134,4 +153,12 @@
               parent="menu_library_config"
               action="action_character_mapping"
               sequence="50"/>
+
+    <!-- Quant Type Menu -->
+    <menuitem id="menu_library_quant_type"
+              name="Loại bản sao"
+              parent="menu_library_config"
+              action="action_library_quant_type"
+              sequence="55"
+              groups="group_library_manager"/>
 </odoo>

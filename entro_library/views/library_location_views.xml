@@ -9,6 +9,7 @@
                 <field name="code"/>
                 <field name="complete_name"/>
                 <field name="location_type"/>
+                <field name="is_borrow_location" widget="boolean_toggle"/>
                 <field name="responsible_id" widget="many2one_avatar_user"/>
                 <field name="capacity"/>
                 <field name="book_count" string="Đầu sách"/>
@@ -49,6 +50,7 @@
                             <field name="responsible_id" widget="many2one_avatar_user"/>
                             <field name="capacity"/>
                             <field name="skip_register_number"/>
+                            <field name="is_borrow_location"/>
                         </group>
                     </group>
                     <group>

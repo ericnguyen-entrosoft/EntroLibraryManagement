@@ -95,8 +95,26 @@ class LibraryBookQuant(models.Model):
 
     # Trạng thái
     active = fields.Boolean(string='Hoạt động', default=True)
-    
-    quant_type = fields.Selection([('no_borrow', 'Đọc tại chỗ'),('can_borrow', 'Có thể mượn')], default='no_borrow')
+
+    # Quant Type
+    quant_type_id = fields.Many2one(
+        'library.quant.type',
+        string='Loại bản sao',
+        required=True,
+        default=lambda self: self.env.ref('entro_library.quant_type_no_borrow', raise_if_not_found=False),
+        index=True
+    )
+    color = fields.Char(
+        related='quant_type_id.color',
+        string='Màu',
+        readonly=True
+    )
+    can_borrow = fields.Boolean(
+        related='quant_type_id.can_borrow',
+        string='Có thể mượn',
+        store=True,
+        readonly=True
+    )
 
     _sql_constraints = [
         ('registration_number_unique', 'UNIQUE(registration_number)',

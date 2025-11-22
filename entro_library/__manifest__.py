@@ -26,6 +26,7 @@
         'data/library_data.xml',
 
         # Security
+        'security/library_security.xml',
         'security/ir.model.access.csv',
 
         # Wizards
@@ -42,6 +43,7 @@
         'views/library_book_image_views.xml',
         'views/library_book_views.xml',
         'views/library_book_quant_views.xml',
+        'views/library_book_quant_count_views.xml',
         'views/library_book_statistics_views.xml',
         'views/library_borrower_type_views.xml',
         'views/library_management_views.xml',
@@ -50,6 +52,7 @@
         'views/library_category_views.xml',
         'views/library_series_views.xml',
         'views/library_location_views.xml',
+        'views/library_quant_type_views.xml',
         'views/character_mapping_views.xml',
         'views/library_borrowing_views.xml',
         'views/library_reservation_views.xml',

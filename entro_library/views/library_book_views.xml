@@ -15,6 +15,7 @@
                 <field name="available_quant_count" />
                 <field name="total_reservation_count" />
                 <field name="category_id" />
+                <field name="borrow_location_ids" />
                 <field name="activity_state" />
                 <progressbar field="activity_state"
                     colors='{"planned": "success", "today": "warning", "overdue": "danger"}' />
@@ -49,6 +50,16 @@
                                     </div>
                                 </t>
                             </div>
+                            <t t-if="record.borrow_location_ids.raw_value.length">
+                                <div class="mb-2">
+                                    <div class="text-muted small">
+                                        <i class="fa fa-map-marker text-primary"/> Khu vực:
+                                    </div>
+                                    <div>
+                                        <field name="borrow_location_ids" widget="many2many_tags"/>
+                                    </div>
+                                </div>
+                            </t>
                         </main>
                         <aside>
                             <field
@@ -132,6 +143,7 @@
                                     <field name="parallel_title" />
                                     <field name="volume_title" />
                                     <field name="category_id" options="{'no_create_edit': False}" />
+                                    <field name="media_link" />
                                 </group>
                                 <group name="registration_info" string="Thông tin đăng ký">
                                     <field name="registration_date" />
@@ -217,12 +229,6 @@
                                     </templates>
                                 </kanban>
                             </field>
-                        </page>
-                        <page string="Bản mềm" name="soft_copy">
-                            <group>
-                                <field name="soft_copy_filename" invisible="1" />
-                                <field name="soft_copy" filename="soft_copy_filename" />
-                            </group>
                         </page>
                         <page string="Ghi chú" name="notes">
                             <field name="note" placeholder="Nhập ghi chú..." />

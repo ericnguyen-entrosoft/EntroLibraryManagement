@@ -25,6 +25,33 @@
         <field name="number_increment">1</field>
     </record>
 
+    <record id="seq_library_book_quant_count" model="ir.sequence">
+        <field name="name">Library Book Quant Count Sequence</field>
+        <field name="code">library.book.quant.count</field>
+        <field name="prefix">KK</field>
+        <field name="padding">5</field>
+        <field name="number_increment">1</field>
+    </record>
+
+    <!-- Quant Types -->
+    <record id="quant_type_no_borrow" model="library.quant.type">
+        <field name="name">Đọc tại chỗ</field>
+        <field name="code">no_borrow</field>
+        <field name="color">#e74c3c</field>
+        <field name="can_borrow" eval="False"/>
+        <field name="sequence">10</field>
+        <field name="description">Bản sao chỉ được đọc tại thư viện, không cho mượn về</field>
+    </record>
+
+    <record id="quant_type_can_borrow" model="library.quant.type">
+        <field name="name">Có thể mượn</field>
+        <field name="code">can_borrow</field>
+        <field name="color">#2ecc71</field>
+        <field name="can_borrow" eval="True"/>
+        <field name="sequence">20</field>
+        <field name="description">Bản sao có thể mượn về nhà</field>
+    </record>
+
     <!-- Cron Jobs -->
     <!-- Update overdue status daily at 1:00 AM -->
     <record id="cron_update_overdue_borrowings" model="ir.cron">

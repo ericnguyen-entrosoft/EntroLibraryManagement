@@ -109,7 +109,7 @@ class LibraryBorrowingLine(models.Model):
                 available_quants = self.env['library.book.quant'].search([
                     ('book_id', '=', line.book_id.id),
                     ('state', '=', 'available'),
-                    ('quant_type', '=', 'can_borrow'),
+                    ('can_borrow', '=', True),
                     ('registration_number', '!=', False)
                 ])
                 line.available_quant_ids = available_quants

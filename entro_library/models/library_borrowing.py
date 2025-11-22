@@ -401,7 +401,7 @@ class LibraryBorrowing(models.Model):
         quant = self.env['library.book.quant'].search([
             ('registration_number', '=', barcode),
             ('state', '=', 'available'),
-            ('quant_type', '=', 'can_borrow')
+            ('can_borrow', '=', True)
         ], limit=1)
 
         if not quant:

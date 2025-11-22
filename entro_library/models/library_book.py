@@ -97,6 +97,14 @@ class LibraryBook(models.Model):
         help='Tổng số người đang đặt trước sách này'
     )
 
+    # Borrow locations
+    borrow_location_ids = fields.Many2many(
+        'library.location',
+        string='Khu vực',
+        compute='_compute_borrow_locations',
+        help='Các vị trí có sách này có thể mượn về'
+    )
+
     # Ghi chú
     note = fields.Text(string='Phụ chú')
 
@@ -107,6 +115,7 @@ class LibraryBook(models.Model):
     # Soft copy
     soft_copy = fields.Binary(string='Bản mềm', attachment=True)
     soft_copy_filename = fields.Char(string='Tên file bản mềm')
+    media_link = fields.Char(string='URL')
 
     # Trạng thái
     active = fields.Boolean(string='Hoạt động', default=True)
@@ -168,6 +177,15 @@ class LibraryBook(models.Model):
             book.available_quant_count = available_counts.get(book.id, 0)
             book.borrowed_quant_count = borrowed_counts.get(book.id, 0)
             book.total_reservation_count = reservation_counts.get(book.id, 0)
+
+    @api.depends('quant_ids', 'quant_ids.location_id', 'quant_ids.location_id.is_borrow_location', 'quant_ids.can_borrow')
+    def _compute_borrow_locations(self):
+        """Compute locations where this book can be borrowed from"""
+        for book in self:
+            # Get all quants that can be borrowed
+            borrowable_quants = book.quant_ids.filtered(lambda q: q.can_borrow and q.location_id.is_borrow_location)
+            # Get unique locations
+            book.borrow_location_ids = borrowable_quants.mapped('location_id')
 
     def action_view_quants(self):
         """View book's physical copies (quants)"""

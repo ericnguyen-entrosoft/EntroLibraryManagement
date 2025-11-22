@@ -189,44 +189,40 @@ class LibraryBookUpdateQuantity(models.TransientModel):
                     f'Số ĐKCB đã tồn tại: {", ".join(existing_quants.mapped("registration_number"))}'
                 )
 
-        # Check if this book already has quants in storage locations (excluding skip_register_number)
-        # Get storage locations that are NOT skip_register_number
-        storage_locations = self.env['library.location'].search([
-            ('location_type', '=', 'storage'),
-            ('skip_register_number', '=', False)
-        ])
+        # Check if this book already has a "no_borrow" quant
+        no_borrow_type = self.env.ref('entro_library.quant_type_no_borrow', raise_if_not_found=False)
+        can_borrow_type = self.env.ref('entro_library.quant_type_can_borrow', raise_if_not_found=False)
 
-        existing_quant_count = self.env['library.book.quant'].search_count([
+        has_no_borrow_quant = self.env['library.book.quant'].search_count([
             ('book_id', '=', self.book_id.id),
-            ('location_id', 'in', storage_locations.ids)
-        ])
+            ('quant_type_id', '=', no_borrow_type.id if no_borrow_type else False)
+        ]) > 0
 
         # Create quants
         created_quants = self.env['library.book.quant']
-        quant_index_in_storage = 0  # Track index for storage locations only
+        is_first_quant = not has_no_borrow_quant  # Flag to track if we need to create first no_borrow quant
 
         for line in self.line_ids:
             # Check if registration number is required (only if location doesn't skip it)
             location_skip_reg = line.location_id.skip_register_number if line.location_id else False
-            location_is_storage = line.location_id.location_type == 'storage' if line.location_id else False
 
             if not line.registration_number and not location_skip_reg:
                 raise exceptions.UserError('Vui lòng nhập Số ĐKCB cho tất cả các bản sao (trừ vị trí không yêu cầu).')
 
-            # First quant in storage location (existing + new) should be no_borrow, rest can_borrow
-            # Only consider storage locations that are not skip_register_number
-            if location_is_storage and not location_skip_reg:
-                quant_type = 'no_borrow' if existing_quant_count == 0 and quant_index_in_storage == 0 else 'can_borrow'
-                quant_index_in_storage += 1
+            # Logic: First quant for the book should be no_borrow, all subsequent quants are can_borrow
+            # If no_borrow quant already exists, all new quants are can_borrow
+            if is_first_quant:
+                quant_type_id = no_borrow_type
+                is_first_quant = False  # Only first quant is no_borrow
             else:
-                quant_type = 'can_borrow'
+                quant_type_id = can_borrow_type
 
             quant = self.env['library.book.quant'].create({
                 'book_id': self.book_id.id,
                 'registration_number': line.registration_number if line.registration_number else False,
                 'location_id': line.location_id.id if line.location_id else False,
                 'state': 'available',
-                'quant_type': quant_type,
+                'quant_type_id': quant_type_id.id if quant_type_id else False,
                 'quantity': line.quantity,
             })
             created_quants |= quant
