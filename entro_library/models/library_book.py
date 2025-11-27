@@ -63,7 +63,7 @@ class LibraryBook(models.Model):
     cutter_number = fields.Char(
         string='Mã Cutter',
         compute='_compute_cutter_number',
-        store=True,
+        store=False,
         help='Mã Cutter được tính tự động từ tên tác giả'
     )
     category_id = fields.Many2one(
@@ -294,9 +294,9 @@ class LibraryBook(models.Model):
                 record.cutter_number = ''
                 continue
 
-            # Bước 1: Lấy chữ cái đầu của từ đầu tiên (viết hoa)
+            # Bước 1: Lấy chữ cái đầu của từ đầu tiên (viết hoa, không dấu)
             first_word = words[0]
-            first_letter = first_word[0].upper()
+            first_letter = self._remove_accents(first_word[0]).upper()
 
             # Bước 2: Lấy vần đầu từ từ đầu tiên
             # Ví dụ: "Rộng" -> remove accents -> "rong" -> remove first consonant(s) -> "ong"
@@ -329,15 +329,16 @@ class LibraryBook(models.Model):
                 if mapping:
                     van_code = mapping.ma_so
 
-            # Bước 3: Lấy chữ cái đầu của từ thứ 2 (viết hoa)
+            # Bước 3: Lấy chữ cái đầu của từ thứ 2 (viết hoa, không dấu)
             second_letter = ''
             if len(words) > 1:
                 second_word = words[1]
                 if second_word:
-                    second_letter = second_word[0].upper()
+                    second_letter = self._remove_accents(second_word[0]).upper()
 
             # Tạo mã Cutter: Chữ cái đầu + mã vần + chữ cái đầu từ 2
             # Ví dụ: "Rộng mở cửa trái tim" -> R + 100 + M = R100M
+            # Tất cả chữ cái đều không dấu
             cutter = first_letter
             if van_code:
                 cutter += van_code
