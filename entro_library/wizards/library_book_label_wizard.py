@@ -18,6 +18,7 @@ class LibraryBookLabelWizard(models.TransientModel):
     )
 
     custom_quantity = fields.Integer(
+        default=1,
         string='Custom Quantity',
         help='If set, this quantity will be used for all selected book quants'
     )

@@ -20,7 +20,7 @@
         <field name="arch" type="xml">
             <list string="Bản sao" editable="bottom" create="false" delete="false">
                 <field name="registration_number" required="True"/>
-                <field name="code_registration_number" optional="hide"/>
+                <field name="code_registration_number" column_invisible="1"/>
                 <field name="location_id" optional="show"/>
                 <field name="quantity"/>
             </list>
