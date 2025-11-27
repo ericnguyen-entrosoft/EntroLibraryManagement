@@ -26,6 +26,12 @@ class LibraryBook(models.Model):
         string='Tác giả',
         required=True
     )
+    author_names = fields.Char(
+        string='Tên tác giả',
+        compute='_compute_author_names',
+        store=True,
+        help='Tên tác giả được nối bởi dấu phẩy'
+    )
     co_author_ids = fields.Many2many(
         'library.author',
         'library_book_coauthor_rel',
@@ -347,6 +353,14 @@ class LibraryBook(models.Model):
                 cutter += second_letter
 
             record.cutter_number = cutter
+
+    @api.depends('author_ids.name')
+    def _compute_author_names(self):
+        for book in self:
+            if book.author_ids:
+                book.author_names = ', '.join(book.author_ids.mapped('name'))
+            else:
+                book.author_names = ''
 
     @api.depends('media_ids')
     def _compute_media_count(self):

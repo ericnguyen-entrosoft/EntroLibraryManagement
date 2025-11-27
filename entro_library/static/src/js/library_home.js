@@ -72,7 +72,7 @@ export class LibraryHome extends Component {
             [
                 "id",
                 "name",
-                "author_ids",
+                "author_names",
                 "publisher_id",
                 "publication_year",
                 "category_id",
