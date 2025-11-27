@@ -52,16 +52,18 @@ export class LibraryHome extends Component {
             return;
         }
 
-        const domain = [["resource_ids", "in", [this.state.selectedResource.id]]];
+        let domain = [["resource_ids", "in", [this.state.selectedResource.id]]];
 
         if (this.state.searchQuery) {
-            domain.push([
+            domain = [
+                "&",
+                ["resource_ids", "in", [this.state.selectedResource.id]],
                 "|",
                 "|",
                 ["name", "ilike", this.state.searchQuery],
                 ["author_ids.name", "ilike", this.state.searchQuery],
                 ["keywords", "ilike", this.state.searchQuery],
-            ]);
+            ];
         }
 
         this.state.books = await this.orm.searchRead(
