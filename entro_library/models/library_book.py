@@ -9,6 +9,7 @@ class LibraryBook(models.Model):
     _description = 'Quản lý sách'
     _inherit = ['image.mixin', 'mail.thread', 'mail.activity.mixin']
     _order = 'registration_date desc, name'
+    _rec_names_search = ['name', 'author_ids', 'keywords', 'parallel_title']
 
     name = fields.Char(string='Tác phẩm (Nhan đề)', required=True, index=True)
     registration_date = fields.Date(

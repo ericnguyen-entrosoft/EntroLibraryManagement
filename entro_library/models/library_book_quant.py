@@ -8,6 +8,7 @@ class LibraryBookQuant(models.Model):
     _inherit = ['mail.thread', 'mail.activity.mixin']
     _order = 'registration_number'
     _rec_name = 'registration_number'
+    _rec_names_search = ['registration_number', 'book_id', 'code_registration_number']
 
     name = fields.Char(
         string='Tên',

@@ -185,6 +185,9 @@
                 <field name="registration_number"/>
                 <field name="book_id"/>
                 <field name="location_id"/>
+                <filter string="Có thể mượn" name="can_borrow" domain="[('can_borrow', '=', True)]"/>
+                <filter string="Đọc tại chỗ" name="no_can_borrow" domain="[('can_borrow', '=', False)]"/>
+                <separator/>
                 <filter string="Có sẵn" name="available" domain="[('state', '=', 'available')]"/>
                 <filter string="Đang mượn" name="borrowed" domain="[('state', '=', 'borrowed')]"/>
                 <filter string="Đã đặt trước" name="reserved" domain="[('state', '=', 'reserved')]"/>
