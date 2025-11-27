@@ -39,13 +39,13 @@ class LibraryBook(models.Model):
     publication_city_id = fields.Many2one(
         'res.country.state', string='Thành phố xuất bản')
     publisher_id = fields.Many2one('library.publisher', string='Nhà xuất bản')
-    publication_year = fields.Integer(string='Năm')
+    publication_year = fields.Char(string='Năm')
 
     # Thông tin vật lý
     language_id = fields.Many2one('res.lang', string='Ngôn ngữ')
     page_count = fields.Integer(string='Số trang')
     length = fields.Char(string='Độ dài')
-    reprint_count = fields.Integer(string='Số lần tái bản', default=0)
+    reprint_count = fields.Char(string='Số lần tái bản')
 
     # Thông tin nhan đề
     subtitle = fields.Char(string='Phụ đề')
@@ -67,7 +67,7 @@ class LibraryBook(models.Model):
         help='Mã Cutter được tính tự động từ tên tác giả'
     )
     category_id = fields.Many2one(
-        'library.category', string='Nhóm', required=True)
+        'library.category', string='Nhóm', required=False)
 
     # Resource assignment (computed from quants' locations)
     resource_ids = fields.Many2many(

@@ -59,8 +59,8 @@ class LibraryResource(models.Model):
     @api.depends('book_ids', 'book_ids.available_quant_count', 'book_ids.borrowed_quant_count')
     def _compute_statistics(self):
         for resource in self:
-            resource.available_book_count = sum(resource.book_ids.mapped('available_quant_count'))
-            resource.borrowed_book_count = sum(resource.book_ids.mapped('borrowed_quant_count'))
+            resource.available_book_count = sum(resource.book_ids.mapped('available_quant_count') or [0])
+            resource.borrowed_book_count = sum(resource.book_ids.mapped('borrowed_quant_count') or [0])
 
     def action_view_books(self):
         """View books assigned to this resource"""
