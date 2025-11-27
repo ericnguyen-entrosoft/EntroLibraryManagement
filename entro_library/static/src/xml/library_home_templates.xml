@@ -115,7 +115,7 @@
                                                         <t t-esc="book.name"/>
                                                     </h6>
                                                     <div class="o_library_book_authors text-muted">
-                                                        <t t-if="book.author_ids">
+                                                        <t t-if="book.author_ids and book.author_ids.length > 0">
                                                             <small>
                                                                 <t t-esc="book.author_ids.map(a => a[1]).join(', ')"/>
                                                             </small>
