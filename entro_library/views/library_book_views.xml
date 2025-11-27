@@ -174,7 +174,7 @@
                                         required="1" />
                                     <field name="page_count" required="1" />
                                     <field name="length" required="1" />
-                                    <field name="reprint_count" required="1" />
+                                    <field name="reprint_count" required="0" />
                                 </group>
                             </group>
                             <group string="Tóm tắt nội dung">
