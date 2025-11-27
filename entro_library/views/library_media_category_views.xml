@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Library Media Category List View -->
+    <record id="view_library_media_category_list" model="ir.ui.view">
+        <field name="name">library.media.category.list</field>
+        <field name="model">library.media.category</field>
+        <field name="arch" type="xml">
+            <list string="Danh mục phương tiện" default_order="sequence,name">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="complete_name"/>
+                <field name="parent_id"/>
+                <field name="media_count"/>
+                <field name="active" widget="boolean_toggle"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Library Media Category Form View -->
+    <record id="view_library_media_category_form" model="ir.ui.view">
+        <field name="name">library.media.category.form</field>
+        <field name="model">library.media.category</field>
+        <field name="arch" type="xml">
+            <form string="Danh mục phương tiện">
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_media" type="object"
+                                class="oe_stat_button" icon="fa-file-video-o"
+                                invisible="media_count == 0">
+                            <field name="media_count" widget="statinfo" string="Phương tiện"/>
+                        </button>
+                    </div>
+                    <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger"
+                            invisible="active"/>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="parent_id"/>
+                            <field name="sequence"/>
+                        </group>
+                        <group>
+                            <field name="color" widget="color_picker"/>
+                            <field name="active" widget="boolean_toggle"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Mô tả" name="description">
+                            <field name="description" placeholder="Mô tả danh mục..."/>
+                        </page>
+                        <page string="Danh mục con" name="children">
+                            <field name="child_ids">
+                                <list>
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="name"/>
+                                    <field name="media_count"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Library Media Category Kanban View -->
+    <record id="view_library_media_category_kanban" model="ir.ui.view">
+        <field name="name">library.media.category.kanban</field>
+        <field name="model">library.media.category</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_mobile" default_order="sequence,name">
+                <field name="id"/>
+                <field name="name"/>
+                <field name="color"/>
+                <field name="media_count"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div t-attf-class="oe_kanban_color_#{kanban_getcolor(record.color.raw_value)} oe_kanban_card oe_kanban_global_click">
+                            <div class="o_kanban_card_header">
+                                <div class="o_kanban_card_header_title">
+                                    <div class="o_primary">
+                                        <strong><field name="name"/></strong>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="container o_kanban_card_content mt-3">
+                                <div class="row">
+                                    <div class="col-12">
+                                        <button class="btn btn-primary btn-sm" type="object" name="action_view_media">
+                                            <i class="fa fa-file-video-o"/> <field name="media_count"/> Phương tiện
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- Library Media Category Search View -->
+    <record id="view_library_media_category_search" model="ir.ui.view">
+        <field name="name">library.media.category.search</field>
+        <field name="model">library.media.category</field>
+        <field name="arch" type="xml">
+            <search string="Tìm kiếm danh mục">
+                <field name="name" string="Tên danh mục"
+                       filter_domain="['|', ('name','ilike',self), ('complete_name','ilike',self)]"/>
+                <field name="parent_id"/>
+                <separator/>
+                <filter string="Hoạt động" name="active" domain="[('active','=',True)]"/>
+                <filter string="Đã lưu trữ" name="inactive" domain="[('active','=',False)]"/>
+                <separator/>
+                <group expand="0" string="Nhóm theo">
+                    <filter string="Danh mục cha" name="group_parent" context="{'group_by':'parent_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Library Media Category Action -->
+    <record id="action_library_media_category" model="ir.actions.act_window">
+        <field name="name">Danh mục phương tiện</field>
+        <field name="res_model">library.media.category</field>
+        <field name="view_mode">list,kanban,form</field>
+        <field name="search_view_id" ref="view_library_media_category_search"/>
+        <field name="context">{'search_default_active': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Tạo danh mục đầu tiên
+            </p>
+            <p>
+                Sắp xếp phương tiện của bạn vào các danh mục để dễ dàng quản lý.
+            </p>
+        </field>
+    </record>
+
+</odoo>

@@ -1,4 +1,5 @@
-# -*- coding: utf-8 -*-
+from datetime import date
+
 from odoo import models, fields, api, exceptions
 
 
@@ -129,31 +130,27 @@ class LibraryBookUpdateQuantity(models.TransientModel):
             self.line_ids = lines
 
     def _get_next_base_number(self, last_quant):
-        """Get the next base registration number
+        """Get the next base registration number based on max existing number
         Format: YY.NNNNNN where YY is 2-digit year and NNNNNN is the next quant number
-        Only count quants in 'Lưu trữ' (storage) locations that are not skip_register_number
         """
         # Get 2-digit year from registration_date
         if self.book_id.registration_date:
             year = self.book_id.registration_date.year % 100  # Get last 2 digits
         else:
-            from datetime import date
             year = date.today().year % 100
 
-        # Get storage locations that are NOT skip_register_number
-        storage_locations = self.env['library.location'].search([
-            ('location_type', '=', 'storage'),
-            ('skip_register_number', '=', False)
-        ])
+        # Extract numeric part directly in SQL and get maximum
+        self.env.cr.execute("""
+            SELECT CAST(SPLIT_PART(registration_number, '.', 2) AS INTEGER) as num
+            FROM library_book_quant
+            WHERE registration_number IS NOT NULL
+            AND registration_number ~ '^[0-9]+\.[0-9]+$'
+            ORDER BY num DESC
+            LIMIT 1
+        """)
 
-        # Count existing quants for this book in storage locations (excluding skip_register_number)
-        total_quants = self.env['library.book.quant'].search_count([
-            ('book_id', '=', self.book_id.id),
-            ('location_id', 'in', storage_locations.ids)
-        ])
-
-        # Next quant number starts from total_quants + 1
-        next_quant_number = total_quants + 1
+        result = self.env.cr.fetchone()
+        next_quant_number = (result[0] + 1) if result and result[0] else 1
 
         return year, next_quant_number
 

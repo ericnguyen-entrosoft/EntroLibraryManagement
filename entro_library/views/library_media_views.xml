@@ -1,0 +1,359 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Library Media List View -->
+    <record id="view_library_media_list" model="ir.ui.view">
+        <field name="name">library.media.list</field>
+        <field name="model">library.media</field>
+        <field name="arch" type="xml">
+            <list string="Phương tiện">
+                <field name="thumbnail" widget="image" options="{'size': [60, 60]}" />
+                <field name="name" />
+                <field name="media_type" widget="badge" />
+                <field name="storage_type" />
+                <field name="category_id" />
+                <field name="author" />
+                <field name="duration_display" />
+                <field name="file_size" widget="float" digits="[16, 2]" />
+                <field name="view_count" />
+                <field name="download_count" />
+                <field name="access_level" widget="badge"
+                    decoration-success="access_level == 'public'"
+                    decoration-warning="access_level == 'members'"
+                    decoration-danger="access_level == 'restricted'" />
+                <field name="active" widget="boolean_toggle" />
+            </list>
+        </field>
+    </record>
+
+    <!-- Library Media Form View -->
+    <record id="view_library_media_form" model="ir.ui.view">
+        <field name="name">library.media.form</field>
+        <field name="model">library.media</field>
+        <field name="arch" type="xml">
+            <form string="Phương tiện">
+                <header>
+                    <button name="action_play" string="Phát" type="object"
+                        class="oe_highlight" icon="fa-play"
+                        invisible="storage_type == 'file' and not file" />
+                    <button name="action_download" string="Tải xuống" type="object"
+                        icon="fa-download"
+                        invisible="storage_type != 'file' or not is_downloadable" />
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                    </div>
+                    <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger"
+                        invisible="active" />
+                    <field name="thumbnail" widget="image" class="oe_avatar" />
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" placeholder="Tiêu đề phương tiện..." />
+                        </h1>
+                    </div>
+                    <div name="options">
+                        <span class="d-inline-flex">
+                            <field name="is_downloadable" />
+                            <label for="is_downloadable" />
+                        </span>
+                        <span class="d-inline-flex">
+                            <label for="access_level" />
+                            <field name="access_level" options="{'horizontal': true}" widget="radio"/>
+                        </span>
+                    </div>
+                    <notebook>
+                        <page string="Thông tin chung" name="general">
+                            <group>
+                                <group string="Thông tin upload">
+                                    <field name="media_type" />
+                                    <field name="storage_type" />
+                                    <field name="file" filename="filename"
+                                        invisible="storage_type != 'file'" />
+                                    <field name="filename" invisible="1"/>
+                                    <field name="file_url" widget="url"
+                                        invisible="storage_type != 'url'"
+                                        placeholder="https://youtube.com/watch?v=..." />
+                                    <field name="file_size" invisible="1" />
+                                    <field name="mime_type" invisible="1" />
+                                </group>
+                                <group string="Thông tin phân loại">
+                                    <field name="category_id" />
+                                    <field name="resource_ids" widget="many2many_tags" />
+                                    <field name="keywords"
+                                        placeholder="Nhập từ khóa, cách nhau bởi dấu phẩy" />
+                                </group>
+                            </group>
+                            <group>
+                                <group string="Thông tin phát hành">
+                                    <field name="author" />
+                                    <field name="language_id" />
+                                    <field name="publication_date" />
+                                    <field name="duration"
+                                        invisible="media_type not in ['video', 'audio']" />
+                                    <field name="duration_display"
+                                        invisible="media_type not in ['video', 'audio']" />
+                                </group>
+                                <group string="Thống kê">
+                                    <field name="view_count" />
+                                    <field name="download_count" />
+                                    <field name="active" widget="boolean_toggle" />
+                                </group>
+                            </group>
+                            <group string="Mô tả">
+                                <field name="description" widget="html" nolabel="1"/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter />
+            </form>
+        </field>
+    </record>
+
+    <!-- Library Media Kanban View -->
+    <record id="view_library_media_kanban" model="ir.ui.view">
+        <field name="name">library.media.kanban</field>
+        <field name="model">library.media</field>
+        <field name="arch" type="xml">
+            <kanban class="o_library_media_kanban" sample="1">
+                <field name="id" />
+                <field name="name" />
+                <field name="media_type" />
+                <field name="storage_type" />
+                <field name="thumbnail" />
+                <field name="author" />
+                <field name="duration" />
+                <field name="duration_display" />
+                <field name="view_count" />
+                <field name="download_count" />
+                <field name="access_level" />
+                <field name="category_id" />
+                <field name="file_size" />
+                <field name="publication_date" />
+                <field name="is_downloadable" />
+                <field name="resource_ids" />
+                <templates>
+                    <t t-name="card" class="flex-row">
+                        <aside class="o_kanban_aside_full">
+                            <t t-if="record.thumbnail.raw_value">
+                                <div class="o_kanban_image_fill position-relative w-100">
+                                    <field name="thumbnail" class="h-100" widget="image"
+                                        options="{'img_class': 'object-fit-cover'}" />
+
+                                    <!-- Duration Badge (for video/audio) -->
+                                    <t
+                                        t-if="record.duration_display.raw_value and record.media_type.raw_value in ['video', 'audio']">
+                                        <div
+                                            class="o_library_media_duration_badge position-absolute bottom-0 end-0 m-2 bg-dark text-white px-2 py-1 rounded">
+                                            <small>
+                                                <i class="fa fa-clock-o me-1" />
+                                                <field name="duration_display" />
+                                            </small>
+                                        </div>
+                                    </t>
+                                </div>
+                            </t>
+                            <t t-else="">
+                                <div
+                                    class="o_kanban_image_fill position-relative w-100 d-flex align-items-center justify-content-center"
+                                    style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                                    <t t-if="record.media_type.raw_value == 'video'">
+                                        <i class="fa fa-video-camera fa-4x text-white" />
+                                    </t>
+                                    <t t-elif="record.media_type.raw_value == 'audio'">
+                                        <i class="fa fa-music fa-4x text-white" />
+                                    </t>
+                                    <t t-elif="record.media_type.raw_value == 'image'">
+                                        <i class="fa fa-image fa-4x text-white" />
+                                    </t>
+                                    <t t-else="">
+                                        <i class="fa fa-file fa-4x text-white" />
+                                    </t>
+                                </div>
+                            </t>
+                        </aside>
+                        <main>
+                            <!-- Title -->
+                            <field name="name" class="fw-bolder fs-5" />
+
+                            <!-- Author -->
+                            <div class="text-muted" t-if="record.author.raw_value">
+                                <field name="author" />
+                            </div>
+
+                            <!-- Resource Tags -->
+                            <field name="resource_ids" widget="many2many_tags" class="mb-2" />
+
+                            <!-- Footer -->
+                            <footer
+                                class="mt-auto d-flex justify-content-between align-items-end pt-0">
+                                <!-- Media Type with Icon -->
+                                <span>
+                                    <t t-if="record.media_type.raw_value == 'video'">
+                                        <i class="fa fa-file-video-o me-2" aria-label="Video"
+                                            role="img" title="Video" />
+                                    </t>
+                                    <t t-elif="record.media_type.raw_value == 'audio'">
+                                        <i class="fa fa-music me-2" aria-label="Audio" role="img"
+                                            title="Âm thanh" />
+                                    </t>
+                                    <t t-elif="record.media_type.raw_value == 'image'">
+                                        <i class="fa fa-file-image-o me-2" aria-label="Image"
+                                            role="img" title="Hình ảnh" />
+                                    </t>
+                                    <t t-else="">
+                                        <i class="fa fa-file-pdf-o me-2" aria-label="Document"
+                                            role="img" title="Tài liệu" />
+                                    </t>
+                                    <field name="media_type" />
+                                </span>
+
+                                <!-- Duration (for video/audio) -->
+                                <span
+                                    t-if="record.duration_display.raw_value and record.media_type.raw_value in ['video', 'audio']"
+                                    class="d-flex align-items-center">
+                                    <i class="fa fa-clock-o me-2" aria-label="Duration" role="img"
+                                        title="Thời lượng" />
+                                    <field name="duration_display" />
+                                </span>
+
+                                <!-- File Size (for files) -->
+                                <span
+                                    t-if="record.storage_type.raw_value == 'file' and record.file_size.raw_value">
+                                    <i class="fa fa-hdd-o me-2" aria-label="File Size" role="img"
+                                        title="Kích thước" />
+                                    <t
+                                        t-esc="record.file_size.raw_value.toFixed(1)" /> MB </span>
+
+                                <!-- Download Count -->
+                                <span t-if="record.is_downloadable.raw_value">
+                                    <i class="fa fa-download me-2" aria-label="Downloads" role="img"
+                                        title="Lượt tải" />
+                                    <field name="download_count" />
+                                </span>
+
+                                <!-- View Count -->
+                                <span>
+                                    <i class="fa fa-eye me-2" aria-label="Views" role="img"
+                                        title="Lượt xem" />
+                                    <field name="view_count" />
+                                </span>
+
+                                <!-- Dropdown Menu -->
+                                <div class="o_dropdown_kanban dropdown"
+                                    groups="entro_library.group_library_user">
+                                    <a class="dropdown-toggle o-no-caret btn btn-sm" role="button"
+                                        data-bs-toggle="dropdown" href="#"
+                                        aria-label="Dropdown menu" title="Dropdown menu">
+                                        <span class="fa fa-ellipsis-v" />
+                                    </a>
+                                    <div class="dropdown-menu" role="menu">
+                                        <a role="menuitem" type="object" name="action_play"
+                                            class="dropdown-item">
+                                            <i class="fa fa-play" /> Phát </a>
+                                        <t t-if="record.is_downloadable.raw_value">
+                                            <a role="menuitem" type="object" name="action_download"
+                                                class="dropdown-item">
+                                                <i class="fa fa-download" /> Tải xuống </a>
+                                        </t>
+                                        <div class="dropdown-divider" />
+                                        <a role="menuitem" type="edit" class="dropdown-item">
+                                            <i class="fa fa-pencil" /> Chỉnh sửa </a>
+                                        <a role="menuitem" type="delete" class="dropdown-item">
+                                            <i class="fa fa-trash" /> Xóa </a>
+                                    </div>
+                                </div>
+                            </footer>
+                        </main>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- Library Media Search View -->
+    <record id="view_library_media_search" model="ir.ui.view">
+        <field name="name">library.media.search</field>
+        <field name="model">library.media</field>
+        <field name="arch" type="xml">
+            <search string="Tìm kiếm phương tiện">
+                <field name="name" string="Tiêu đề"
+                    filter_domain="['|', '|', ('name','ilike',self), ('keywords','ilike',self), ('author','ilike',self)]" />
+                <field name="category_id" />
+                <field name="author" />
+                <separator />
+                <filter string="Video" name="filter_video" domain="[('media_type','=','video')]" />
+                <filter string="Âm thanh" name="filter_audio" domain="[('media_type','=','audio')]" />
+                <filter string="Hình ảnh" name="filter_image" domain="[('media_type','=','image')]" />
+                <filter string="Tài liệu" name="filter_document"
+                    domain="[('media_type','=','document')]" />
+                <separator />
+                <filter string="Tệp tải lên" name="filter_file"
+                    domain="[('storage_type','=','file')]" />
+                <filter string="URL" name="filter_url" domain="[('storage_type','=','url')]" />
+                <separator />
+                <filter string="Công khai" name="filter_public"
+                    domain="[('access_level','=','public')]" />
+                <filter string="Thành viên" name="filter_members"
+                    domain="[('access_level','=','members')]" />
+                <filter string="Hạn chế" name="filter_restricted"
+                    domain="[('access_level','=','restricted')]" />
+                <separator />
+                <filter string="Hoạt động" name="active" domain="[('active','=',True)]" />
+                <filter string="Đã lưu trữ" name="inactive" domain="[('active','=',False)]" />
+                <separator />
+                <group expand="0" string="Nhóm theo">
+                    <filter string="Loại phương tiện" name="group_type"
+                        context="{'group_by':'media_type'}" />
+                    <filter string="Danh mục" name="group_category"
+                        context="{'group_by':'category_id'}" />
+                    <filter string="Mức độ truy cập" name="group_access"
+                        context="{'group_by':'access_level'}" />
+                    <filter string="Tác giả" name="group_author" context="{'group_by':'author'}" />
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Library Media Action -->
+    <record id="action_library_media" model="ir.actions.act_window">
+        <field name="name">Phương tiện</field>
+        <field name="res_model">library.media</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="search_view_id" ref="view_library_media_search" />
+        <field name="context">{'search_default_active': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Thêm phương tiện đầu tiên
+            </p>
+            <p>
+                Quản lý video, âm thanh, hình ảnh và tài liệu cho thư viện của bạn.
+            </p>
+        </field>
+    </record>
+
+    <!-- Actions for specific media types -->
+    <record id="action_library_media_video" model="ir.actions.act_window">
+        <field name="name">Video</field>
+        <field name="res_model">library.media</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="domain">[('media_type','=','video')]</field>
+        <field name="context">{'default_media_type': 'video', 'search_default_active': 1}</field>
+    </record>
+
+    <record id="action_library_media_audio" model="ir.actions.act_window">
+        <field name="name">Âm thanh</field>
+        <field name="res_model">library.media</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="domain">[('media_type','=','audio')]</field>
+        <field name="context">{'default_media_type': 'audio', 'search_default_active': 1}</field>
+    </record>
+
+    <record id="action_library_media_image" model="ir.actions.act_window">
+        <field name="name">Hình ảnh</field>
+        <field name="res_model">library.media</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="domain">[('media_type','=','image')]</field>
+        <field name="context">{'default_media_type': 'image', 'search_default_active': 1}</field>
+    </record>
+
+</odoo>

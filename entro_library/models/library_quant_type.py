@@ -4,7 +4,7 @@ from odoo import models, fields, api
 
 class LibraryQuantType(models.Model):
     _name = 'library.quant.type'
-    _description = 'Loại bản sao sách'
+    _description = 'Loại nhãn'
     _order = 'sequence, name'
 
     name = fields.Char(
@@ -16,13 +16,13 @@ class LibraryQuantType(models.Model):
         string='Mã',
         required=True,
         index=True,
-        help='Mã định danh cho loại bản sao'
+        help='Mã định danh cho loại nhãn'
     )
     color = fields.Char(
         string='Màu',
         required=True,
         default='#3498db',
-        help='Màu hiển thị cho loại bản sao (mã hex)'
+        help='Màu hiển thị cho loại nhãn (mã hex)'
     )
     can_borrow = fields.Boolean(
         string='Có thể mượn',

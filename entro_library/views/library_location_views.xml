@@ -8,6 +8,7 @@
             <list string="Danh sách vị trí">
                 <field name="code"/>
                 <field name="complete_name"/>
+                <field name="resource_id"/>
                 <field name="location_type"/>
                 <field name="is_borrow_location" widget="boolean_toggle"/>
                 <field name="responsible_id" widget="many2one_avatar_user"/>
@@ -45,6 +46,7 @@
                             <field name="code"/>
                             <field name="location_type"/>
                             <field name="parent_id"/>
+                            <field name="resource_id"/>
                         </group>
                         <group>
                             <field name="responsible_id" widget="many2one_avatar_user"/>
@@ -75,6 +77,7 @@
                 <field name="name" string="Tên vị trí" filter_domain="['|', ('name', 'ilike', self), ('complete_name', 'ilike', self)]"/>
                 <field name="code"/>
                 <field name="location_type"/>
+                <field name="resource_id"/>
                 <field name="responsible_id"/>
                 <separator/>
                 <filter string="Hoạt động" name="active" domain="[('active', '=', True)]"/>
@@ -86,6 +89,7 @@
                 <filter string="Độc giả" name="type_reader" domain="[('location_type', '=', 'reader')]"/>
                 <separator/>
                 <group expand="0" string="Nhóm theo">
+                    <filter string="Kho tài nguyên" name="group_resource" context="{'group_by': 'resource_id'}"/>
                     <filter string="Loại vị trí" name="group_type" context="{'group_by': 'location_type'}"/>
                     <filter string="Vị trí cha" name="group_parent" context="{'group_by': 'parent_id'}"/>
                     <filter string="Người phụ trách" name="group_responsible" context="{'group_by': 'responsible_id'}"/>

@@ -5,7 +5,7 @@
         <field name="name">library.quant.type.form</field>
         <field name="model">library.quant.type</field>
         <field name="arch" type="xml">
-            <form string="Loại bản sao sách">
+            <form string="Loại nhãn">
                 <sheet>
                     <div class="oe_title">
                         <label for="name" string="Tên loại"/>
@@ -25,7 +25,7 @@
                         </group>
                     </group>
                     <group name="description_group" string="Mô tả">
-                        <field name="description" placeholder="Mô tả về loại bản sao này..." nolabel="1"/>
+                        <field name="description" placeholder="Mô tả về loại nhãn này..." nolabel="1"/>
                     </group>
                 </sheet>
             </form>
@@ -37,7 +37,7 @@
         <field name="name">library.quant.type.list</field>
         <field name="model">library.quant.type</field>
         <field name="arch" type="xml">
-            <list string="Loại bản sao sách">
+            <list string="Loại nhãn">
                 <field name="sequence" widget="handle"/>
                 <field name="name"/>
                 <field name="code"/>
@@ -93,7 +93,7 @@
         <field name="name">library.quant.type.search</field>
         <field name="model">library.quant.type</field>
         <field name="arch" type="xml">
-            <search string="Tìm loại bản sao">
+            <search string="Tìm loại nhãn">
                 <field name="name"/>
                 <field name="code"/>
                 <filter string="Có thể mượn" name="can_borrow" domain="[('can_borrow', '=', True)]"/>
@@ -109,15 +109,15 @@
 
     <!-- Action -->
     <record id="action_library_quant_type" model="ir.actions.act_window">
-        <field name="name">Loại bản sao</field>
+        <field name="name">Loại nhãn</field>
         <field name="res_model">library.quant.type</field>
         <field name="view_mode">list,kanban,form</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
-                Tạo loại bản sao mới
+                Tạo loại nhãn mới
             </p>
             <p>
-                Quản lý các loại bản sao sách với màu sắc và quy tắc mượn riêng.
+                Quản lý các loại nhãn sách với màu sắc và quy tắc mượn riêng.
             </p>
         </field>
     </record>

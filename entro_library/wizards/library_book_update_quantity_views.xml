@@ -54,7 +54,7 @@
                         </field>
                     </page>
                 </notebook>
-                <group string="Bản sao sẽ tạo">
+                <group string="Chi tiết">
                     <field name="line_ids" nolabel="1" />
                 </group>
                 <footer>

@@ -7,10 +7,4 @@
         <field name="target">current</field>
     </record>
 
-    <!-- Dashboard Menu -->
-    <menuitem id="menu_library_dashboard"
-              name="Tổng quan"
-              parent="menu_library_root"
-              action="action_library_dashboard"
-              sequence="1"/>
 </odoo>

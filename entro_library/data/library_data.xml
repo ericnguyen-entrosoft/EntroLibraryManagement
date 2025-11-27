@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<odoo>
+<odoo noupdate="1">
     <!-- Sequences -->
     <record id="seq_library_borrowing" model="ir.sequence">
         <field name="name">Library Borrowing Sequence</field>
@@ -50,6 +50,61 @@
         <field name="can_borrow" eval="True"/>
         <field name="sequence">20</field>
         <field name="description">Bản sao có thể mượn về nhà</field>
+    </record>
+
+    <!-- Library Resources -->
+    <record id="resource_current_storage" model="library.resource">
+        <field name="name">Kho hiện hành</field>
+        <field name="code">current_storage</field>
+        <field name="sequence">10</field>
+        <field name="icon">fa-archive</field>
+        <field name="color">1</field>
+        <field name="description">Kho lưu trữ sách hiện hành đang lưu hành</field>
+    </record>
+
+    <record id="resource_digital_publication" model="library.resource">
+        <field name="name">Kho ấn phẩm số</field>
+        <field name="code">digital_publication</field>
+        <field name="sequence">20</field>
+        <field name="icon">fa-laptop</field>
+        <field name="color">2</field>
+        <field name="description">Kho lưu trữ các ấn phẩm số, sách điện tử</field>
+    </record>
+
+    <record id="resource_multimedia" model="library.resource">
+        <field name="name">Kho đa phương tiện</field>
+        <field name="code">multimedia</field>
+        <field name="sequence">30</field>
+        <field name="icon">fa-video-camera</field>
+        <field name="color">3</field>
+        <field name="description">Kho lưu trữ tài liệu đa phương tiện (video, audio, DVD)</field>
+    </record>
+
+    <record id="resource_photo_storage" model="library.resource">
+        <field name="name">Kho ảnh</field>
+        <field name="code">photo_storage</field>
+        <field name="sequence">40</field>
+        <field name="icon">fa-camera</field>
+        <field name="color">4</field>
+        <field name="description">Kho lưu trữ ảnh và tài liệu hình ảnh</field>
+    </record>
+
+    <record id="resource_archive_storage" model="library.resource">
+        <field name="name">Kho lưu</field>
+        <field name="code">archive_storage</field>
+        <field name="sequence">50</field>
+        <field name="icon">fa-database</field>
+        <field name="color">5</field>
+        <field name="description">Kho lưu trữ tài liệu cũ, ít sử dụng</field>
+    </record>
+
+    <record id="resource_gift_storage" model="library.resource">
+        <field name="name">Kho biếu tặng</field>
+        <field name="code">gift_storage</field>
+        <field name="sequence">60</field>
+        <field name="icon">fa-gift</field>
+        <field name="color">6</field>
+        <field name="description">Kho lưu trữ sách biếu tặng, quyên góp</field>
     </record>
 
     <!-- Cron Jobs -->

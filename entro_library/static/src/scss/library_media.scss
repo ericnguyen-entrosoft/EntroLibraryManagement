@@ -1,0 +1,14 @@
+// Library Media Kanban Styles (Based on website_slides)
+.o_kanban_view.o_library_media_kanban .o_kanban_renderer {
+    // Set custom width for media cards (like slides: 400px)
+    --KanbanRecord-width: 400px;
+}
+
+// Aside image styling for media kanban
+.o_kanban_renderer .o_kanban_aside_full {
+    .o_library_media_duration_badge {
+        font-size: 0.75rem;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    }
+}
+

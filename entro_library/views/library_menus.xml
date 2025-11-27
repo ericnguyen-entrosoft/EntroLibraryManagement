@@ -6,77 +6,85 @@
               web_icon="entro_library,static/description/icon.png"
               sequence="10"/>
 
-    <!-- Books Menu -->
-    <menuitem id="menu_library_books"
-              name="Sách"
-              parent="menu_library_root"
-              action="action_library_book"
-              sequence="10"/>
-
-    
-    <menuitem id="menu_library_book_root"
-            name="Sách"
-            web_icon="entro_library,static/description/book_icon.png"
-            sequence="15"/>
-
-    <menuitem id="menu_library_books_manage"
-              name="Sách"
-              parent="menu_library_book_root"
-              action="action_library_book"
-              sequence="10"/>
-
     <!-- Borrowing Management Menu -->
     <menuitem id="menu_library_borrowing_management"
               name="Mượn/Trả"
               parent="menu_library_root"
               sequence="30"/>
+              
 
-    <!-- Borrowing Menu -->
-    <menuitem id="menu_library_borrowing"
-              name="Mượn/Trả sách"
-              parent="menu_library_borrowing_management"
-              action="action_library_borrowing"
-              sequence="10"/>
-
-    <!-- Reservation Menu -->
-    <menuitem id="menu_library_reservation"
-              name="Đặt trước"
-              parent="menu_library_borrowing_management"
-              action="action_library_reservation"
-              sequence="20"/>
+    <!-- Dashboard Menu -->
+    <menuitem id="menu_library_dashboard"
+              name="Tổng quan"
+              parent="menu_library_root"
+              action="action_library_dashboard"
+              sequence="1"/>
 
     <!-- Management Menu -->
     <menuitem id="menu_library_management"
               name="Quản lý"
               parent="menu_library_root"
-              sequence="40"/>
+              sequence="10"/>
+
+    <!-- Books Menu -->
+    <menuitem id="menu_library_books"
+              name="Sách"
+              parent="menu_library_management"
+              action="action_library_book"
+              sequence="10"/>
+
+    <!-- All Media -->
+    <menuitem id="menu_library_media"
+              name="Tài liệu số"
+              parent="menu_library_management"
+              action="action_library_media"
+              sequence="10"/>
+
 
     <!-- Borrowers Menu (under Management) -->
     <menuitem id="menu_library_borrowers"
               name="Độc giả"
               parent="menu_library_management"
               action="action_library_borrowers"
-              sequence="5"/>
+              sequence="20"/>
 
     <!-- Storage Location Menu (under Management) -->
     <menuitem id="menu_library_storage_location"
               name="Vị trí lưu trữ"
               parent="menu_library_management"
               action="action_library_storage_location"
-              sequence="10"/>
+              sequence="50"/>
 
+    <!-- Borrowing Menu -->
+    <menuitem id="menu_library_borrowing"
+              name="Mượn/Trả sách"
+              parent="menu_library_management"
+              action="action_library_borrowing"
+              sequence="60"/>
+
+    
     <!-- Book Quant Count Menu (under Management) -->
     <menuitem id="menu_library_book_quant_count"
               name="Kiểm kê sách"
               parent="menu_library_management"
               action="action_library_book_quant_count"
-              sequence="15"/>
+              sequence="70"/>
+
+    <!-- Reservation Menu -->
+    <!-- <menuitem id="menu_library_reservation"
+              name="Đặt trước"
+              parent="menu_library_borrowing_management"
+              action="action_library_reservation"
+              sequence="20"/> -->
+    
+    <!-- End Management Menu -->
+
 
     <!-- Reports Menu -->
     <menuitem id="menu_library_reports"
               name="Báo cáo"
               parent="menu_library_root"
-              sequence="90"/>
+              sequence="20"/>
 
     <!-- Borrowing Line Report -->
     <menuitem id="menu_library_borrowing_line_report"
@@ -97,68 +105,78 @@
               name="Sách quá hạn"
               parent="menu_library_reports"
               action="action_library_borrowing_overdue"
-              sequence="10"/>
+              sequence="30"/>
 
+    
     <!-- Configuration Menu -->
     <menuitem id="menu_library_config"
               name="Cấu hình"
               parent="menu_library_root"
               sequence="100"/>
 
-    <!-- Borrower Types Menu -->
-    <menuitem id="menu_library_borrower_types"
-              name="Loại độc giả"
-              parent="menu_library_config"
-              action="action_library_borrower_type"
-              sequence="3"/>
-
-    <!-- Locations Menu -->
-    <menuitem id="menu_library_locations"
-              name="Vị trí lưu trữ"
-              parent="menu_library_config"
-              action="action_library_location"
-              sequence="5"/>
-
-    <!-- Authors Menu -->
-    <menuitem id="menu_library_authors"
-              name="Tác giả"
-              parent="menu_library_config"
-              action="action_library_author"
-              sequence="10"/>
-
-    <!-- Publishers Menu -->
-    <menuitem id="menu_library_publishers"
-              name="Nhà xuất bản"
-              parent="menu_library_config"
-              action="action_library_publisher"
-              sequence="20"/>
-
     <!-- Categories Menu -->
     <menuitem id="menu_library_categories"
-              name="Nhóm"
+              name="Nhóm sách"
               parent="menu_library_config"
               action="action_library_category"
-              sequence="30"/>
+              sequence="1"/>
+
+    <!-- Media Categories Menu -->
+    <menuitem id="menu_library_media_category"
+              name="Nhóm tài liệu số"
+              parent="menu_library_config"
+              action="action_library_media_category"
+              sequence="10"/>
 
     <!-- Series Menu -->
     <menuitem id="menu_library_series"
               name="Tùng thư"
               parent="menu_library_config"
               action="action_library_series"
+              sequence="20"/>
+
+    <!-- Authors Menu -->
+    <menuitem id="menu_library_authors"
+              name="Tác giả"
+              parent="menu_library_config"
+              action="action_library_author"
+              sequence="30"/>
+
+    <!-- Publishers Menu -->
+    <menuitem id="menu_library_publishers"
+              name="Nhà xuất bản"
+              parent="menu_library_config"
+              action="action_library_publisher"
               sequence="40"/>
+
+    <!-- Borrower Types Menu -->
+    <menuitem id="menu_library_borrower_types"
+              name="Loại độc giả"
+              parent="menu_library_config"
+              action="action_library_borrower_type"
+              sequence="50"/>
+
+    <!-- Locations Menu -->
+    <menuitem id="menu_library_locations"
+              name="Vị trí lưu trữ"
+              parent="menu_library_config"
+              action="action_library_location"
+              sequence="60"/>
+
 
     <!-- Character Mapping Menu -->
     <menuitem id="menu_character_mapping"
               name="Ánh xạ ký tự"
               parent="menu_library_config"
               action="action_character_mapping"
-              sequence="50"/>
+              sequence="70"/>
 
     <!-- Quant Type Menu -->
     <menuitem id="menu_library_quant_type"
-              name="Loại bản sao"
+              name="Loại nhãn"
               parent="menu_library_config"
               action="action_library_quant_type"
-              sequence="55"
+              sequence="80"
               groups="group_library_manager"/>
+
 </odoo>

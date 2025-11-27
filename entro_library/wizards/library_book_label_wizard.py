@@ -9,12 +9,12 @@ class LibraryBookLabelWizard(models.TransientModel):
     print_format = fields.Selection([
         ('custom', 'Nhãn ĐKCB'),
         ('ddc', 'Nhãn DDC'),
-    ], string='Format', default='custom', required=True)
+    ], string='Nhãn', default='custom', required=True)
 
     quant_line_ids = fields.One2many(
         'library.book.label.line',
         'wizard_id',
-        string='Bản sao sách'
+        string='ĐKCB'
     )
 
     custom_quantity = fields.Integer(
@@ -96,7 +96,7 @@ class LibraryBookLabelLine(models.TransientModel):
     )
     quant_id = fields.Many2one(
         'library.book.quant',
-        string='Bản sao sách',
+        string='Số ĐKCB',
         required=True
     )
     quantity = fields.Integer(

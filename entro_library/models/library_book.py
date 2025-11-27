@@ -69,6 +69,28 @@ class LibraryBook(models.Model):
     category_id = fields.Many2one(
         'library.category', string='Nhóm', required=True)
 
+    # Resource assignment (computed from quants' locations)
+    resource_ids = fields.Many2many(
+        'library.resource',
+        string='Kho tài nguyên',
+        compute='_compute_resource_ids',
+        store=True
+    )
+
+    # Media relationship
+    media_ids = fields.Many2many(
+        'library.media',
+        'library_media_book_rel',
+        'book_id',
+        'media_id',
+        string='Phương tiện'
+    )
+    media_count = fields.Integer(
+        string='Số phương tiện',
+        compute='_compute_media_count',
+        store=True
+    )
+
     # Quants (Physical copies)
     quant_ids = fields.One2many(
         'library.book.quant', 'book_id', string='Bản sao vật lý')
@@ -186,6 +208,14 @@ class LibraryBook(models.Model):
             borrowable_quants = book.quant_ids.filtered(lambda q: q.can_borrow and q.location_id.is_borrow_location)
             # Get unique locations
             book.borrow_location_ids = borrowable_quants.mapped('location_id')
+
+    @api.depends('quant_ids', 'quant_ids.location_id', 'quant_ids.location_id.resource_id')
+    def _compute_resource_ids(self):
+        """Compute resources based on quants' locations"""
+        for book in self:
+            # Get unique resources from all quants' locations
+            resources = book.quant_ids.mapped('location_id.resource_id')
+            book.resource_ids = resources
 
     def action_view_quants(self):
         """View book's physical copies (quants)"""
@@ -315,6 +345,23 @@ class LibraryBook(models.Model):
                 cutter += second_letter
 
             record.cutter_number = cutter
+
+    @api.depends('media_ids')
+    def _compute_media_count(self):
+        for book in self:
+            book.media_count = len(book.media_ids)
+
+    def action_view_media(self):
+        """View media related to this book"""
+        self.ensure_one()
+        return {
+            'name': f'Phương tiện - {self.name}',
+            'type': 'ir.actions.act_window',
+            'res_model': 'library.media',
+            'view_mode': 'kanban,list,form',
+            'domain': [('id', 'in', self.media_ids.ids)],
+            'context': {'default_book_ids': [(4, self.id)]}
+        }
 
     def action_update_quantity(self):
         """Open wizard to create multiple book quants"""

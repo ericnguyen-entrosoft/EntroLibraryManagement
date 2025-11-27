@@ -24,6 +24,7 @@
     'data': [
         # Data
         'data/library_data.xml',
+        'data/library_resource_actions.xml',
 
         # Security
         'security/library_security.xml',
@@ -56,10 +57,18 @@
         'views/character_mapping_views.xml',
         'views/library_borrowing_views.xml',
         'views/library_reservation_views.xml',
+        'views/library_media_views.xml',
+        'views/library_media_category_views.xml',
+        'views/library_media_playlist_views.xml',
         'views/res_config_settings_views.xml',
 
         # Menus (must be loaded before dashboard)
         'views/library_menus.xml',
+        'views/library_resource_views.xml',
+
+
+        # Home (must be loaded after menus)
+        'views/library_home_views.xml',
 
         # Dashboard (must be loaded after menus)
         'views/library_dashboard_views.xml',
@@ -69,6 +78,10 @@
             'entro_library/static/src/js/library_dashboard.js',
             'entro_library/static/src/xml/library_dashboard_templates.xml',
             'entro_library/static/src/scss/library_dashboard.scss',
+            'entro_library/static/src/js/library_home.js',
+            'entro_library/static/src/xml/library_home_templates.xml',
+            'entro_library/static/src/scss/library_home.scss',
+            'entro_library/static/src/scss/library_media.scss',
         ],
     },
     'installable': True,

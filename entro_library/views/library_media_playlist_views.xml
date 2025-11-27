@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Library Media Playlist List View -->
+    <record id="view_library_media_playlist_list" model="ir.ui.view">
+        <field name="name">library.media.playlist.list</field>
+        <field name="model">library.media.playlist</field>
+        <field name="arch" type="xml">
+            <list string="Danh sách phát" default_order="sequence,name">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="user_id"/>
+                <field name="media_count"/>
+                <field name="total_duration_display"/>
+                <field name="is_public" widget="boolean_toggle"/>
+                <field name="active" widget="boolean_toggle"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Library Media Playlist Form View -->
+    <record id="view_library_media_playlist_form" model="ir.ui.view">
+        <field name="name">library.media.playlist.form</field>
+        <field name="model">library.media.playlist</field>
+        <field name="arch" type="xml">
+            <form string="Danh sách phát">
+                <header>
+                    <button name="action_play_all" string="Phát tất cả" type="object"
+                            class="oe_highlight" icon="fa-play"
+                            invisible="media_count == 0"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_media" type="object"
+                                class="oe_stat_button" icon="fa-file-video-o"
+                                invisible="media_count == 0">
+                            <field name="media_count" widget="statinfo" string="Phương tiện"/>
+                        </button>
+                    </div>
+                    <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger"
+                            invisible="active"/>
+                    <field name="cover_image" widget="image" class="oe_avatar"/>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" placeholder="Tên danh sách phát..."/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="user_id"/>
+                            <field name="sequence"/>
+                            <field name="is_public"/>
+                        </group>
+                        <group>
+                            <field name="total_duration_display"/>
+                            <field name="active" widget="boolean_toggle"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Mô tả" name="description">
+                            <field name="description" widget="html"/>
+                        </page>
+                        <page string="Phương tiện" name="media">
+                            <field name="media_ids">
+                                <list>
+                                    <field name="thumbnail" widget="image" options="{'size': [40, 40]}"/>
+                                    <field name="name"/>
+                                    <field name="media_type" widget="badge"/>
+                                    <field name="author"/>
+                                    <field name="duration_display"/>
+                                    <field name="view_count"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <!-- Library Media Playlist Kanban View -->
+    <record id="view_library_media_playlist_kanban" model="ir.ui.view">
+        <field name="name">library.media.playlist.kanban</field>
+        <field name="model">library.media.playlist</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_mobile" default_order="sequence,name">
+                <field name="id"/>
+                <field name="name"/>
+                <field name="cover_image"/>
+                <field name="user_id"/>
+                <field name="media_count"/>
+                <field name="total_duration_display"/>
+                <field name="is_public"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_global_click o_library_playlist_card">
+                            <div class="o_kanban_image">
+                                <img t-att-src="kanban_image('library.media.playlist', 'cover_image', record.id.raw_value)"
+                                     alt="Cover" class="o_image_64_cover"/>
+                                <div class="o_playlist_badge">
+                                    <span t-if="record.is_public.raw_value" class="badge text-bg-success">
+                                        <i class="fa fa-globe"/> Công khai
+                                    </span>
+                                    <span t-if="!record.is_public.raw_value" class="badge text-bg-warning">
+                                        <i class="fa fa-lock"/> Riêng tư
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="oe_kanban_details">
+                                <strong class="o_kanban_record_title">
+                                    <field name="name"/>
+                                </strong>
+                                <div class="o_kanban_record_subtitle">
+                                    <i class="fa fa-user"/> <field name="user_id"/>
+                                </div>
+                                <div class="o_kanban_record_bottom">
+                                    <div class="oe_kanban_bottom_left">
+                                        <span class="badge text-bg-primary">
+                                            <i class="fa fa-file-video-o"/> <field name="media_count"/> phương tiện
+                                        </span>
+                                    </div>
+                                    <div class="oe_kanban_bottom_right">
+                                        <span class="badge text-bg-secondary">
+                                            <i class="fa fa-clock-o"/> <field name="total_duration_display"/>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- Library Media Playlist Search View -->
+    <record id="view_library_media_playlist_search" model="ir.ui.view">
+        <field name="name">library.media.playlist.search</field>
+        <field name="model">library.media.playlist</field>
+        <field name="arch" type="xml">
+            <search string="Tìm kiếm danh sách phát">
+                <field name="name"/>
+                <field name="user_id"/>
+                <separator/>
+                <filter string="Của tôi" name="filter_my" domain="[('user_id','=',uid)]"/>
+                <filter string="Công khai" name="filter_public" domain="[('is_public','=',True)]"/>
+                <filter string="Riêng tư" name="filter_private" domain="[('is_public','=',False)]"/>
+                <separator/>
+                <filter string="Hoạt động" name="active" domain="[('active','=',True)]"/>
+                <filter string="Đã lưu trữ" name="inactive" domain="[('active','=',False)]"/>
+                <separator/>
+                <group expand="0" string="Nhóm theo">
+                    <filter string="Người tạo" name="group_user" context="{'group_by':'user_id'}"/>
+                    <filter string="Công khai/Riêng tư" name="group_public" context="{'group_by':'is_public'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Library Media Playlist Action -->
+    <record id="action_library_media_playlist" model="ir.actions.act_window">
+        <field name="name">Danh sách phát</field>
+        <field name="res_model">library.media.playlist</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="search_view_id" ref="view_library_media_playlist_search"/>
+        <field name="context">{'search_default_active': 1, 'search_default_filter_my': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Tạo danh sách phát đầu tiên
+            </p>
+            <p>
+                Tạo danh sách phát để tổ chức và chia sẻ phương tiện của bạn.
+            </p>
+        </field>
+    </record>
+
+</odoo>

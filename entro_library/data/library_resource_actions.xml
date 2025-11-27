@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="0">
+    <!-- Actions for each default resource -->
+    <record id="action_library_resource_current_storage" model="ir.actions.act_window">
+        <field name="name">Kho hiện hành</field>
+        <field name="res_model">library.book</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain" eval="[('resource_ids', 'in', [ref('entro_library.resource_current_storage')])]"/>
+    </record>
+
+    <record id="action_library_resource_digital_publication" model="ir.actions.act_window">
+        <field name="name">Kho ấn phẩm số</field>
+        <field name="res_model">library.book</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain" eval="[('resource_ids', 'in', [ref('entro_library.resource_digital_publication')])]"/>
+    </record>
+
+    <record id="action_library_resource_multimedia" model="ir.actions.act_window">
+        <field name="name">Kho đa phương tiện</field>
+        <field name="res_model">library.book</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain" eval="[('resource_ids', 'in', [ref('entro_library.resource_multimedia')])]"/>
+    </record>
+
+    <record id="action_library_resource_photo_storage" model="ir.actions.act_window">
+        <field name="name">Kho ảnh</field>
+        <field name="res_model">library.book</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain" eval="[('resource_ids', 'in', [ref('entro_library.resource_photo_storage')])]"/>
+    </record>
+
+    <record id="action_library_resource_archive_storage" model="ir.actions.act_window">
+        <field name="name">Kho lưu</field>
+        <field name="res_model">library.book</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain" eval="[('resource_ids', 'in', [ref('entro_library.resource_archive_storage')])]"/>
+    </record>
+
+    <record id="action_library_resource_gift_storage" model="ir.actions.act_window">
+        <field name="name">Kho biếu tặng</field>
+        <field name="res_model">library.book</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain" eval="[('resource_ids', 'in', [ref('entro_library.resource_gift_storage')])]"/>
+    </record>
+</odoo>

@@ -99,7 +99,7 @@ class LibraryBookQuant(models.Model):
     # Quant Type
     quant_type_id = fields.Many2one(
         'library.quant.type',
-        string='Loại bản sao',
+        string='Loại nhãn',
         required=True,
         default=lambda self: self.env.ref('entro_library.quant_type_no_borrow', raise_if_not_found=False),
         index=True
