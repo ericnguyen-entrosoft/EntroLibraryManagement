@@ -61,6 +61,7 @@
         'views/library_media_category_views.xml',
         'views/library_media_playlist_views.xml',
         'views/res_config_settings_views.xml',
+        'views/library_dashboard_views.xml',
 
         # Menus (must be loaded before dashboard)
         'views/library_menus.xml',
@@ -68,10 +69,7 @@
 
 
         # Home (must be loaded after menus)
-        'views/library_home_views.xml',
-
-        # Dashboard (must be loaded after menus)
-        'views/library_dashboard_views.xml',
+        'views/library_home_views.xml'
     ],
     'assets': {
         'web.assets_backend': [
