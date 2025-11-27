@@ -104,7 +104,7 @@ export class LibraryHome extends Component {
         if (book.image_1920) {
             return `data:image/png;base64,${book.image_1920}`;
         }
-        return "/web/static/img/placeholder.png";
+        return "/entro_library/static/src/image/logo.png";
     }
 
     getResourceIcon(resource) {

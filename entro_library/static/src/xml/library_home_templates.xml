@@ -115,7 +115,7 @@
                                                         <t t-esc="book.name"/>
                                                     </h6>
                                                     <div class="o_library_book_authors text-muted">
-                                                        <t t-if="book.author_ids.length > 0">
+                                                        <t t-if="book.author_ids">
                                                             <small>
                                                                 <t t-esc="book.author_ids.map(a => a[1]).join(', ')"/>
                                                             </small>
@@ -131,9 +131,6 @@
                                                     <div class="o_library_book_stats">
                                                         <span class="badge text-bg-success">
                                                             <i class="fa fa-check"/> <t t-esc="book.available_quant_count"/> có sẵn
-                                                        </span>
-                                                        <span class="badge text-bg-warning">
-                                                            <i class="fa fa-clock-o"/> <t t-esc="book.borrowed_quant_count"/> đang mượn
                                                         </span>
                                                     </div>
                                                 </div>
