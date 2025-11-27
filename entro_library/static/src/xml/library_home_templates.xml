@@ -60,18 +60,18 @@
                                 </h3>
                             </div>
                             <div class="o_library_home_policy_content">
-                                <t t-if="state.selectedResource.policy">
-                                    <div class="o_library_policy_section">
-                                        <h5 style="color:#8C675A">Chính sách</h5>
-                                        <div t-out="state.selectedResource.policy"/>
-                                    </div>
-                                </t>
                                 <t t-if="state.selectedResource.description">
                                     <div class="o_library_description_section">
-                                        <h5 style="color:#8C675A">Mô tả</h5>
                                         <div t-out="state.selectedResource.description"/>
                                     </div>
                                 </t>
+                                <t t-if="state.selectedResource.policy">
+                                    <div class="o_library_policy_section">
+                                        <h5 style="color:#8C675A">Nội quy</h5>
+                                        <div t-out="state.selectedResource.policy"/>
+                                    </div>
+                                </t>
+                                
                             </div>
                         </div>
 

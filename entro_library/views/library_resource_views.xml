@@ -45,11 +45,11 @@
                         </group>
                     </group>
                     <notebook>
-                        <page string="Chính sách" name="policy">
-                            <field name="policy" widget="html"/>
-                        </page>
                         <page string="Mô tả" name="description">
                             <field name="description" widget="html"/>
+                        </page>
+                        <page string="Nội quy" name="policy">
+                            <field name="policy" widget="html"/>
                         </page>
                         <page string="Sách" name="books">
                             <field name="book_ids">
