@@ -247,7 +247,7 @@
         <field name="arch" type="xml">
             <search string="Tìm kiếm sách">
                 <field name="name" string="Tên sách"
-                    filter_domain="['|', ('name', 'ilike', self), ('subtitle', 'ilike', self)]" />
+                    filter_domain="['|', '|', ('keywords', 'ilike', self), ('name', 'ilike', self), ('subtitle', 'ilike', self)]" />
                 <field name="author_ids" />
                 <field name="publisher_id" />
                 <field name="keywords" />
