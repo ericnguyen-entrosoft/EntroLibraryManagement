@@ -10,6 +10,7 @@ export class LibraryHome extends Component {
     setup() {
         this.orm = useService("orm");
         this.action = useService("action");
+        this.notification = useService("notification");
         this.state = useState({
             resources: [],
             selectedResource: null,
@@ -117,6 +118,45 @@ export class LibraryHome extends Component {
             return "/entro_library/static/src/image/white_logo.png";
         }
         return "/entro_library/static/src/image/logo.png";
+    }
+
+    async onAddToBorrowing(bookId, ev) {
+        // Stop event propagation to prevent book card click
+        ev.stopPropagation();
+
+        try {
+            const result = await this.orm.call(
+                "library.book",
+                "action_add_to_borrowing",
+                [[bookId]]
+            );
+
+            // If the result is a notification action, handle it
+            if (result && result.type === 'ir.actions.client' && result.tag === 'display_notification') {
+                // Show notification
+                this.notification.add(result.params.message, {
+                    title: result.params.title,
+                    type: result.params.type,
+                });
+
+                // Execute next action if provided
+                if (result.params.next) {
+                    this.action.doAction(result.params.next);
+                }
+            } else if (result) {
+                // Execute the action directly
+                this.action.doAction(result);
+            }
+        } catch (error) {
+            // Show error notification
+            this.notification.add(
+                error.data?.message || error.message || "Không thể thêm sách vào phiếu mượn",
+                {
+                    title: "Lỗi",
+                    type: "danger"
+                }
+            );
+        }
     }
 }
 

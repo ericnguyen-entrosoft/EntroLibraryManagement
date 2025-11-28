@@ -74,8 +74,8 @@ class LibraryBookQuant(models.Model):
         string='Người đang mượn',
         store=True
     )
-    borrowing_line_ids = fields.One2many(
-        'library.borrowing.line',
+    borrowing_quant_line_ids = fields.One2many(
+        'library.borrowing.quant.line',
         'quant_id',
         string='Lịch sử mượn'
     )
@@ -149,10 +149,10 @@ class LibraryBookQuant(models.Model):
         return {
             'name': 'Lịch sử mượn',
             'type': 'ir.actions.act_window',
-            'res_model': 'library.borrowing.line',
+            'res_model': 'library.borrowing.quant.line',
             'view_mode': 'list,form',
             'domain': [('quant_id', '=', self.id)],
-            'context': {'default_quant_id': self.id, 'default_book_id': self.book_id.id}
+            'context': {'default_quant_id': self.id}
         }
 
     def action_view_reservations(self):

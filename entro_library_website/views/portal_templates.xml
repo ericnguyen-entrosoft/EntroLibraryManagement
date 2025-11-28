@@ -1,0 +1,274 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Add library items to portal home -->
+    <template id="portal_my_home_library" name="Portal My Home: Library"
+              inherit_id="portal.portal_my_home" priority="40">
+        <xpath expr="//div[hasclass('o_portal_docs')]" position="inside">
+
+            <!-- Borrowings -->
+            <t t-call="portal.portal_docs_entry">
+                <t t-set="title">Phiếu mượn</t>
+                <t t-set="url" t-value="'/my/borrowings'"/>
+                <t t-set="placeholder_count" t-value="'borrowing_count'"/>
+            </t>
+
+            <!-- Reservations -->
+            <t t-call="portal.portal_docs_entry">
+                <t t-set="title">Đặt trước</t>
+                <t t-set="url" t-value="'/my/reservations'"/>
+                <t t-set="placeholder_count" t-value="'reservation_count'"/>
+            </t>
+
+        </xpath>
+    </template>
+
+
+    <!-- My Borrowings List -->
+    <template id="portal_my_borrowings" name="My Borrowings">
+        <t t-call="portal.portal_layout">
+            <t t-set="breadcrumbs_searchbar" t-value="True"/>
+
+            <t t-call="portal.portal_searchbar">
+                <t t-set="title">Phiếu mượn của tôi</t>
+            </t>
+
+            <div t-if="not borrowings" class="alert alert-info text-center mt-3">
+                <p class="mb-0"><i class="fa fa-info-circle fa-2x mb-3 d-block"/>Bạn chưa có phiếu mượn nào.</p>
+                <a href="/thu-vien" class="btn btn-primary mt-3"><i class="fa fa-book me-2"/>Khám phá thư viện</a>
+            </div>
+
+            <div t-if="borrowings" class="row">
+                <t t-foreach="borrowings" t-as="borrowing">
+                    <div class="col-lg-6 mb-4">
+                        <div class="card h-100">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h5 class="mb-0">
+                                    <a t-attf-href="/my/borrowing/#{borrowing.id}"><t t-esc="borrowing.name"/></a>
+                                </h5>
+                                <span t-attf-class="badge bg-#{borrowing.state == 'draft' and 'secondary' or borrowing.state == 'borrowed' and 'info' or 'success'}">
+                                    <t t-if="borrowing.state == 'draft'">Nháp</t>
+                                    <t t-elif="borrowing.state == 'borrowed'">Đang mượn</t>
+                                    <t t-else="">Đã trả</t>
+                                </span>
+                            </div>
+                            <div class="card-body">
+                                <div class="row mb-3">
+                                    <div class="col-6"><small class="text-muted">Ngày mượn</small><div><strong t-field="borrowing.borrow_date"/></div></div>
+                                    <div class="col-6"><small class="text-muted">Ngày hẹn trả</small><div><strong t-field="borrowing.due_date"/></div></div>
+                                </div>
+                                <div class="mb-3"><small class="text-muted">Số lượng sách</small><div><strong t-esc="borrowing.book_count"/> cuốn</div></div>
+                                <a t-attf-href="/my/borrowing/#{borrowing.id}" class="btn btn-primary btn-sm w-100"><i class="fa fa-eye me-2"/>Xem chi tiết</a>
+                            </div>
+                        </div>
+                    </div>
+                </t>
+            </div>
+
+            <div t-if="pager" class="o_portal_pager text-center"><t t-call="portal.pager"/></div>
+        </t>
+    </template>
+
+
+    <!-- My Borrowing Detail -->
+    <template id="portal_my_borrowing_detail" name="My Borrowing Detail">
+        <t t-call="portal.portal_layout">
+            <t t-call="portal.portal_record_layout">
+                <t t-set="card_header">
+                    <h5 class="mb-2">Phiếu mượn <span t-esc="borrowing.name"/>
+                        <span t-attf-class="badge bg-#{borrowing.state == 'draft' and 'secondary' or borrowing.state == 'borrowed' and 'info' or 'success'} ms-2">
+                            <t t-if="borrowing.state == 'draft'">Nháp</t>
+                            <t t-elif="borrowing.state == 'borrowed'">Đang mượn</t>
+                            <t t-else="">Đã trả</t>
+                        </span>
+                    </h5>
+                </t>
+
+                <t t-set="card_body">
+                    <div class="row mb-4">
+                        <div class="col-md-4"><strong>Ngày mượn:</strong><div t-field="borrowing.borrow_date"/></div>
+                        <div class="col-md-4"><strong>Ngày hẹn trả:</strong><div t-field="borrowing.due_date"/></div>
+                        <div class="col-md-4"><strong>Tổng số sách:</strong><div t-esc="borrowing.book_count"/> cuốn</div>
+                    </div>
+
+                    <h5 class="mt-4 mb-3">Danh sách sách</h5>
+                    <table class="table table-hover">
+                        <thead class="table-light">
+                            <tr><th style="width: 80px;">Ảnh</th><th>Tên sách</th><th>Tác giả</th><th class="text-center">SL</th><th>Trạng thái</th></tr>
+                        </thead>
+                        <tbody>
+                            <t t-foreach="borrowing.borrowing_line_ids" t-as="line">
+                                <tr>
+                                    <td><img t-att-src="'/web/image/library.book/%s/image_128' % line.book_id.id" class="img-thumbnail" style="width: 60px;"/></td>
+                                    <td><a t-attf-href="/thu-vien/sach/#{line.book_id.id}" target="_blank"><strong t-esc="line.book_id.name"/></a></td>
+                                    <td t-esc="line.book_id.author_names"/>
+                                    <td class="text-center"><t t-esc="line.requested_quantity"/></td>
+                                    <td><span t-if="line.state == 'draft'" class="badge bg-secondary">Nháp</span>
+                                        <span t-elif="line.state == 'borrowed'" class="badge bg-info">Đang mượn</span>
+                                        <span t-else="" class="badge bg-success">Đã trả</span>
+                                    </td>
+                                </tr>
+                            </t>
+                        </tbody>
+                    </table>
+                </t>
+            </t>
+        </t>
+    </template>
+
+
+    <!-- My Reservations -->
+    <template id="portal_my_reservations" name="My Reservations">
+        <t t-call="portal.portal_layout">
+            <t t-set="breadcrumbs_searchbar" t-value="True"/>
+            <t t-call="portal.portal_searchbar"><t t-set="title">Đặt trước của tôi</t></t>
+
+            <div t-if="not reservations" class="alert alert-info text-center mt-3">
+                <i class="fa fa-info-circle fa-2x mb-3 d-block"/><p>Bạn chưa có đặt trước nào.</p>
+                <a href="/thu-vien" class="btn btn-primary mt-2">Tìm sách để đặt trước</a>
+            </div>
+
+            <table t-if="reservations" class="table table-hover mt-3">
+                <thead class="table-light">
+                    <tr><th style="width: 80px;">Ảnh</th><th>Tên sách</th><th>Ngày đặt</th><th>Thứ tự</th><th>Trạng thái</th><th class="text-end">Hành động</th></tr>
+                </thead>
+                <tbody>
+                    <t t-foreach="reservations" t-as="reservation">
+                        <tr>
+                            <td><img t-att-src="'/web/image/library.book/%s/image_128' % reservation.book_id.id" class="img-thumbnail" style="width: 60px;"/></td>
+                            <td><a t-attf-href="/thu-vien/sach/#{reservation.book_id.id}" target="_blank"><strong t-esc="reservation.book_id.name"/></a><br/><small class="text-muted" t-esc="reservation.book_id.author_names"/></td>
+                            <td><span t-field="reservation.reservation_date"/></td>
+                            <td><span class="badge bg-info">#<t t-esc="reservation.priority_order"/></span></td>
+                            <td>
+                                <span t-if="reservation.state == 'active'" class="badge bg-warning">Đang chờ</span>
+                                <span t-elif="reservation.state == 'available'" class="badge bg-success">Đã có sẵn!</span>
+                                <span t-elif="reservation.state == 'borrowed'" class="badge bg-info">Đã mượn</span>
+                                <span t-else="" class="badge bg-secondary">Đã hủy</span>
+                            </td>
+                            <td class="text-end">
+                                <t t-if="reservation.state in ['active', 'available']">
+                                    <form t-attf-action="/my/reservation/#{reservation.id}/cancel" method="POST" style="display: inline;">
+                                        <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Bạn có chắc muốn hủy?')"><i class="fa fa-times"/> Hủy</button>
+                                    </form>
+                                </t>
+                            </td>
+                        </tr>
+                    </t>
+                </tbody>
+            </table>
+
+            <div t-if="pager" class="o_portal_pager text-center"><t t-call="portal.pager"/></div>
+        </t>
+    </template>
+
+
+    <!-- Borrowing Cart -->
+    <template id="portal_my_borrowing_cart" name="My Borrowing Cart">
+        <t t-call="portal.portal_layout">
+            <div class="container mt-4">
+                <h1 class="mb-4"><i class="fa fa-shopping-cart me-2"/>Giỏ mượn sách</h1>
+
+                <t t-if="not borrowing or not borrowing.borrowing_line_ids">
+                    <div class="alert alert-info text-center">
+                        <i class="fa fa-shopping-cart fa-3x mb-3 d-block"/><p class="lead">Giỏ mượn của bạn đang trống</p>
+                        <a href="/thu-vien" class="btn btn-primary"><i class="fa fa-book me-2"/>Tìm sách để mượn</a>
+                    </div>
+                </t>
+
+                <t t-else="">
+                    <div class="row">
+                        <div class="col-lg-8">
+                            <div class="card">
+                                <div class="card-body">
+                                    <table class="table">
+                                        <thead><tr><th style="width: 80px;">Ảnh</th><th>Tên sách</th><th>Tác giả</th><th class="text-center">SL</th><th>Hạn trả</th><th class="text-end">Xóa</th></tr></thead>
+                                        <tbody>
+                                            <t t-foreach="borrowing.borrowing_line_ids" t-as="line">
+                                                <tr>
+                                                    <td><img t-att-src="'/web/image/library.book/%s/image_128' % line.book_id.id" class="img-thumbnail" style="width: 60px;"/></td>
+                                                    <td><a t-attf-href="/thu-vien/sach/#{line.book_id.id}" target="_blank"><strong t-esc="line.book_id.name"/></a></td>
+                                                    <td t-esc="line.book_id.author_names"/>
+                                                    <td class="text-center" t-esc="line.requested_quantity"/>
+                                                    <td><span t-field="line.due_date"/></td>
+                                                    <td class="text-end">
+                                                        <form t-attf-action="/my/borrowing-cart/remove/#{line.id}" method="POST" style="display: inline;">
+                                                            <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                                                            <button type="submit" class="btn btn-sm btn-danger"><i class="fa fa-trash"/></button>
+                                                        </form>
+                                                    </td>
+                                                </tr>
+                                            </t>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-4">
+                            <div class="card">
+                                <div class="card-header"><h5 class="mb-0">Thông tin mượn</h5></div>
+                                <div class="card-body">
+                                    <p><strong>Tổng số sách:</strong> <t t-esc="borrowing.book_count"/> cuốn</p>
+                                    <p><strong>Ngày mượn:</strong> <t t-esc="borrowing.borrow_date"/></p>
+                                    <p><strong>Ngày hẹn trả:</strong> <t t-esc="borrowing.due_date"/></p>
+                                    <hr/>
+                                    <form action="/my/borrowing-cart/checkout" method="POST">
+                                        <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                                        <button type="submit" class="btn btn-primary w-100 btn-lg" onclick="return confirm('Xác nhận mượn các sách này?')"><i class="fa fa-check me-2"/>Xác nhận mượn</button>
+                                    </form>
+                                    <a href="/thu-vien" class="btn btn-outline-secondary w-100 mt-2"><i class="fa fa-shopping-cart me-2"/>Tiếp tục chọn sách</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </t>
+            </div>
+        </t>
+    </template>
+
+
+    <!-- Borrowing History -->
+    <template id="portal_borrowing_history" name="Borrowing History">
+        <t t-call="portal.portal_layout">
+            <div class="container mt-4">
+                <h1 class="mb-4">Lịch sử mượn sách</h1>
+
+                <div class="row mb-4">
+                    <div class="col-md-3"><div class="card text-center"><div class="card-body"><h3 class="text-primary" t-esc="total_borrowings"/><p class="mb-0">Tổng lần mượn</p></div></div></div>
+                    <div class="col-md-3"><div class="card text-center"><div class="card-body"><h3 class="text-success" t-esc="total_books_borrowed"/><p class="mb-0">Tổng sách đã mượn</p></div></div></div>
+                    <div class="col-md-3"><div class="card text-center"><div class="card-body"><h3 class="text-info" t-esc="current_borrowed"/><p class="mb-0">Đang mượn</p></div></div></div>
+                    <div class="col-md-3"><div class="card text-center"><div class="card-body"><h3 class="text-danger" t-esc="overdue_count"/><p class="mb-0">Quá hạn</p></div></div></div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card"><div class="card-header"><h5 class="mb-0">Danh mục yêu thích</h5></div>
+                            <div class="card-body">
+                                <ul class="list-unstyled">
+                                    <t t-foreach="top_categories" t-as="cat">
+                                        <li class="mb-2"><div class="d-flex justify-content-between"><span t-esc="cat[0]"/><span class="badge bg-primary" t-esc="cat[1]"/></div></li>
+                                    </t>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="card"><div class="card-header"><h5 class="mb-0">Sách trả gần đây</h5></div>
+                            <div class="card-body">
+                                <t t-foreach="recently_returned[:5]" t-as="borrowing">
+                                    <div class="d-flex align-items-center mb-3">
+                                        <img t-if="borrowing.borrowing_line_ids" t-att-src="'/web/image/library.book/%s/image_128' % borrowing.borrowing_line_ids[0].book_id.id" class="img-thumbnail me-3" style="width: 50px;"/>
+                                        <div class="flex-grow-1"><div class="fw-bold" t-esc="borrowing.name"/><small class="text-muted" t-field="borrowing.return_date"/></div>
+                                    </div>
+                                </t>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+</odoo>

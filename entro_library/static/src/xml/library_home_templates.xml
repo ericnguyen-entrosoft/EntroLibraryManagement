@@ -128,10 +128,23 @@
                                                             </small>
                                                         </t>
                                                     </div>
-                                                    <div class="o_library_book_stats">
+                                                    <div class="o_library_book_stats mb-2">
                                                         <span class="badge text-bg-success">
                                                             <i class="fa fa-check"/> <t t-esc="book.available_quant_count"/> có sẵn
                                                         </span>
+                                                    </div>
+                                                    <div class="o_library_book_actions">
+                                                        <t t-if="book.available_quant_count > 0">
+                                                            <button class="btn btn-sm btn-primary w-100"
+                                                                    t-on-click.stop="(ev) => this.onAddToBorrowing(book.id, ev)">
+                                                                <i class="fa fa-plus"/> Thêm vào mượn
+                                                            </button>
+                                                        </t>
+                                                        <t t-else="">
+                                                            <button class="btn btn-sm btn-secondary w-100" disabled="disabled">
+                                                                <i class="fa fa-ban"/> Hết sách
+                                                            </button>
+                                                        </t>
                                                     </div>
                                                 </div>
                                             </div>

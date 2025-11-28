@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Custom Paper Format for Borrowing Receipt -->
+    <record id="paperformat_library_borrowing_receipt" model="report.paperformat">
+        <field name="name">Phiếu mượn sách</field>
+        <field name="default" eval="False"/>
+        <field name="format">A4</field>
+        <field name="page_height">0</field>
+        <field name="page_width">0</field>
+        <field name="orientation">Portrait</field>
+        <field name="margin_top">40</field>
+        <field name="margin_bottom">25</field>
+        <field name="margin_left">10</field>
+        <field name="margin_right">10</field>
+        <field name="header_line" eval="False"/>
+        <field name="header_spacing">35</field>
+        <field name="dpi">90</field>
+    </record>
+
+    <!-- Thermal Printer Paper Format (80mm) -->
+    <record id="paperformat_library_borrowing_thermal" model="report.paperformat">
+        <field name="name">Phiếu mượn sách (Máy in nhiệt)</field>
+        <field name="default" eval="False"/>
+        <field name="format">custom</field>
+        <field name="page_height">297</field>
+        <field name="page_width">80</field>
+        <field name="orientation">Portrait</field>
+        <field name="margin_top">3</field>
+        <field name="margin_bottom">3</field>
+        <field name="margin_left">3</field>
+        <field name="margin_right">3</field>
+        <field name="header_line" eval="False"/>
+        <field name="header_spacing">3</field>
+        <field name="dpi">90</field>
+    </record>
+
+    <!-- Additional Report for Thermal Printer -->
+    <record id="report_library_borrowing_thermal" model="ir.actions.report">
+        <field name="name">Phiếu mượn (Máy in nhiệt)</field>
+        <field name="model">library.borrowing</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">entro_library.report_library_borrowing_receipt</field>
+        <field name="report_file">entro_library.report_library_borrowing_receipt</field>
+        <field name="paperformat_id" ref="paperformat_library_borrowing_thermal"/>
+        <field name="print_report_name">'Phiếu mượn - %s' % object.name</field>
+        <field name="binding_model_id" ref="model_library_borrowing"/>
+        <field name="binding_type">report</field>
+    </record>
+
+</odoo>

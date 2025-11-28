@@ -44,6 +44,17 @@
                             <field name="active" widget="boolean_toggle"/>
                         </group>
                     </group>
+                    <group string="Chính sách mượn sách">
+                        <group>
+                            <field name="allow_borrowing" widget="boolean_toggle"/>
+                            <field name="max_books_per_borrower"
+                                   invisible="allow_borrowing == False"/>
+                        </group>
+                        <group>
+                            <field name="default_borrowing_days"
+                                   invisible="allow_borrowing == False"/>
+                        </group>
+                    </group>
                     <notebook>
                         <page string="Mô tả" name="description">
                             <field name="description" widget="html"/>
@@ -82,58 +93,6 @@
         </field>
     </record>
 
-    <!-- Library Resource Kanban View -->
-    <record id="view_library_resource_kanban" model="ir.ui.view">
-        <field name="name">library.resource.kanban</field>
-        <field name="model">library.resource</field>
-        <field name="arch" type="xml">
-            <kanban class="o_kanban_mobile" default_order="sequence,name">
-                <field name="id"/>
-                <field name="name"/>
-                <field name="code"/>
-                <field name="color"/>
-                <field name="icon"/>
-                <field name="book_count"/>
-                <field name="available_book_count"/>
-                <field name="borrowed_book_count"/>
-                <templates>
-                    <t t-name="kanban-box">
-                        <div t-attf-class="oe_kanban_color_#{kanban_getcolor(record.color.raw_value)} oe_kanban_card oe_kanban_global_click">
-                            <div class="o_kanban_card_header">
-                                <div class="o_kanban_card_header_title">
-                                    <div class="o_primary">
-                                        <i t-attf-class="fa #{record.icon.raw_value} me-2"/>
-                                        <strong><field name="name"/></strong>
-                                    </div>
-                                    <div class="o_secondary">
-                                        <small><field name="code"/></small>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="container o_kanban_card_content mt-3">
-                                <div class="row">
-                                    <div class="col-6">
-                                        <button class="btn btn-primary btn-sm" type="object" name="action_view_books">
-                                            <i class="fa fa-book"/> <field name="book_count"/> Sách
-                                        </button>
-                                    </div>
-                                    <div class="col-6 text-end">
-                                        <span class="badge text-bg-success">
-                                            <i class="fa fa-check"/> <field name="available_book_count"/>
-                                        </span>
-                                        <span class="badge text-bg-warning">
-                                            <i class="fa fa-clock-o"/> <field name="borrowed_book_count"/>
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </t>
-                </templates>
-            </kanban>
-        </field>
-    </record>
-
     <!-- Library Resource Search View -->
     <record id="view_library_resource_search" model="ir.ui.view">
         <field name="name">library.resource.search</field>
@@ -158,7 +117,7 @@
     <record id="action_library_resource" model="ir.actions.act_window">
         <field name="name">Kho tài nguyên thư viện</field>
         <field name="res_model">library.resource</field>
-        <field name="view_mode">list,kanban,form</field>
+        <field name="view_mode">list,form</field>
         <field name="search_view_id" ref="view_library_resource_search"/>
         <field name="context">{'search_default_active': 1}</field>
         <field name="help" type="html">
@@ -170,42 +129,4 @@
             </p>
         </field>
     </record>
-
-    <!-- Submenus for each resource (actions defined in data/library_resource_actions.xml) -->
-    <!-- <menuitem id="menu_library_resource_current_storage"
-              name="Kho hiện hành"
-              parent="menu_library_home"
-              action="action_library_resource_current_storage"
-              sequence="10"/>
-
-    <menuitem id="menu_library_resource_digital_publication"
-              name="Kho ấn phẩm số"
-              parent="menu_library_home"
-              action="action_library_resource_digital_publication"
-              sequence="20"/>
-
-    <menuitem id="menu_library_resource_multimedia"
-              name="Kho đa phương tiện"
-              parent="menu_library_home"
-              action="action_library_resource_multimedia"
-              sequence="30"/>
-
-    <menuitem id="menu_library_resource_photo_storage"
-              name="Kho ảnh"
-              parent="menu_library_home"
-              action="action_library_resource_photo_storage"
-              sequence="40"/>
-
-    <menuitem id="menu_library_resource_archive_storage"
-              name="Kho lưu"
-              parent="menu_library_home"
-              action="action_library_resource_archive_storage"
-              sequence="50"/>
-
-    <menuitem id="menu_library_resource_gift_storage"
-              name="Kho biếu tặng"
-              parent="menu_library_home"
-              action="action_library_resource_gift_storage"
-              sequence="60"/> -->
-
 </odoo>

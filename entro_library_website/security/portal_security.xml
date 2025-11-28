@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Portal users can see their own borrowings -->
+    <record id="library_borrowing_portal_rule" model="ir.rule">
+        <field name="name">Portal: see own borrowings</field>
+        <field name="model_id" ref="entro_library.model_library_borrowing"/>
+        <field name="domain_force">[('borrower_id.user_ids', 'in', user.id)]</field>
+        <field name="groups" eval="[(4, ref('base.group_portal'))]"/>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <!-- Portal users can see their own borrowing lines -->
+    <record id="library_borrowing_line_portal_rule" model="ir.rule">
+        <field name="name">Portal: see own borrowing lines</field>
+        <field name="model_id" ref="entro_library.model_library_borrowing_line"/>
+        <field name="domain_force">[('borrowing_id.borrower_id.user_ids', 'in', user.id)]</field>
+        <field name="groups" eval="[(4, ref('base.group_portal'))]"/>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <!-- Portal users can see their own reservations -->
+    <record id="library_reservation_portal_rule" model="ir.rule">
+        <field name="name">Portal: see own reservations</field>
+        <field name="model_id" ref="entro_library.model_library_reservation"/>
+        <field name="domain_force">[('borrower_id.user_ids', 'in', user.id)]</field>
+        <field name="groups" eval="[(4, ref('base.group_portal'))]"/>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <!-- Public users can see published books -->
+    <record id="library_book_public_rule" model="ir.rule">
+        <field name="name">Public: see published books</field>
+        <field name="model_id" ref="entro_library.model_library_book"/>
+        <field name="domain_force">[('website_published', '=', True), ('active', '=', True)]</field>
+        <field name="groups" eval="[(4, ref('base.group_public')), (4, ref('base.group_portal'))]"/>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+</odoo>

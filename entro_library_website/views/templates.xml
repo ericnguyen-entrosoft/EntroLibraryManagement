@@ -1,0 +1,696 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Include external libraries for image gallery in layout head -->
+    <template id="library_external_assets" name="Library External Assets" inherit_id="website.layout">
+        <xpath expr="//head" position="inside">
+            <!-- Swiper CSS -->
+            <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@8/swiper-bundle.min.css"/>
+            <!-- lightGallery CSS -->
+            <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lightgallery@2.7.0/css/lightgallery-bundle.min.css"/>
+
+            <!-- Swiper JS -->
+            <script src="https://cdn.jsdelivr.net/npm/swiper@8/swiper-bundle.min.js"></script>
+            <!-- lightGallery JS -->
+            <script src="https://cdn.jsdelivr.net/npm/lightgallery@2.7.0/lightgallery.min.js"></script>
+            <script src="https://cdn.jsdelivr.net/npm/lightgallery@2.7.0/plugins/thumbnail/lg-thumbnail.min.js"></script>
+            <script src="https://cdn.jsdelivr.net/npm/lightgallery@2.7.0/plugins/zoom/lg-zoom.min.js"></script>
+        </xpath>
+    </template>
+
+    <!-- ========== BOOK LISTING PAGE ========== -->
+
+    <template id="library_books" name="Thư Viện - Danh Sách Sách">
+        <t t-call="website.layout">
+            <div id="wrap" class="js_library">
+                <div class="container mt-4 library_container">
+
+                    <!-- Header -->
+                    <div class="library_header text-center mb-4">
+                        <h1 class="display-3">Thư Viện Sách</h1>
+                        <p class="lead">Khám phá kho tàng tri thức của chúng tôi</p>
+                    </div>
+
+                    <!-- Search box (centered, below header) -->
+                    <div class="search_box mb-5">
+                        <div class="row justify-content-center">
+                            <div class="col-lg-6 col-md-8">
+                                <form method="get" class="input-group input-group-lg" t-att-action="keep()">
+                                    <input type="text" name="search"
+                                           class="form-control"
+                                           placeholder="Tìm kiếm sách, tác giả..."
+                                           t-att-value="search"/>
+                                    <button class="btn btn-primary" type="submit">
+                                        <i class="fa fa-search me-2"/>Tìm kiếm
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <!-- Sidebar -->
+                        <div class="col-lg-3 mb-4">
+                            <!-- Categories -->
+                            <div class="categories_filter mb-4">
+                                <h5>Danh mục</h5>
+                                <ul class="list-unstyled">
+                                    <li>
+                                        <a href="/thu-vien"
+                                           t-attf-class="#{not category and 'fw-bold text-primary'}">
+                                            Tất cả danh mục
+                                        </a>
+                                    </li>
+                                    <t t-foreach="categories" t-as="cat">
+                                        <li>
+                                            <a t-attf-href="/thu-vien/danh-muc/#{cat.id}"
+                                               t-attf-class="#{category and category.id == cat.id and 'fw-bold text-primary'}">
+                                                <t t-esc="cat.name"/>
+                                            </a>
+                                        </li>
+                                    </t>
+                                </ul>
+                            </div>
+
+                            <!-- Resource filter -->
+                            <div class="resource_selector mb-4" t-if="resources">
+                                <h5>Kho tài nguyên</h5>
+                                <ul class="list-unstyled">
+                                    <li>
+                                        <a href="/thu-vien"
+                                           t-attf-class="#{not request.params.get('resource') and 'fw-bold text-primary'}">
+                                            Tất cả kho
+                                        </a>
+                                    </li>
+                                    <t t-foreach="resources" t-as="res">
+                                        <li>
+                                            <a t-attf-href="/thu-vien/kho-tai-nguyen/#{res.id}"
+                                               class="text-decoration-none">
+                                                <t t-esc="res.name"/>
+                                            </a>
+                                        </li>
+                                    </t>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <!-- Main content -->
+                        <div class="col-lg-9">
+
+                            <!-- Info bar -->
+                            <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap">
+                                <p class="text-muted mb-0">
+                                    Tìm thấy <strong t-esc="books_count"/> cuốn sách
+                                </p>
+                                <!-- Sort -->
+                                <form method="get" class="d-flex align-items-center" t-att-action="keep()">
+                                    <label class="me-2 mb-0">Sắp xếp:</label>
+                                    <select class="form-select form-select-sm w-auto" name="sortby" onchange="this.form.submit()">
+                                        <option value="date_desc" t-att-selected="'selected' if sortby == 'date_desc' else None">Mới nhất</option>
+                                        <option value="date_asc" t-att-selected="'selected' if sortby == 'date_asc' else None">Cũ nhất</option>
+                                        <option value="name_asc" t-att-selected="'selected' if sortby == 'name_asc' else None">Tên A-Z</option>
+                                        <option value="name_desc" t-att-selected="'selected' if sortby == 'name_desc' else None">Tên Z-A</option>
+                                        <option value="author_asc" t-att-selected="'selected' if sortby == 'author_asc' else None">Tác giả A-Z</option>
+                                    </select>
+                                </form>
+                            </div>
+
+                            <!-- Books grid -->
+                            <div class="row books_grid" t-if="books">
+                                <t t-foreach="books" t-as="book">
+                                    <div class="col-md-4 col-sm-6 mb-4">
+                                        <t t-call="entro_library_website.library_book_card"/>
+                                    </div>
+                                </t>
+                            </div>
+
+                            <!-- No results -->
+                            <div t-if="not books" class="alert alert-info text-center">
+                                <i class="fa fa-info-circle fa-2x mb-2 d-block"/>
+                                <p class="mb-0">Không tìm thấy sách nào phù hợp.</p>
+                            </div>
+
+                            <!-- Pagination -->
+                            <div t-if="pager" class="mt-4">
+                                <t t-call="website.pager">
+                                    <t t-set="classname">justify-content-center</t>
+                                </t>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </t>
+    </template>
+
+
+    <!-- ========== BOOK CARD COMPONENT ========== -->
+
+    <template id="library_book_card" name="Thẻ Sách">
+        <div class="card book_card shadow-sm">
+            <a t-attf-href="/thu-vien/sach/#{book.id}" class="text-decoration-none text-dark d-flex flex-column h-100">
+                <div class="card-img-top book_cover position-relative overflow-hidden">
+                    <img t-if="book.image_512"
+                         t-att-src="'/web/image/library.book/%s/image_512' % book.id"
+                         t-att-alt="book.name"
+                         class="img-fluid w-100"
+                         style="height: 224.625px; width: 224.625px; object-fit: cover;"/>
+                    <div t-else="" class="bg-light d-flex align-items-center justify-content-center"
+                         style="height: 300px;">
+                        <i class="fa fa-book fa-5x text-muted"/>
+                    </div>
+
+                    <!-- Status badge -->
+                    <t t-if="book.available_quant_count > 0">
+                        <span class="badge bg-success position-absolute top-0 end-0 m-2">
+                            <i class="fa fa-check"/> Có sẵn
+                        </span>
+                    </t>
+                    <t t-else="">
+                        <span class="badge bg-danger position-absolute top-0 end-0 m-2">
+                            <i class="fa fa-times"/> Hết sách
+                        </span>
+                    </t>
+                </div>
+
+                <div class="card-body">
+                    <h5 class="card-title book_title text-truncate" t-att-title="book.name" t-esc="book.name"/>
+                    <p class="card-text text-muted small mb-2 text-truncate">
+                        <i class="fa fa-user"/> <t t-esc="book.author_names or 'Chưa rõ'"/>
+                    </p>
+                    <p class="card-text small text-muted mb-2">
+                        <i class="fa fa-tag"/> <t t-esc="book.category_id.name if book.category_id else 'Chưa phân loại'"/>
+                    </p>
+                    <p class="card-text small mb-0">
+                        <i class="fa fa-calendar"/> <t t-esc="book.publication_year or 'N/A'"/>
+                    </p>
+                </div>
+
+                <div class="card-footer bg-transparent border-top">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <small class="text-muted">
+                            <i class="fa fa-book"/>
+                            <t t-esc="book.available_quant_count"/>/<t t-esc="book.quant_count"/>
+                        </small>
+                        <span class="btn btn-sm btn-primary">Xem chi tiết</span>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </template>
+
+
+    <!-- ========== BOOK DETAIL PAGE (Enhanced Fahasa-style) ========== -->
+
+    <template id="library_book_detail" name="Chi Tiết Sách">
+        <t t-call="website.layout">
+            <div id="wrap" class="js_library_book" t-att-data-book-id="book.id">
+                <div class="container mt-4 mb-5">
+
+                    <!-- Breadcrumb -->
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item">
+                                <a href="/thu-vien">Thư viện</a>
+                            </li>
+                            <li class="breadcrumb-item" t-if="book.category_id">
+                                <a t-attf-href="/thu-vien/danh-muc/#{book.category_id.id}">
+                                    <t t-esc="book.category_id.name"/>
+                                </a>
+                            </li>
+                            <li class="breadcrumb-item active" t-esc="book.name"/>
+                        </ol>
+                    </nav>
+
+                    <div class="product-essential row mt-4">
+                        <!-- LEFT: Image Gallery (Tiki-style) -->
+                        <div class="col-lg-5 mb-4 product-essential-media-parent">
+                            <div class="product-view-image" style="display: flex; flex-direction: column; background: white; gap: 16px; padding: 16px 0px 12px 0px;">
+
+                                <t t-set="all_images" t-value="[book] + list(book.book_image_ids)"/>
+
+                                <!-- Hidden lightGallery links for full-screen -->
+                                <div class="lightgallery" id="lightgallery-book-media" style="display: none;">
+                                    <t t-foreach="all_images" t-as="img">
+                                        <t t-set="img_large" t-value="'/web/image/library.book/%s/image_1920' % book.id if img == book else '/web/image/library.book.image/%s/image_1920' % img.id"/>
+                                        <a class="include-in-gallery"
+                                           t-attf-id="lightgallery-item-#{img_index}"
+                                           t-att-href="img_large"
+                                           t-att-title="book.name">
+                                            <img t-att-src="img_large" t-att-alt="book.name"/>
+                                        </a>
+                                    </t>
+                                </div>
+
+                                <!-- Main Image Frame -->
+                                <div class="image-frame">
+                                    <div style="width: 100%; aspect-ratio: 1/1;">
+                                        <div style="position: relative; cursor: pointer;" id="main-image-container">
+                                            <img id="main-book-image"
+                                                 t-att-src="'/web/image/library.book/%s/image_1920' % book.id"
+                                                 t-att-alt="book.name"
+                                                 style="width: 100%; height: 100%; object-fit: contain; z-index: 2; opacity: 1;"
+                                                 class="main-product-image"/>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Thumbnail Slider (below main image) -->
+                                <div class="thumbnail-list" t-if="len(all_images) > 1">
+                                    <div class="thumbnail-slider">
+                                        <span class="icon icon-prev" id="thumb-prev">
+                                            <svg width="20" height="20" viewBox="0 0 18 18" fill="none">
+                                                <path fill-rule="evenodd" clip-rule="evenodd" d="M12.0899 14.5899C11.7645 14.9153 11.2368 14.9153 10.9114 14.5899L5.91139 9.58991C5.58596 9.26447 5.58596 8.73683 5.91139 8.4114L10.9114 3.41139C11.2368 3.08596 11.7645 3.08596 12.0899 3.41139C12.4153 3.73683 12.4153 4.26447 12.0899 4.58991L7.67916 9.00065L12.0899 13.4114C12.4153 13.7368 12.4153 14.2645 12.0899 14.5899Z" fill="#0A68FF"/>
+                                            </svg>
+                                        </span>
+                                        <div class="thumbnail-content">
+                                            <div class="thumbnail-slider-track" style="gap: 8px; transform: translateX(0px); transition: 0.5s ease-in-out; display: flex;">
+                                                <t t-foreach="all_images" t-as="img">
+                                                    <t t-set="img_src" t-value="'/web/image/library.book/%s/image_256' % book.id if img == book else '/web/image/library.book.image/%s/image_256' % img.id"/>
+                                                    <a class="thumbnail-item" t-attf-data-index="#{img_index}" t-attf-class="thumbnail-item #{img_index == 0 and 'active' or ''}">
+                                                        <img width="56" height="56"
+                                                             style="width: 56px; height: 56px; object-fit: cover;"
+                                                             t-att-alt="book.name"
+                                                             t-att-src="img_src"/>
+                                                    </a>
+                                                </t>
+                                            </div>
+                                        </div>
+                                        <span class="icon icon-next" id="thumb-next">
+                                            <svg width="20" height="20" viewBox="0 0 18 18" fill="none">
+                                                <path fill-rule="evenodd" clip-rule="evenodd" d="M5.91107 3.41107C6.23651 3.08563 6.76414 3.08563 7.08958 3.41107L12.0896 8.41107C12.415 8.73651 12.415 9.26415 12.0896 9.58958L7.08958 14.5896C6.76414 14.915 6.23651 14.915 5.91107 14.5896C5.58563 14.2641 5.58563 13.7365 5.91107 13.4111L10.3218 9.00033L5.91107 4.58958C5.58563 4.26414 5.58563 3.73651 5.91107 3.41107Z" fill="#0A68FF"/>
+                                            </svg>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Action button (below images in left column) -->
+                            <div class="book_actions mt-3">
+                                <t t-if="not is_public_user">
+                                    <t t-if="is_in_cart">
+                                        <!-- Already in cart -->
+                                        <a href="/my/borrowing-cart" class="btn btn-success btn-lg w-100">
+                                            <i class="fa fa-check me-2"/>
+                                            Đã có trong giỏ - Xem giỏ mượn
+                                        </a>
+                                    </t>
+                                    <t t-elif="book.available_quant_count > 0 and book.can_borrow">
+                                        <!-- Available - can add to cart -->
+                                        <button class="btn btn-primary btn-lg w-100 btn_add_to_cart"
+                                                t-att-data-book-id="book.id">
+                                            <i class="fa fa-shopping-cart me-2"/>
+                                            Thêm vào giỏ mượn
+                                        </button>
+                                    </t>
+                                    <t t-else="">
+                                        <!-- Not available -->
+                                        <button class="btn btn-secondary btn-lg w-100" disabled="disabled">
+                                            <i class="fa fa-ban me-2"/>
+                                            Hiện không thể mượn
+                                        </button>
+                                    </t>
+                                </t>
+                                <t t-else="">
+                                    <!-- Public user - need login -->
+                                    <a t-attf-href="/web/login?redirect=/thu-vien/sach/#{book.id}"
+                                       class="btn btn-primary btn-lg w-100">
+                                        <i class="fa fa-sign-in me-2"/>
+                                        Đăng nhập để mượn sách
+                                    </a>
+                                </t>
+                            </div>
+                        </div>
+
+                        <!-- RIGHT: Book info -->
+                        <div class="col-lg-7 product-essential-detail-parent">
+                            <div class="product-essential-detail">
+
+                            <!-- Title -->
+                            <div class="book_header mb-3">
+                                <h1 class="book_title h3 fw-bold" t-esc="book.name"/>
+                                <h2 class="book_subtitle h6 text-muted" t-if="book.subtitle"
+                                    t-esc="book.subtitle"/>
+                            </div>
+
+                            <!-- Quick info (Fahasa-style) -->
+                            <div class="product-view-sa mb-3">
+                                <div class="product-view-sa-row d-flex">
+                                    <div class="product-view-sa-item me-4">
+                                        <span class="text-muted">Tác giả:</span>
+                                        <span class="fw-bold">
+                                            <t t-if="book.author_ids">
+                                                <t t-foreach="book.author_ids" t-as="author">
+                                                    <t t-esc="author.name"/>
+                                                    <t t-if="not author_last">, </t>
+                                                </t>
+                                            </t>
+                                            <t t-else="">Chưa rõ</t>
+                                        </span>
+                                    </div>
+                                    <div class="product-view-sa-item">
+                                        <span class="text-muted">NXB:</span>
+                                        <span class="fw-bold" t-esc="book.publisher_id.name if book.publisher_id else 'N/A'"/>
+                                    </div>
+                                </div>
+                                <div class="product-view-sa-row d-flex mt-2">
+                                    <div class="product-view-sa-item me-4">
+                                        <span class="text-muted">Năm XB:</span>
+                                        <span class="fw-bold" t-esc="book.publication_year or 'N/A'"/>
+                                    </div>
+                                    <div class="product-view-sa-item">
+                                        <span class="text-muted">Số trang:</span>
+                                        <span class="fw-bold" t-esc="book.page_count or 'N/A'"/>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Availability count -->
+                            <div class="book-stock-info mb-3 p-3 bg-light rounded">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <i class="fa fa-map-marker text-primary me-2"/>
+                                        <span class="fw-bold"><t t-esc="len(book.borrow_location_ids)"/> kho có sách</span>
+                                    </div>
+                                    <div>
+                                        <span class="badge bg-success" t-if="book.available_quant_count > 0">
+                                            <t t-esc="book.available_quant_count"/> bản có sẵn
+                                        </span>
+                                        <span class="badge bg-danger" t-else="">
+                                            Hết sách
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Info Detail Section (inside right column) -->
+                            <div class="block-content-product-detail mt-4">
+                                <h2 class="block-content-product-detail-title h5 mb-3">Thông tin chi tiết</h2>
+                                <div class="book-info-table">
+                                    <table class="table table-bordered bg-white mb-0">
+                                        <colgroup>
+                                            <col width="35%"/>
+                                            <col/>
+                                        </colgroup>
+                                        <tbody>
+                                            <tr>
+                                                <th class="table-label bg-light">Tác giả</th>
+                                                <td class="data" t-esc="book.author_names or 'Chưa rõ'"/>
+                                            </tr>
+                                            <tr t-if="book.co_author_ids">
+                                                <th class="table-label bg-light">Đồng tác giả</th>
+                                                <td class="data">
+                                                    <t t-foreach="book.co_author_ids" t-as="co_author">
+                                                        <t t-esc="co_author.name"/>
+                                                        <t t-if="not co_author_last">, </t>
+                                                    </t>
+                                                </td>
+                                            </tr>
+                                            <tr t-if="book.publisher_id">
+                                                <th class="table-label bg-light">Nhà xuất bản</th>
+                                                <td class="data" t-esc="book.publisher_id.name"/>
+                                            </tr>
+                                            <tr t-if="book.publication_year">
+                                                <th class="table-label bg-light">Năm xuất bản</th>
+                                                <td class="data" t-esc="book.publication_year"/>
+                                            </tr>
+                                            <tr t-if="book.publication_country_id">
+                                                <th class="table-label bg-light">Quốc gia</th>
+                                                <td class="data" t-esc="book.publication_country_id.name"/>
+                                            </tr>
+                                            <tr t-if="book.publication_city_id">
+                                                <th class="table-label bg-light">Thành phố XB</th>
+                                                <td class="data" t-esc="book.publication_city_id.name"/>
+                                            </tr>
+                                            <tr t-if="book.page_count">
+                                                <th class="table-label bg-light">Số trang</th>
+                                                <td class="data" t-esc="book.page_count"/>
+                                            </tr>
+                                            <tr t-if="book.language_id">
+                                                <th class="table-label bg-light">Ngôn ngữ</th>
+                                                <td class="data" t-esc="book.language_id.name"/>
+                                            </tr>
+                                            <tr t-if="book.category_id">
+                                                <th class="table-label bg-light">Danh mục</th>
+                                                <td class="data" t-esc="book.category_id.name"/>
+                                            </tr>
+                                            <tr t-if="book.series_id">
+                                                <th class="table-label bg-light">Tùng thư</th>
+                                                <td class="data" t-esc="book.series_id.name"/>
+                                            </tr>
+                                            <tr t-if="book.ddc_number">
+                                                <th class="table-label bg-light">Số DDC</th>
+                                                <td class="data" t-esc="book.ddc_number"/>
+                                            </tr>
+                                            <tr t-if="book.cutter_number">
+                                                <th class="table-label bg-light">Mã Cutter</th>
+                                                <td class="data" t-esc="book.cutter_number"/>
+                                            </tr>
+                                            <tr t-if="book.keywords">
+                                                <th class="table-label bg-light">Từ khóa</th>
+                                                <td class="data" t-esc="book.keywords"/>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Description Section (full width below product-essential) -->
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <div class="block-content-product-detail">
+                                <h2 class="block-content-product-detail-title h4 mb-4">Mô tả sản phẩm</h2>
+                                <div id="book_description_content" class="book-description-content p-4 bg-white rounded border">
+                                    <div t-if="book.summary" t-field="book.summary" class="book_summary"/>
+                                    <p t-else="" class="text-muted text-center py-4">
+                                        Chưa có mô tả cho cuốn sách này.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Media Section (full width if any) -->
+                    <div class="row mt-4" t-if="book.media_ids">
+                        <div class="col-12">
+                            <div class="block-content-product-detail">
+                                <h2 class="block-content-product-detail-title h4 mb-4">
+                                    Phương tiện liên quan (<t t-esc="len(book.media_ids)"/>)
+                                </h2>
+                                <div class="row">
+                                    <t t-foreach="book.media_ids" t-as="media">
+                                        <div class="col-md-3 col-sm-6 mb-3">
+                                            <div class="card h-100">
+                                                <div class="card-body">
+                                                    <h6 class="card-title" t-esc="media.name"/>
+                                                    <p class="small text-muted mb-0" t-esc="media.media_type"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </t>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Related books -->
+                    <div class="row mt-5" t-if="related_books">
+                        <div class="col-12">
+                            <h3 class="mb-4">Có thể bạn cũng thích</h3>
+                            <div class="row">
+                                <t t-foreach="related_books" t-as="book">
+                                    <div class="col-lg-2 col-md-3 col-sm-4 col-6 mb-4">
+                                        <t t-call="entro_library_website.library_book_card"/>
+                                    </div>
+                                </t>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </t>
+    </template>
+
+
+    <!-- ========== RESOURCES LIST PAGE ========== -->
+
+    <template id="library_resources_list" name="Các Kho Tài Nguyên">
+        <t t-call="website.layout">
+            <div class="container mt-5">
+                <h1 class="text-center display-4 mb-5">Các Kho Tài Nguyên</h1>
+
+                <div class="row">
+                    <t t-foreach="resources" t-as="resource">
+                        <div class="col-md-6 col-lg-4 mb-4">
+                            <div class="card resource_card h-100 shadow-sm">
+                                <div class="card-body">
+                                    <h3 class="card-title" t-esc="resource.name"/>
+                                    <p class="card-text text-muted" t-if="resource.description" t-esc="resource.description"/>
+
+                                    <div class="resource_stats mt-3 mb-3">
+                                        <p class="mb-1">
+                                            <i class="fa fa-book text-primary me-2"/>
+                                            <strong t-esc="resource.book_count"/> cuốn sách
+                                        </p>
+                                        <p class="mb-1">
+                                            <i class="fa fa-clock text-primary me-2"/>
+                                            Mượn <strong t-esc="resource.default_borrowing_days"/> ngày
+                                        </p>
+                                        <p class="mb-0">
+                                            <i class="fa fa-list text-primary me-2"/>
+                                            Tối đa <strong t-esc="resource.max_books_per_borrower"/> cuốn/lần
+                                        </p>
+                                    </div>
+
+                                    <a t-attf-href="/thu-vien/kho-tai-nguyen/#{resource.id}"
+                                       class="btn btn-primary w-100">
+                                        <i class="fa fa-eye me-2"/>
+                                        Xem sách
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </div>
+            </div>
+        </t>
+    </template>
+
+
+    <!-- ========== RESOURCE BOOKS PAGE ========== -->
+
+    <template id="library_resource_books" name="Sách theo Kho Tài Nguyên">
+        <t t-call="website.layout">
+            <div class="container mt-4">
+
+                <!-- Resource header -->
+                <div class="resource_header mb-4 p-4 bg-light rounded">
+                    <h3 t-esc="resource.name"/>
+
+                    <!-- Description (HTML parsed) -->
+                    <div class="resource-description mt-3" t-if="resource.description">
+                        <div t-field="resource.description" class="resource-description-content"/>
+                    </div>
+
+                    <!-- Policy (HTML parsed) -->
+                    <div class="resource-policy mt-3" t-if="resource.policy">
+                        <h5 class="text-primary">Nội quy</h5>
+                        <div t-field="resource.policy" class="resource-policy-content"/>
+                    </div>
+                </div>
+
+                <!-- Breadcrumb -->
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item">
+                            <a href="/thu-vien">Thư viện</a>
+                        </li>
+                        <li class="breadcrumb-item">
+                            <a href="/thu-vien/cac-kho">Các kho</a>
+                        </li>
+                        <li class="breadcrumb-item active" t-esc="resource.name"/>
+                    </ol>
+                </nav>
+
+                <!-- Search box (centered) -->
+                <div class="search_box mb-5">
+                    <div class="row justify-content-center">
+                        <div class="col-lg-6 col-md-8">
+                            <form method="get" class="input-group input-group-lg">
+                                <input type="text" name="search"
+                                       class="form-control"
+                                       placeholder="Tìm kiếm sách..."
+                                       t-att-value="search"/>
+                                <button class="btn btn-primary" type="submit">
+                                    <i class="fa fa-search me-2"/>Tìm kiếm
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Books grid (reuse from library_books) -->
+                <div class="row">
+                    <div class="col-lg-3 mb-4">
+                        <!-- Categories -->
+                        <div class="categories_filter mb-4">
+                            <h5>Danh mục</h5>
+                            <ul class="list-unstyled">
+                                <li>
+                                    <a t-attf-href="/thu-vien/kho-tai-nguyen/#{resource.id}"
+                                       t-attf-class="#{not category and 'fw-bold text-primary'}">
+                                        Tất cả
+                                    </a>
+                                </li>
+                                <t t-foreach="categories" t-as="cat">
+                                    <li>
+                                        <a t-attf-href="/thu-vien/kho-tai-nguyen/#{resource.id}?category=#{cat.id}"
+                                           t-attf-class="#{category and category.id == cat.id and 'fw-bold text-primary'}">
+                                            <t t-esc="cat.name"/>
+                                        </a>
+                                    </li>
+                                </t>
+                            </ul>
+                        </div>
+
+                        <!-- Resource filter -->
+                        <div class="resource_selector mb-4" t-if="resources">
+                            <h5>Kho tài nguyên</h5>
+                            <ul class="list-unstyled">
+                                <li>
+                                    <a href="/thu-vien"
+                                       class="text-decoration-none">
+                                        Tất cả kho
+                                    </a>
+                                </li>
+                                <t t-foreach="resources" t-as="res">
+                                    <li>
+                                        <a t-attf-href="/thu-vien/kho-tai-nguyen/#{res.id}"
+                                           t-attf-class="#{resource.id == res.id and 'fw-bold text-primary' or ''}">
+                                            <t t-esc="res.name"/>
+                                        </a>
+                                    </li>
+                                </t>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-9">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <p class="text-muted mb-0">
+                                <strong t-esc="books_count"/> cuốn sách
+                            </p>
+                        </div>
+
+                        <div class="row books_grid" t-if="books">
+                            <t t-foreach="books" t-as="book">
+                                <div class="col-md-4 col-sm-6 mb-4">
+                                    <t t-call="entro_library_website.library_book_card"/>
+                                </div>
+                            </t>
+                        </div>
+
+                        <div t-if="not books" class="alert alert-info text-center">
+                            <i class="fa fa-info-circle fa-2x mb-2 d-block"/>
+                            <p class="mb-0">Không có sách nào.</p>
+                        </div>
+
+                        <div t-if="pager" class="mt-4">
+                            <t t-call="website.pager">
+                                <t t-set="classname">justify-content-center</t>
+                            </t>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </t>
+    </template>
+
+</odoo>

@@ -114,3 +114,46 @@ class ResPartner(models.Model):
                 if not record.borrower_code:
                     vals['borrower_code'] = self.env['ir.sequence'].next_by_code('library.borrower') or 'New'
         return super(ResPartner, self).write(vals)
+
+    def get_or_create_draft_borrowing(self):
+        """
+        Get or create draft borrowing for this borrower (like shopping cart)
+        Returns existing draft borrowing or creates a new one
+        """
+        self.ensure_one()
+
+        if not self.is_borrower:
+            from odoo.exceptions import UserError
+            raise UserError('Bạn cần đăng ký làm độc giả để mượn sách.')
+
+        if not self.is_membership_active:
+            from odoo.exceptions import UserError
+            raise UserError('Thẻ độc giả của bạn đã hết hạn. Vui lòng gia hạn.')
+
+        # Find existing draft borrowing
+        draft_borrowing = self.env['library.borrowing'].search([
+            ('borrower_id', '=', self.id),
+            ('state', '=', 'draft')
+        ], order='borrow_date desc', limit=1)
+
+        if not draft_borrowing:
+            # Create new draft borrowing
+            draft_borrowing = self.env['library.borrowing'].create({
+                'borrower_id': self.id,
+                'borrow_date': fields.Date.today(),
+            })
+
+        return draft_borrowing
+
+    def get_resource_borrowing_stats(self):
+        """Get borrowing statistics per resource for this borrower"""
+        self.ensure_one()
+
+        resources = self.env['library.resource'].search([('active', '=', True)])
+        stats = []
+
+        for resource in resources:
+            resource_stats = resource.get_borrower_stats(self.id)
+            stats.append(resource_stats)
+
+        return stats

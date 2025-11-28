@@ -25,10 +25,12 @@
         # Data
         'data/library_data.xml',
         'data/library_resource_actions.xml',
+        'data/library_paper_format.xml',
 
         # Security
         'security/library_security.xml',
         'security/ir.model.access.csv',
+        'security/library_record_rules.xml',
 
         # Wizards
         'wizards/library_book_update_quantity_views.xml',
@@ -38,6 +40,7 @@
         # Reports (must be loaded before views that reference them)
         'reports/library_card_report.xml',
         'reports/library_book_label_reports.xml',
+        'reports/library_borrowing_report.xml',
 
         # Views
         'views/res_partner_views.xml',
@@ -64,8 +67,8 @@
         'views/library_dashboard_views.xml',
 
         # Menus (must be loaded before dashboard)
-        'views/library_menus.xml',
         'views/library_resource_views.xml',
+        'views/library_menus.xml',
 
 
         # Home (must be loaded after menus)

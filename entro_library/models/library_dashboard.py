@@ -100,13 +100,14 @@ class LibraryDashboard(models.Model):
         ])
         books_borrowed_in_period = len(borrowing_lines_in_period)
 
-        # Count books returned in period from lines
-        returned_lines_in_period = BorrowingLine.search([
+        # Count books returned in period from quant lines
+        BorrowingQuantLine = self.env['library.borrowing.quant.line'].sudo()
+        returned_quants_in_period = BorrowingQuantLine.search([
             ('return_date', '>=', date_from),
             ('return_date', '<=', date_to),
             ('state', '=', 'returned')
         ])
-        books_returned_in_period = len(returned_lines_in_period)
+        books_returned_in_period = len(returned_quants_in_period)
 
         return {
             'total_books': total_book_titles,
@@ -232,6 +233,7 @@ class LibraryDashboard(models.Model):
     def _get_borrowing_trends(self, days=7):
         """Get borrowing trends for last N days - count books, not borrowings"""
         BorrowingLine = self.env['library.borrowing.line'].sudo()
+        BorrowingQuantLine = self.env['library.borrowing.quant.line'].sudo()
         trends = []
 
         for i in range(days):
@@ -243,12 +245,12 @@ class LibraryDashboard(models.Model):
             ])
             borrowed = len(borrowed_lines)
 
-            # Count books returned on this date (from lines)
-            returned_lines = BorrowingLine.search([
+            # Count books returned on this date (from quant lines)
+            returned_quants = BorrowingQuantLine.search([
                 ('return_date', '=', date),
                 ('state', '=', 'returned')
             ])
-            returned = len(returned_lines)
+            returned = len(returned_quants)
 
             trends.append({
                 'date': date.strftime('%Y-%m-%d'),

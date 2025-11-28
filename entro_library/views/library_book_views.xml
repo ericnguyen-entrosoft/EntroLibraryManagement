@@ -101,6 +101,10 @@
         <field name="arch" type="xml">
             <form string="Thông tin sách">
                 <header>
+                    <button name="action_add_to_borrowing" type="object"
+                        string="Thêm vào mượn"
+                        class="btn-primary"
+                        invisible="available_quant_count == 0" />
                     <button name="action_update_quantity" type="object"
                         class="oe_stat_button"
                         string="Cập nhật số lượng"

@@ -64,33 +64,71 @@
                         </group>
                     </group>
                     <notebook>
-                        <page string="Chi tiết" name="books">
+                        <page string="Chi tiết sách" name="books">
                             <field name="borrowing_line_ids" readonly="state != 'draft'">
-                                <list editable="bottom" decoration-danger="is_overdue == True" decoration-success="state == 'returned'">
+                                <list editable="bottom"
+                                      decoration-danger="is_overdue == True"
+                                      decoration-success="state == 'returned'"
+                                      decoration-warning="state == 'partial'">
                                     <field name="sequence" widget="handle"/>
                                     <field name="book_id" options="{'no_create': True}"/>
-                                    <field name="available_quant_ids" column_invisible="1"/>
-                                    <field name="quant_id" options="{'no_create': True}" string="Số ĐKCB"/>
-                                    <field name="quant_location" readonly="1" optional="show"/>
+                                    <field name="requested_quantity" string="SL yêu cầu"/>
+                                    <field name="fulfilled_quantity" string="Đã cấp" readonly="1"/>
+                                    <field name="borrowed_quantity" string="Đang mượn" readonly="1" optional="show"/>
+                                    <field name="returned_quantity" string="Đã trả" readonly="1" optional="show"/>
                                     <field name="due_date"/>
-                                    <field name="return_date" readonly="1" optional="hide"/>
                                     <field name="late_days" readonly="1" optional="hide"/>
-                                    <field name="fine_amount" widget="monetary" readonly="1" optional="hide"/>
-                                    <field name="is_overdue" column_invisible="1" optional="hide"/>
+                                    <field name="fine_amount" widget="monetary" readonly="1" optional="show"/>
+                                    <field name="is_overdue" column_invisible="1"/>
                                     <field name="state" widget="badge"
                                            decoration-info="state == 'draft'"
+                                           decoration-warning="state == 'partial'"
+                                           decoration-muted="state == 'allocated'"
                                            decoration-primary="state == 'borrowed'"
                                            decoration-success="state == 'returned'"
-                                           decoration-danger="state == 'overdue'"
-                                           decoration-warning="state == 'cancelled'" />
-                                    <button name="action_return" string="Trả sách" type="object"
-                                            icon="fa-check"
-                                            invisible="state not in ('borrowed', 'overdue')"/>
-                                    <button name="action_mark_lost" string="Đánh dấu mất" type="object"
-                                            icon="fa-exclamation-triangle"
-                                            invisible="state not in ('borrowed', 'overdue')"
-                                            confirm="Bạn có chắc chắn đánh dấu sách này là mất?"/>
+                                           decoration-danger="state == 'overdue'"/>
+                                    <button name="action_allocate_quants"
+                                            string="Phân bổ"
+                                            type="object"
+                                            icon="fa-plus"
+                                            invisible="state not in ('draft', 'partial')"
+                                            title="Tự động phân bổ bản sao cho sách này"/>
+                                    <button name="action_view_quant_lines"
+                                            string="Chi tiết"
+                                            type="object"
+                                            icon="fa-list"
+                                            title="Xem danh sách bản sao cụ thể"/>
                                 </list>
+                                <form>
+                                    <group>
+                                        <group>
+                                            <field name="book_id"/>
+                                            <field name="requested_quantity"/>
+                                            <field name="due_date"/>
+                                        </group>
+                                        <group>
+                                            <field name="fulfilled_quantity" readonly="1"/>
+                                            <field name="borrowed_quantity" readonly="1"/>
+                                            <field name="returned_quantity" readonly="1"/>
+                                            <field name="state" readonly="1"/>
+                                        </group>
+                                    </group>
+                                    <separator string="Bản sao cụ thể"/>
+                                    <field name="quant_line_ids">
+                                        <list editable="bottom">
+                                            <field name="quant_id"
+                                                   domain="[('id', 'in', parent.available_quant_ids)]"
+                                                   options="{'no_create': True}"/>
+                                            <field name="registration_number" readonly="1"/>
+                                            <field name="location_id" readonly="1"/>
+                                            <field name="due_date"/>
+                                            <field name="return_date" readonly="1" optional="hide"/>
+                                            <field name="late_days" readonly="1" optional="show"/>
+                                            <field name="fine_amount" widget="monetary" readonly="1" optional="show"/>
+                                            <field name="state" widget="badge"/>
+                                        </list>
+                                    </field>
+                                </form>
                             </field>
                             <group class="oe_subtotal_footer oe_right">
                                 <field name="is_overdue" invisible="1"/>
@@ -105,6 +143,22 @@
                 </sheet>
                 <chatter/>
             </form>
+        </field>
+    </record>
+
+    <!-- Add Print Button (inherits form view, loaded after report) -->
+    <record id="view_library_borrowing_form_print" model="ir.ui.view">
+        <field name="name">library.borrowing.form.print</field>
+        <field name="model">library.borrowing</field>
+        <field name="inherit_id" ref="view_library_borrowing_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header/button[@name='action_return']" position="after">
+                <button name="%(entro_library.report_library_borrowing)d"
+                        string="In phiếu mượn"
+                        type="action"
+                        invisible="state == 'draft'"
+                        class="btn-secondary"/>
+            </xpath>
         </field>
     </record>
 
@@ -219,20 +273,19 @@
         <field name="context">{'create': False}</field>
     </record>
 
-    <!-- Borrowing Line List View (for Reports) -->
+    <!-- Borrowing Quant Line List View (for Reports) -->
     <record id="view_library_borrowing_line_report_list" model="ir.ui.view">
-        <field name="name">library.borrowing.line.report.list</field>
-        <field name="model">library.borrowing.line</field>
+        <field name="name">library.borrowing.quant.line.report.list</field>
+        <field name="model">library.borrowing.quant.line</field>
         <field name="arch" type="xml">
             <list string="Chi tiết mượn/trả" create="false" edit="false" delete="false"
                   decoration-danger="state == 'overdue'" decoration-success="state == 'returned'">
                 <field name="borrowing_id" string="Phiếu mượn"/>
                 <field name="borrower_id"/>
-                <field name="borrow_date"/>
                 <field name="quant_id" column_invisible="1"/>
                 <field name="book_id"/>
                 <field name="registration_number"/>
-                <field name="quant_location" optional="hide"/>
+                <field name="location_id" string="Vị trí" optional="hide"/>
                 <field name="due_date"/>
                 <field name="return_date" optional="show"/>
                 <field name="late_days" column_invisible="1"/>
@@ -247,10 +300,10 @@
         </field>
     </record>
 
-    <!-- Borrowing Line Search View (for Reports) -->
+    <!-- Borrowing Quant Line Search View (for Reports) -->
     <record id="view_library_borrowing_line_report_search" model="ir.ui.view">
-        <field name="name">library.borrowing.line.report.search</field>
-        <field name="model">library.borrowing.line</field>
+        <field name="name">library.borrowing.quant.line.report.search</field>
+        <field name="model">library.borrowing.quant.line</field>
         <field name="arch" type="xml">
             <search string="Tìm kiếm chi tiết mượn/trả">
                 <field name="borrowing_id"/>
@@ -263,9 +316,8 @@
                 <filter string="Quá hạn" name="overdue" domain="[('state', '=', 'overdue')]"/>
                 <filter string="Đã trả" name="returned" domain="[('state', '=', 'returned')]"/>
                 <separator/>
-                <filter string="Hôm nay" name="today" domain="[('borrow_date', '=', context_today().strftime('%Y-%m-%d'))]"/>
-                <filter string="Tuần này" name="this_week" domain="[('borrow_date', '&gt;=', (context_today()-relativedelta(weeks=1)).strftime('%Y-%m-%d'))]"/>
-                <filter string="Tháng này" name="this_month" domain="[('borrow_date', '&gt;=', (context_today()-relativedelta(months=1)).strftime('%Y-%m-%d'))]"/>
+                <filter string="Hạn trả hôm nay" name="due_today" domain="[('due_date', '=', context_today().strftime('%Y-%m-%d'))]"/>
+                <filter string="Hạn trả tuần này" name="due_this_week" domain="[('due_date', '&gt;=', context_today().strftime('%Y-%m-%d')), ('due_date', '&lt;=', (context_today()+relativedelta(weeks=1)).strftime('%Y-%m-%d'))]"/>
                 <separator/>
                 <group expand="0" string="Nhóm theo">
                     <filter string="Phiếu mượn" name="group_borrowing" context="{'group_by': 'borrowing_id'}"/>
@@ -277,10 +329,10 @@
         </field>
     </record>
 
-    <!-- Borrowing Line Report Action -->
+    <!-- Borrowing Quant Line Report Action -->
     <record id="action_library_borrowing_line_report" model="ir.actions.act_window">
         <field name="name">Chi tiết mượn/trả</field>
-        <field name="res_model">library.borrowing.line</field>
+        <field name="res_model">library.borrowing.quant.line</field>
         <field name="view_mode">list</field>
         <field name="search_view_id" ref="view_library_borrowing_line_report_search"/>
         <field name="view_id" ref="view_library_borrowing_line_report_list"/>

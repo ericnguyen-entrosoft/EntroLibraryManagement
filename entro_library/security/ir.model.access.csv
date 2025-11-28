@@ -45,6 +45,11 @@ access_library_borrowing_system,library.borrowing.system,model_library_borrowing
 access_library_borrowing_line_system,library.borrowing.line.system,model_library_borrowing_line,base.group_system,1,1,1,1
 access_library_borrowing_portal,library.borrowing.portal,model_library_borrowing,base.group_portal,1,0,0,0
 access_library_borrowing_line_portal,library.borrowing.line.portal,model_library_borrowing_line,base.group_portal,1,0,0,0
+access_library_borrowing_quant_line_internal,library.borrowing.quant.line.internal,model_library_borrowing_quant_line,base.group_user,1,0,0,0
+access_library_borrowing_quant_line_user,library.borrowing.quant.line.user,model_library_borrowing_quant_line,group_library_user,1,1,1,0
+access_library_borrowing_quant_line_manager,library.borrowing.quant.line.manager,model_library_borrowing_quant_line,group_library_manager,1,1,1,1
+access_library_borrowing_quant_line_system,library.borrowing.quant.line.system,model_library_borrowing_quant_line,base.group_system,1,1,1,1
+access_library_borrowing_quant_line_portal,library.borrowing.quant.line.portal,model_library_borrowing_quant_line,base.group_portal,1,0,0,0
 access_library_reservation_internal,library.reservation.internal,model_library_reservation,base.group_user,1,0,0,0
 access_library_reservation_user,library.reservation.user,model_library_reservation,group_library_user,1,1,1,0
 access_library_reservation_manager,library.reservation.manager,model_library_reservation,group_library_manager,1,1,1,1

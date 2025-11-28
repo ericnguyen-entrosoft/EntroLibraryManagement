@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-from odoo import models, fields, api
+from odoo import models, fields, api, exceptions
+from datetime import timedelta
 import re
 import unicodedata
 
@@ -391,5 +392,94 @@ class LibraryBook(models.Model):
             'context': {
                 'default_book_id': self.id,
                 'default_quantity': 1,
+            }
+        }
+
+    def action_add_to_borrowing(self):
+        """
+        Add ONE copy of this book to borrower's draft borrowing (like adding to cart)
+        Uses two-layer structure: creates book line with 1 quantity, adds 1 quant line
+        If user wants more copies, they click "Add to Cart" multiple times
+        """
+        self.ensure_one()
+
+        # Get current user's partner
+        borrower = self.env.user.partner_id
+
+        # Get or create draft borrowing (this also validates membership)
+        borrowing = borrower.get_or_create_draft_borrowing()
+
+        # Check if book has available copies
+        available_count = self.env['library.book.quant'].search_count([
+            ('book_id', '=', self.id),
+            ('state', '=', 'available'),
+            ('can_borrow', '=', True),
+            ('registration_number', '!=', False),
+            ('location_id.is_borrow_location', '=', True),
+        ])
+
+        if available_count == 0:
+            raise exceptions.UserError(
+                f'Sách "{self.name}" hiện không có bản sao nào khả dụng để mượn.'
+            )
+
+        # Check resource limits for each resource this book belongs to
+        for resource in self.resource_ids:
+            can_borrow, message, current_count = resource.check_borrowing_limit(
+                borrower.id,
+                book_id=self.id,
+                exclude_borrowing_id=borrowing.id
+            )
+            if not can_borrow:
+                raise exceptions.UserError(message)
+
+        # Calculate due date based on resource's default borrowing days
+        if self.resource_ids:
+            default_days = self.resource_ids[0].default_borrowing_days
+        else:
+            config = self.env['ir.config_parameter'].sudo()
+            default_days = int(config.get_param('library.default_borrowing_days', default=14))
+
+        due_date = borrowing.borrow_date + timedelta(days=default_days)
+
+        # Find existing book line for this book
+        book_line = borrowing.borrowing_line_ids.filtered(
+            lambda l: l.book_id.id == self.id
+        )
+
+        if book_line:
+            # Book already exists in cart - don't allow adding again
+            raise exceptions.UserError(
+                f'Sách "{self.name}" đã có trong giỏ mượn của bạn. Mỗi sách chỉ được mượn 1 bản mỗi lần.'
+            )
+
+        # Create new book line with quantity=1 (NO quant assignment yet)
+        book_line = self.env['library.borrowing.line'].create({
+            'borrowing_id': borrowing.id,
+            'book_id': self.id,
+            'requested_quantity': 1,
+            'due_date': due_date,
+        })
+
+        # NOTE: Quant assignment will be done later (at checkout or by staff)
+        # No quant_line is created here
+
+        # Return action to open borrowing form
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'title': 'Thành công!',
+                'message': 'Đã thêm sách vào phiếu mượn.',
+                'type': 'success',
+                'sticky': False,
+                'next': {
+                    'type': 'ir.actions.act_window',
+                    'res_model': 'library.borrowing',
+                    'res_id': borrowing.id,
+                    'view_mode': 'form',
+                    'views': [[False, 'form']],
+                    'target': 'current',
+                }
             }
         }

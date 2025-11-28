@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="mail_template_signup_approved" model="mail.template">
+        <field name="name">Library Signup: Approved</field>
+        <field name="model_id" ref="model_library_signup_request"/>
+        <field name="subject">Tài khoản thư viện đã được kích hoạt</field>
+        <field name="email_to">${object.email}</field>
+        <field name="body_html" type="html"><![CDATA[
+<div style="font-family: Arial; max-width: 600px; margin: 0 auto;">
+    <div style="background-color: #4CAF50; color: white; padding: 20px; text-align: center;">
+        <h2>Chào mừng đến với thư viện!</h2>
+    </div>
+    <div style="padding: 20px;">
+        <p>Xin chào <strong>${object.full_name}</strong>,</p>
+        <p>Tài khoản của bạn đã được phê duyệt. Email: <strong>${object.email}</strong></p>
+        <p>Chúng tôi đã gửi email với link đặt mật khẩu.</p>
+        <a href="/web/login" style="background-color: #4CAF50; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px;">Đăng nhập</a>
+    </div>
+</div>
+]]></field>
+    </record>
+
+    <record id="mail_template_signup_rejected" model="mail.template">
+        <field name="name">Library Signup: Rejected</field>
+        <field name="model_id" ref="model_library_signup_request"/>
+        <field name="subject">Thông báo yêu cầu đăng ký</field>
+        <field name="email_to">${object.email}</field>
+        <field name="body_html" type="html"><![CDATA[
+<div style="font-family: Arial; max-width: 600px; margin: 0 auto;">
+    <div style="background-color: #f44336; color: white; padding: 20px; text-align: center;">
+        <h2>Thông báo yêu cầu đăng ký</h2>
+    </div>
+    <div style="padding: 20px;">
+        <p>Xin chào <strong>${object.full_name}</strong>,</p>
+        <p>Yêu cầu đăng ký không được chấp nhận.</p>
+        <p><strong>Lý do:</strong> ${object.rejection_reason or ''}</p>
+        <a href="/web/library/signup">Đăng ký lại</a>
+    </div>
+</div>
+]]></field>
+    </record>
+</odoo>

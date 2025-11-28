@@ -113,6 +113,12 @@
               name="Cấu hình"
               parent="menu_library_root"
               sequence="100"/>
+    
+    <menuitem id="menu_library_resource"
+            name="Kho tài nguyên"
+            parent="menu_library_config"
+            action="action_library_resource"
+            sequence="0"/>
 
     <!-- Categories Menu -->
     <menuitem id="menu_library_categories"

@@ -15,6 +15,7 @@ from . import character_mapping
 from . import library_sequence_mixin
 from . import library_borrowing
 from . import library_borrowing_line
+from . import library_borrowing_quant_line
 from . import library_reservation
 from . import library_resource
 from . import library_media

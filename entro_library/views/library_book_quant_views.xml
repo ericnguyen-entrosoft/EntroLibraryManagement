@@ -75,13 +75,15 @@
                     </group>
                     <notebook>
                         <page string="Lịch sử mượn" name="borrowing_history">
-                            <field name="borrowing_line_ids">
+                            <field name="borrowing_quant_line_ids">
                                 <list string="Lịch sử mượn" editable="bottom">
                                     <field name="borrowing_id"/>
+                                    <field name="book_id"/>
                                     <field name="due_date"/>
                                     <field name="return_date"/>
                                     <field name="state"/>
                                     <field name="late_days"/>
+                                    <field name="fine_amount" widget="monetary" optional="show"/>
                                 </list>
                             </field>
                         </page>

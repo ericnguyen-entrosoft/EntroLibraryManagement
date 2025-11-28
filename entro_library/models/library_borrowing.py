@@ -166,10 +166,10 @@ class LibraryBorrowing(models.Model):
 
     @api.depends('borrowing_line_ids.late_days', 'borrowing_line_ids.is_overdue', 'state')
     def _compute_late_info(self):
-        """Compute late days and overdue status from lines"""
+        """Compute late days and overdue status from lines (aggregated from quant lines)"""
         for record in self:
             if record.borrowing_line_ids:
-                # Get the maximum late days from all lines
+                # Get the maximum late days from all lines (which aggregate from quant lines)
                 max_late_days = max(record.borrowing_line_ids.mapped('late_days') or [0])
                 record.late_days = max_late_days
                 record.is_overdue = any(record.borrowing_line_ids.mapped('is_overdue'))
@@ -179,13 +179,13 @@ class LibraryBorrowing(models.Model):
 
     @api.depends('borrowing_line_ids.fine_amount')
     def _compute_fine_amount(self):
-        """Compute total fine amount from all lines"""
+        """Compute total fine amount from all lines (aggregated from quant lines)"""
         for record in self:
             record.fine_amount = sum(record.borrowing_line_ids.mapped('fine_amount'))
 
-    @api.depends('borrowing_line_ids')
+    @api.depends('borrowing_line_ids', 'borrowing_line_ids.requested_quantity')
     def _compute_book_count(self):
-        """Count number of books in this borrowing"""
+        """Count number of book titles (lines) in this borrowing"""
         for record in self:
             record.book_count = len(record.borrowing_line_ids)
 
@@ -228,12 +228,12 @@ class LibraryBorrowing(models.Model):
 
     @api.constrains('borrower_id', 'borrowing_line_ids')
     def _check_borrowing_constraints(self):
-        """Check borrower's total book limit"""
+        """Check borrower's total book limit and resource-based limits"""
         for record in self:
             if record.state == 'draft':
                 continue
 
-            # Check borrower's current borrowing limit
+            # Check borrower's current borrowing limit (global)
             config = self.env['ir.config_parameter'].sudo()
             max_books = int(config.get_param(
                 'library.max_books_per_borrower', default=5))
@@ -260,22 +260,67 @@ class LibraryBorrowing(models.Model):
                     f'Người mượn đã đạt giới hạn {max_books} quyển sách. Hiện tại: {total_books} quyển.'
                 )
 
+            # Check resource-based limits for each book in borrowing
+            resource_book_count = {}  # Track books per resource
+            for line in record.borrowing_line_ids.filtered(lambda l: l.state in ('borrowed', 'overdue')):
+                # Get resources for this book via quant location
+                if line.quant_id and line.quant_id.location_id and line.quant_id.location_id.resource_id:
+                    resource = line.quant_id.location_id.resource_id
+
+                    # Initialize counter for this resource
+                    if resource.id not in resource_book_count:
+                        resource_book_count[resource.id] = {
+                            'resource': resource,
+                            'count': 0
+                        }
+
+                    resource_book_count[resource.id]['count'] += 1
+
+            # Validate against each resource's limit
+            for resource_id, data in resource_book_count.items():
+                resource = data['resource']
+                current_count_in_borrowing = data['count']
+
+                # Get current borrowed count from other borrowings for this resource
+                can_borrow, message, current_count_other = resource.check_borrowing_limit(
+                    record.borrower_id.id,
+                    book_id=None,
+                    exclude_borrowing_id=record.id
+                )
+
+                total_from_resource = current_count_in_borrowing + current_count_other
+
+                if total_from_resource > resource.max_books_per_borrower:
+                    raise exceptions.ValidationError(
+                        f'Vượt quá giới hạn của tài nguyên "{resource.name}": '
+                        f'{total_from_resource}/{resource.max_books_per_borrower} quyển.'
+                    )
+
     def action_confirm(self):
         """Xác nhận phiếu mượn"""
         for record in self:
             if not record.borrowing_line_ids:
                 raise exceptions.ValidationError('Vui lòng thêm ít nhất một cuốn sách vào phiếu mượn.')
 
+            # Check if all lines have at least one quant allocated
+            lines_without_quants = record.borrowing_line_ids.filtered(
+                lambda l: not l.quant_line_ids
+            )
+            if lines_without_quants:
+                book_names = ', '.join(lines_without_quants.mapped('book_id.name'))
+                raise exceptions.ValidationError(
+                    f'Vui lòng phân bổ bản sao cụ thể cho các sách sau: {book_names}'
+                )
+
             # Mark as posted before (for sequence logic)
             record.posted_before = True
 
-            # Confirm all lines - borrowing state will be computed automatically
+            # Confirm all quant lines - line and borrowing states will be computed automatically
             for line in record.borrowing_line_ids:
-                line.state = 'borrowed'
-                line.quant_id.write({
-                    'state': 'borrowed',
-                    'current_borrowing_id': record.id
-                })
+                for quant_line in line.quant_line_ids:
+                    if quant_line.state == 'draft':
+                        quant_line.action_confirm()
+
             # Send notification email
             if record.borrower_email:
                 self._send_borrowing_email()
@@ -283,15 +328,15 @@ class LibraryBorrowing(models.Model):
     def action_return(self):
         """Trả sách - always show wizard for flexibility"""
         for record in self:
-            # All lines in borrowed/overdue state
-            lines_to_return = record.borrowing_line_ids.filtered(
-                lambda l: l.state in ('borrowed', 'overdue')
+            # Get all quant lines in borrowed/overdue state
+            quant_lines_to_return = record.borrowing_line_ids.mapped('quant_line_ids').filtered(
+                lambda ql: ql.state in ('borrowed', 'overdue')
             )
 
-            if not lines_to_return:
+            if not quant_lines_to_return:
                 raise exceptions.ValidationError('Không có sách nào để trả.')
 
-            # Always show wizard to allow user to select which books to return
+            # Always show wizard to allow user to select which quants to return
             return {
                 'name': 'Xác nhận trả sách',
                 'type': 'ir.actions.act_window',
@@ -307,28 +352,33 @@ class LibraryBorrowing(models.Model):
     def action_mark_lost(self):
         """Đánh dấu tất cả sách mất"""
         for record in self:
-            # Mark all borrowed/overdue lines as lost - borrowing state will be computed
-            for line in record.borrowing_line_ids.filtered(lambda l: l.state in ('borrowed', 'overdue')):
-                line.action_mark_lost()
+            # Mark all borrowed/overdue quant lines as lost
+            for line in record.borrowing_line_ids:
+                borrowed_quants = line.quant_line_ids.filtered(
+                    lambda ql: ql.state in ('borrowed', 'overdue')
+                )
+                borrowed_quants.action_mark_lost()
 
     def action_cancel(self):
         """Hủy phiếu mượn"""
         for record in self:
-            # Cancel all lines - borrowing state will be computed
+            # Cancel all quant lines
             for line in record.borrowing_line_ids:
-                if line.state == 'borrowed':
-                    line.quant_id.write({
-                        'state': 'available',
-                        'current_borrowing_id': False
-                    })
-                line.state = 'cancelled'
+                for quant_line in line.quant_line_ids:
+                    quant_line.action_cancel()
 
     def action_set_to_draft(self):
         """Chuyển về nháp"""
         for record in self:
-            # Set all lines to draft - borrowing state will be computed
+            # Set all quant lines to draft
             for line in record.borrowing_line_ids:
-                line.state = 'draft'
+                for quant_line in line.quant_line_ids:
+                    if quant_line.state in ('borrowed', 'overdue'):
+                        quant_line.quant_id.write({
+                            'state': 'available',
+                            'current_borrowing_id': False
+                        })
+                    quant_line.state = 'draft'
 
     def _send_borrowing_email(self):
         """Send email notification to borrower"""
@@ -356,21 +406,23 @@ class LibraryBorrowing(models.Model):
 
     @api.model
     def _cron_update_overdue_status(self):
-        """Scheduled action to update overdue borrowing lines"""
+        """Scheduled action to update overdue quant lines"""
         today = fields.Date.today()
 
-        # Update overdue lines
-        BorrowingLine = self.env['library.borrowing.line']
-        overdue_lines = BorrowingLine.search([
+        # Update overdue QUANT lines (not book lines)
+        QuantLine = self.env['library.borrowing.quant.line']
+        overdue_quant_lines = QuantLine.search([
             ('state', '=', 'borrowed'),
             ('due_date', '<', today)
         ])
-        overdue_lines.write({'state': 'overdue'})
+        overdue_quant_lines.write({'state': 'overdue'})
 
-        # Send overdue notification (borrowing state will be computed automatically)
-        borrowings_to_notify = overdue_lines.mapped('borrowing_id')
+        # Send overdue notification (borrowing and line states will be computed automatically)
+        borrowings_to_notify = overdue_quant_lines.mapped('borrowing_id').filtered(
+            lambda b: b.state == 'overdue'
+        )
         for borrowing in borrowings_to_notify:
-            if borrowing.borrower_email and borrowing.state == 'overdue':
+            if borrowing.borrower_email:
                 borrowing._send_overdue_email()
 
     @api.model
@@ -382,21 +434,24 @@ class LibraryBorrowing(models.Model):
 
         reminder_date = fields.Date.today() + timedelta(days=reminder_days)
 
-        # Find borrowing lines with upcoming due dates
-        BorrowingLine = self.env['library.borrowing.line']
-        upcoming_lines = BorrowingLine.search([
+        # Find QUANT lines with upcoming due dates
+        QuantLine = self.env['library.borrowing.quant.line']
+        upcoming_quant_lines = QuantLine.search([
             ('state', '=', 'borrowed'),
             ('due_date', '=', reminder_date)
         ])
 
-        # Send reminders per borrowing (not per line)
-        borrowings = upcoming_lines.mapped('borrowing_id')
+        # Send reminders per borrowing (not per quant line)
+        borrowings = upcoming_quant_lines.mapped('borrowing_id')
         for borrowing in borrowings:
             if borrowing.borrower_email:
                 borrowing._send_due_reminder_email()
 
     def on_barcode_scanned(self, barcode):
-        """Handle barcode scanning event"""
+        """
+        Handle barcode scanning event - adds quant to borrowing
+        Supports two-layer structure: finds or creates book line, then adds quant line
+        """
         # Search for quant with matching registration_number
         quant = self.env['library.book.quant'].search([
             ('registration_number', '=', barcode),
@@ -412,11 +467,14 @@ class LibraryBorrowing(models.Model):
                 }
             }
 
-        # Check if quant already exists in current borrowing lines
-        existing_line = self.borrowing_line_ids.filtered(
-            lambda l: l.quant_id.id == quant.id and l.state == 'draft'
-        )
-        if existing_line:
+        # Check if quant already exists in current borrowing
+        existing_quant_line = self.env['library.borrowing.quant.line'].search([
+            ('borrowing_id', '=', self.id),
+            ('quant_id', '=', quant.id),
+            ('state', '!=', 'cancelled')
+        ], limit=1)
+
+        if existing_quant_line:
             return {
                 'warning': {
                     'title': 'Đã tồn tại',
@@ -425,17 +483,40 @@ class LibraryBorrowing(models.Model):
             }
 
         # Calculate default due date
-        config = self.env['ir.config_parameter'].sudo()
-        default_days = int(config.get_param('library.default_borrowing_days', default=14))
+        # Try to get from book's resource, otherwise use system default
+        if quant.book_id.resource_ids:
+            default_days = quant.book_id.resource_ids[0].default_borrowing_days
+        else:
+            config = self.env['ir.config_parameter'].sudo()
+            default_days = int(config.get_param('library.default_borrowing_days', default=14))
+
         due_date = self.borrow_date + timedelta(days=default_days)
 
-        # Add new borrowing line
-        self.borrowing_line_ids = [(0, 0, {
-            'book_id': quant.book_id.id,
+        # Find or create book line for this book
+        book_line = self.borrowing_line_ids.filtered(
+            lambda l: l.book_id.id == quant.book_id.id
+        )
+
+        if not book_line:
+            # Create new book line
+            book_line = self.env['library.borrowing.line'].create({
+                'borrowing_id': self.id,
+                'book_id': quant.book_id.id,
+                'requested_quantity': 1,
+                'due_date': due_date,
+            })
+        else:
+            book_line = book_line[0]
+            # Increment requested quantity
+            book_line.requested_quantity += 1
+
+        # Add quant line under the book line
+        self.env['library.borrowing.quant.line'].create({
+            'line_id': book_line.id,
             'quant_id': quant.id,
             'due_date': due_date,
             'state': 'draft'
-        })]
+        })
 
         return {
             'type': 'ir.actions.client',

@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Action to open website (must be defined before the view that references it) -->
+    <record id="action_open_website" model="ir.actions.act_url">
+        <field name="name">Xem trên Website</field>
+        <field name="target">new</field>
+        <field name="url">%(url)s</field>
+    </record>
+
+    <!-- Add website fields to library.book form view -->
+    <record id="view_library_book_form_website" model="ir.ui.view">
+        <field name="name">library.book.form.website</field>
+        <field name="model">library.book</field>
+        <field name="inherit_id" ref="entro_library.view_library_book_form"/>
+        <field name="arch" type="xml">
+            <!-- Add website published button in header -->
+            <xpath expr="//header" position="inside">
+                <button name="action_toggle_website_published" type="object"
+                        class="btn-primary" string="Xuất bản Web"
+                        invisible="website_published"/>
+                <button name="action_toggle_website_published" type="object"
+                        class="btn-secondary" string="Gỡ khỏi Web"
+                        invisible="not website_published"/>
+            </xpath>
+
+            <!-- Add Website tab -->
+            <xpath expr="//notebook" position="inside">
+                <page string="Website" name="website">
+                    <group>
+                        <group>
+                            <field name="website_published"/>
+                            <field name="is_published" readonly="1"/>
+                            <field name="website_url" widget="url" readonly="1"/>
+                            <field name="website_sequence"/>
+                        </group>
+                        <group>
+                            <!-- Website preview button -->
+                            <button name="%(entro_library_website.action_open_website)d" type="action"
+                                    string="Xem trên Website"
+                                    icon="fa-external-link"
+                                    invisible="not website_published"
+                                    context="{'url': website_url}"/>
+                        </group>
+                    </group>
+
+                    <group string="SEO">
+                        <field name="website_meta_title" placeholder="Tối ưu cho tìm kiếm Google"/>
+                        <field name="website_meta_description"
+                               placeholder="Mô tả ngắn gọn (khoảng 160 ký tự)"/>
+                        <field name="website_meta_keywords"
+                               placeholder="từ khóa 1, từ khóa 2, từ khóa 3"/>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

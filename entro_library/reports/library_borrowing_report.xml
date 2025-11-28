@@ -1,0 +1,255 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Borrowing Receipt Report -->
+    <record id="report_library_borrowing" model="ir.actions.report">
+        <field name="name">Phiếu mượn sách</field>
+        <field name="model">library.borrowing</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">entro_library.report_library_borrowing_document</field>
+        <field name="report_file">entro_library.report_library_borrowing_document</field>
+        <field name="print_report_name">'Phiếu mượn - %s' % object.name</field>
+        <field name="paperformat_id" ref="paperformat_library_borrowing_receipt"/>
+        <field name="binding_model_id" ref="model_library_borrowing"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <!-- Borrowing Receipt Template -->
+    <template id="report_library_borrowing_document">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <!-- Header -->
+                        <div class="text-center mb-4">
+                            <h2 class="mt-0 mb-2">PHIẾU MƯỢN SÁCH</h2>
+                            <h4 class="text-muted" t-field="o.name"/>
+                        </div>
+
+                        <!-- Borrower Information -->
+                        <div class="row mb-4">
+                            <div class="col-6">
+                                <strong>Thông tin người mượn:</strong>
+                                <div class="mt-2">
+                                    <div><strong>Họ tên:</strong> <span t-field="o.borrower_id.name"/></div>
+                                    <div t-if="o.borrower_id.borrower_code">
+                                        <strong>Mã độc giả:</strong> <span t-field="o.borrower_id.borrower_code"/>
+                                    </div>
+                                    <div t-if="o.borrower_phone">
+                                        <strong>Điện thoại:</strong> <span t-field="o.borrower_phone"/>
+                                    </div>
+                                    <div t-if="o.borrower_email">
+                                        <strong>Email:</strong> <span t-field="o.borrower_email"/>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <strong>Thông tin mượn:</strong>
+                                <div class="mt-2">
+                                    <div><strong>Ngày mượn:</strong> <span t-field="o.borrow_date"/></div>
+                                    <div><strong>Hạn trả:</strong> <span t-field="o.due_date"/></div>
+                                    <div><strong>Thủ thư:</strong> <span t-field="o.librarian_id.name"/></div>
+                                    <div>
+                                        <strong>Trạng thái:</strong>
+                                        <t t-if="o.state == 'draft'">
+                                            <span class="badge badge-secondary">Nháp</span>
+                                        </t>
+                                        <t t-elif="o.state == 'borrowed'">
+                                            <span class="badge badge-info">Đang mượn</span>
+                                        </t>
+                                        <t t-elif="o.state == 'returned'">
+                                            <span class="badge badge-success">Đã trả</span>
+                                        </t>
+                                        <t t-elif="o.state == 'overdue'">
+                                            <span class="badge badge-danger">Quá hạn</span>
+                                        </t>
+                                        <t t-else="">
+                                            <span class="badge badge-warning" t-field="o.state"/>
+                                        </t>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Books List (Grouped by Book with Quants) -->
+                        <div class="mb-4">
+                            <strong class="mb-2 d-block">Danh sách sách mượn:</strong>
+                            <table class="table table-sm table-bordered">
+                                <thead style="background-color: #f8f9fa;">
+                                    <tr>
+                                        <th class="text-center" style="width: 5%;">STT</th>
+                                        <th style="width: 40%;">Tên sách</th>
+                                        <th class="text-center" style="width: 15%;">Số ĐKCB</th>
+                                        <th class="text-center" style="width: 15%;">Vị trí</th>
+                                        <th class="text-center" style="width: 12%;">Hạn trả</th>
+                                        <th class="text-center" style="width: 13%;">Trạng thái</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <t t-set="line_no" t-value="0"/>
+                                    <t t-foreach="o.borrowing_line_ids" t-as="line">
+                                        <t t-foreach="line.quant_line_ids" t-as="quant_line">
+                                            <t t-set="line_no" t-value="line_no + 1"/>
+                                            <tr>
+                                                <td class="text-center">
+                                                    <span t-esc="line_no"/>
+                                                </td>
+                                                <td>
+                                                    <strong t-field="line.book_id.name"/>
+                                                    <div class="small text-muted" t-if="line.book_id.author_names">
+                                                        Tác giả: <span t-field="line.book_id.author_names"/>
+                                                    </div>
+                                                </td>
+                                                <td class="text-center">
+                                                    <span t-field="quant_line.registration_number"/>
+                                                </td>
+                                                <td class="text-center small">
+                                                    <span t-field="quant_line.location_id.complete_name"/>
+                                                </td>
+                                                <td class="text-center">
+                                                    <span t-field="quant_line.due_date"/>
+                                                </td>
+                                                <td class="text-center">
+                                                    <t t-if="quant_line.state == 'draft'">
+                                                        <span class="badge badge-secondary small">Nháp</span>
+                                                    </t>
+                                                    <t t-elif="quant_line.state == 'borrowed'">
+                                                        <span class="badge badge-info small">Đang mượn</span>
+                                                    </t>
+                                                    <t t-elif="quant_line.state == 'returned'">
+                                                        <span class="badge badge-success small">Đã trả</span>
+                                                    </t>
+                                                    <t t-elif="quant_line.state == 'overdue'">
+                                                        <span class="badge badge-danger small">Quá hạn</span>
+                                                    </t>
+                                                    <t t-else="">
+                                                        <span class="badge badge-warning small" t-field="quant_line.state"/>
+                                                    </t>
+                                                </td>
+                                            </tr>
+                                        </t>
+                                    </t>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Summary -->
+                        <div class="row mb-4">
+                            <div class="col-6">
+                                <div class="alert alert-info">
+                                    <strong>Tổng số sách:</strong>
+                                    <t t-set="total_quants" t-value="sum(o.borrowing_line_ids.mapped('quant_line_ids').mapped('id'))"/>
+                                    <span t-esc="len(o.borrowing_line_ids.mapped('quant_line_ids'))"/> bản sao
+                                </div>
+                            </div>
+                            <div class="col-6" t-if="o.state in ['overdue', 'returned'] and o.fine_amount > 0">
+                                <div class="alert alert-warning">
+                                    <strong>Tiền phạt:</strong>
+                                    <span t-field="o.fine_amount" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Notes -->
+                        <div class="mb-4" t-if="o.notes">
+                            <strong>Ghi chú:</strong>
+                            <p class="mt-2" t-field="o.notes"/>
+                        </div>
+
+                        <!-- Important Notice -->
+                        <div class="mt-4 p-3" style="background-color: #fff3cd; border: 1px solid #ffc107; border-radius: 4px;">
+                            <strong>Lưu ý quan trọng:</strong>
+                            <ul class="mb-0 mt-2">
+                                <li>Vui lòng trả sách đúng hạn để tránh bị phạt</li>
+                                <li>Giữ gìn sách sạch sẽ, không làm hư hỏng</li>
+                                <li>Liên hệ thư viện nếu cần gia hạn</li>
+                                <li>Phí phạt trễ hạn sẽ được tính từ ngày quá hạn</li>
+                            </ul>
+                        </div>
+
+                        <!-- Signature Section -->
+                        <div class="row mt-5">
+                            <div class="col-6 text-center">
+                                <div class="mb-5">
+                                    <strong>Người mượn</strong>
+                                    <div class="small text-muted">(Ký và ghi rõ họ tên)</div>
+                                </div>
+                                <div class="mt-5 pt-4">
+                                    <span t-field="o.borrower_id.name"/>
+                                </div>
+                            </div>
+                            <div class="col-6 text-center">
+                                <div class="mb-5">
+                                    <strong>Thủ thư</strong>
+                                    <div class="small text-muted">(Ký và ghi rõ họ tên)</div>
+                                </div>
+                                <div class="mt-5 pt-4">
+                                    <span t-field="o.librarian_id.name"/>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Footer with print date -->
+                        <div class="text-center mt-5 small text-muted">
+                            <p class="mb-0">
+                                In lúc: <span t-esc="context_timestamp(datetime.datetime.now()).strftime('%d/%m/%Y %H:%M:%S')"/>
+                            </p>
+                            <p class="mb-0">
+                                Phiếu này là bằng chứng mượn sách. Vui lòng giữ lại để đối chiếu khi trả.
+                            </p>
+                        </div>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+    <!-- Alternative Simple Template (for thermal printers) -->
+    <template id="report_library_borrowing_receipt">
+        <t t-call="web.basic_layout">
+            <t t-foreach="docs" t-as="o">
+                <div class="page" style="font-family: monospace; font-size: 12px; max-width: 80mm;">
+                    <div class="text-center mb-3">
+                        <div style="font-size: 16px;"><strong>PHIẾU MƯỢN SÁCH</strong></div>
+                        <div><span t-field="o.name"/></div>
+                    </div>
+
+                    <div class="mb-2">
+                        <div>Người mượn: <span t-field="o.borrower_id.name"/></div>
+                        <div t-if="o.borrower_id.borrower_code">Mã ĐG: <span t-field="o.borrower_id.borrower_code"/></div>
+                        <div>Ngày mượn: <span t-field="o.borrow_date"/></div>
+                        <div>Hạn trả: <span t-field="o.due_date"/></div>
+                    </div>
+
+                    <div style="border-top: 1px dashed #000; border-bottom: 1px dashed #000; padding: 5px 0;">
+                        <strong>Danh sách sách:</strong>
+                    </div>
+
+                    <t t-set="line_no" t-value="0"/>
+                    <t t-foreach="o.borrowing_line_ids" t-as="line">
+                        <t t-foreach="line.quant_line_ids" t-as="quant_line">
+                            <t t-set="line_no" t-value="line_no + 1"/>
+                            <div class="mb-2" style="border-bottom: 1px dashed #ccc; padding: 5px 0;">
+                                <div><span t-esc="line_no"/>. <strong t-field="line.book_id.name"/></div>
+                                <div style="padding-left: 10px;">
+                                    <div>ĐKCB: <span t-field="quant_line.registration_number"/></div>
+                                    <div t-if="quant_line.location_id">Vị trí: <span t-field="quant_line.location_id.name"/></div>
+                                    <div>Hạn: <span t-field="quant_line.due_date"/></div>
+                                </div>
+                            </div>
+                        </t>
+                    </t>
+
+                    <div style="border-top: 1px dashed #000; padding-top: 5px;" class="mt-2">
+                        <div>Tổng: <span t-esc="len(o.borrowing_line_ids.mapped('quant_line_ids'))"/> cuốn</div>
+                    </div>
+
+                    <div class="text-center mt-3 small">
+                        <div>Vui lòng trả đúng hạn</div>
+                        <div>In: <span t-esc="context_timestamp(datetime.datetime.now()).strftime('%d/%m/%Y %H:%M')"/></div>
+                    </div>
+                </div>
+            </t>
+        </t>
+    </template>
+
+</odoo>
