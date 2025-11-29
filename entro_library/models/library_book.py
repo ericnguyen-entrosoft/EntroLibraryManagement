@@ -150,6 +150,17 @@ class LibraryBook(models.Model):
     # Trạng thái
     active = fields.Boolean(string='Hoạt động', default=True)
     can_borrow = fields.Boolean(string='Có thể mượn', default=True, help='Cho phép mượn sách này về nhà')
+    is_published = fields.Boolean(
+        string='Hiển thị trên Website',
+        default=False,
+        copy=False,
+        help='Hiển thị sách này trên trang web công khai'
+    )
+    website_url = fields.Char(
+        string='Website URL',
+        compute='_compute_website_url',
+        help='URL truy cập sách trên website'
+    )
 
     def _compute_quantities(self):
         """
@@ -368,6 +379,14 @@ class LibraryBook(models.Model):
         for book in self:
             book.media_count = len(book.media_ids)
 
+    def _compute_website_url(self):
+        """Compute the website URL for this book"""
+        for book in self:
+            if book.id:
+                book.website_url = f"/library/book/{book.id}"
+            else:
+                book.website_url = False
+
     def action_view_media(self):
         """View media related to this book"""
         self.ensure_one()
@@ -394,6 +413,12 @@ class LibraryBook(models.Model):
                 'default_quantity': 1,
             }
         }
+
+    def action_toggle_website_published(self):
+        """Toggle website publication status"""
+        for book in self:
+            book.is_published = not book.is_published
+        return True
 
     def action_add_to_borrowing(self):
         """

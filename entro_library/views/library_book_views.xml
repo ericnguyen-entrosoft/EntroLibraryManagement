@@ -114,6 +114,12 @@
                     <field name="image_1920" widget="image" class="oe_avatar"
                         options="{'preview_image': 'image_128', 'size': [90, 90]}" />
                     <div class="oe_button_box" name="button_box">
+                        <button name="action_toggle_website_published" type="object"
+                                class="oe_stat_button" icon="fa-globe" string="Đăng website" invisible="is_published">
+                        </button>
+                        <button name="action_toggle_website_published" type="object"
+                                class="oe_stat_button" icon="fa-globe" string="Gỡ website" invisible="not is_published">
+                        </button>
                         <button name="action_view_quants" type="object"
                             class="oe_stat_button" icon="fa-cubes">
                             <field name="quant_count" widget="statinfo" string="Số lượng" />

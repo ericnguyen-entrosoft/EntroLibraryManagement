@@ -14,16 +14,6 @@
         <field name="model">library.book</field>
         <field name="inherit_id" ref="entro_library.view_library_book_form"/>
         <field name="arch" type="xml">
-            <!-- Add website published button in header -->
-            <xpath expr="//header" position="inside">
-                <button name="action_toggle_website_published" type="object"
-                        class="btn-primary" string="Xuất bản Web"
-                        invisible="website_published"/>
-                <button name="action_toggle_website_published" type="object"
-                        class="btn-secondary" string="Gỡ khỏi Web"
-                        invisible="not website_published"/>
-            </xpath>
-
             <!-- Add Website tab -->
             <xpath expr="//notebook" position="inside">
                 <page string="Website" name="website">

@@ -153,6 +153,6 @@
     </record>
 
     <!-- Menu -->
-    <menuitem id="menu_library_signup_request" name="Yêu cầu đăng ký" parent="entro_library.menu_library_root" action="action_library_signup_request" sequence="100" groups="entro_library.group_library_manager"/>
+    <menuitem id="menu_library_signup_request" name="Yêu cầu đăng ký" parent="entro_library.menu_library_management" action="action_library_signup_request" sequence="100" groups="entro_library.group_library_manager"/>
 
 </odoo>
