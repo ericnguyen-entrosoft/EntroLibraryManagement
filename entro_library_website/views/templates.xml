@@ -41,7 +41,7 @@
                                            placeholder="Tìm kiếm sách, tác giả..."
                                            t-att-value="search"/>
                                     <button class="btn btn-primary" type="submit">
-                                        <i class="fa fa-search me-2"/>Tìm kiếm
+                                        <i class="fa fa-search me-2"/>
                                     </button>
                                 </form>
                             </div>
@@ -604,7 +604,7 @@
                                        placeholder="Tìm kiếm sách..."
                                        t-att-value="search"/>
                                 <button class="btn btn-primary" type="submit">
-                                    <i class="fa fa-search me-2"/>Tìm kiếm
+                                    <i class="fa fa-search me-2"/>
                                 </button>
                             </form>
                         </div>
