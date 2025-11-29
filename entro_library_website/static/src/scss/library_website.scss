@@ -1,19 +1,31 @@
 // Library Website Styles
 
+// Override Bootstrap button hover
+.btn:hover {
+    background-color: white !important;
+    border-color: #591202 !important;
+}
+
 // Override Bootstrap primary and success colors
-.btn-primary {
+.btn-primary,
+.badge.bg-primary {
     background-color: #591202 !important;
     border-color: #591202 !important;
+    color: white !important;
+}
 
+.btn-primary {
     &:hover {
         background-color: #3d0c01 !important;
         border-color: #3d0c01 !important;
+        color: white !important;
     }
 
     &:focus,
     &:active {
         background-color: #3d0c01 !important;
         border-color: #3d0c01 !important;
+        color: white !important;
         box-shadow: 0 0 0 0.2rem rgba(89, 18, 2, 0.5) !important;
     }
 }
@@ -29,12 +41,23 @@
     }
 }
 
+.bg-primary {
+    background-color: #591202 !important;
+    color: white !important;
+}
+
 .bg-success,
 .badge.bg-success,
 .alert-success {
     background-color: #591202 !important;
     border-color: #591202 !important;
     color: white !important;
+}
+
+.alert-info {
+    background-color: #F2E5D5 !important;
+    border-color: #F2E5D5 !important;
+    color: #591202 !important;
 }
 
 .text-success {
@@ -45,16 +68,30 @@
     color: #591202 !important;
 }
 
+a {
+    color: #591202 !important;
+
+    &:hover {
+        color: #3d0c01 !important;
+    }
+}
+
 a.text-primary:hover {
     color: #3d0c01 !important;
 }
 
-.bg-light {
-    background-color: #f1ebe1 !important;
+.badge.bg-info {
+    background-color: #f2e5d5 !important;
+    color: #8c675a !important;
+    border-color: #f2e5d5 !important;
 }
 
 h2 {
     color: #8C675A !important;
+}
+
+th {
+    background-color: #f1ebe1 !important;
 }
 
 .library_container {

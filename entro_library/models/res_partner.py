@@ -7,7 +7,7 @@ class ResPartner(models.Model):
 
     # Borrower information
     is_borrower = fields.Boolean(string='Là độc giả', default=False)
-    borrower_type = fields.Many2one('library.borrower.type', string='Loại độc giả')
+    borrower_type_id = fields.Many2one('library.borrower.type', string='Loại độc giả')
 
     borrower_code = fields.Char(string='Mã độc giả', copy=False)
     membership_date = fields.Date(string='Ngày đăng ký')

@@ -61,6 +61,7 @@
                             <field name="borrow_date" readonly="state != 'draft'"/>
                             <field name="librarian_id" readonly="state != 'draft'"/>
                             <field name="book_count" readonly="1"/>
+                            <field name="checkout_code" readonly="1" invisible="state != 'draft'" widget="barcode"/>
                         </group>
                     </group>
                     <notebook>
@@ -87,12 +88,12 @@
                                            decoration-primary="state == 'borrowed'"
                                            decoration-success="state == 'returned'"
                                            decoration-danger="state == 'overdue'"/>
-                                    <button name="action_allocate_quants"
+                                    <!-- <button name="action_allocate_quants"
                                             string="Phân bổ"
                                             type="object"
                                             icon="fa-plus"
                                             invisible="state not in ('draft', 'partial')"
-                                            title="Tự động phân bổ bản sao cho sách này"/>
+                                            title="Tự động phân bổ bản sao cho sách này"/> -->
                                     <button name="action_view_quant_lines"
                                             string="Chi tiết"
                                             type="object"
@@ -225,6 +226,7 @@
         <field name="arch" type="xml">
             <search string="Tìm kiếm phiếu mượn">
                 <field name="name"/>
+                <field name="checkout_code" string="Mã xác nhận"/>
                 <field name="borrower_id"/>
                 <field name="borrowing_line_ids" string="Sách" filter_domain="[('borrowing_line_ids.book_id.name', 'ilike', self)]"/>
                 <separator/>

@@ -3,7 +3,7 @@
 
     <!-- Website menu for library -->
     <record id="menu_library" model="website.menu">
-        <field name="name">Thư Viện</field>
+        <field name="name">Kho tài nguyên</field>
         <field name="url">/thu-vien</field>
         <field name="parent_id" ref="website.main_menu"/>
         <field name="sequence">50</field>

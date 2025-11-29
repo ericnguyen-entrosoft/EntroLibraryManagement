@@ -101,21 +101,42 @@ class LibraryPortal(CustomerPortal):
         return request.render("entro_library_website.portal_my_borrowings", values)
 
     @http.route(['/my/borrowing/<int:borrowing_id>'],
-                type='http', auth="user", website=True)
+                type='http', auth="public", website=True)
     def portal_my_borrowing(self, borrowing_id=None, access_token=None, **kw):
-        """Chi tiết phiếu mượn"""
+        """Chi tiết phiếu mượn - supports access_token for QR code access"""
 
+        # Try to get borrowing record
         try:
-            borrowing_sudo = self._document_check_access(
-                'library.borrowing', borrowing_id, access_token
-            )
-        except (AccessError, MissingError):
+            borrowing_sudo = request.env['library.borrowing'].sudo().browse(borrowing_id)
+            if not borrowing_sudo.exists():
+                raise MissingError(_("Không tìm thấy phiếu mượn"))
+        except Exception:
             return request.redirect('/my')
+
+        # Access control
+        if access_token:
+            # Token-based access (from QR code) - validate token
+            if not borrowing_sudo.access_token or borrowing_sudo.access_token != access_token:
+                return request.render('website.403')
+        else:
+            # Normal logged-in access - check ownership
+            if request.env.user._is_public():
+                return request.redirect('/web/login?redirect=/my/borrowing/%s' % borrowing_id)
+
+            partner = request.env.user.partner_id
+            if borrowing_sudo.borrower_id.id != partner.id:
+                # Check if user has library access rights
+                try:
+                    self._document_check_access('library.borrowing', borrowing_id)
+                except (AccessError, MissingError):
+                    return request.redirect('/my')
 
         values = {
             'borrowing': borrowing_sudo,
             'page_name': 'borrowing',
             'report_type': 'pdf',
+            'no_breadcrumbs': bool(access_token),  # Hide breadcrumbs for token access
+            'token_access': bool(access_token),  # Flag to indicate token-based access
         }
 
         return request.render("entro_library_website.portal_my_borrowing_detail", values)
@@ -257,7 +278,7 @@ class LibraryPortal(CustomerPortal):
     @http.route(['/my/borrowing-cart/checkout'],
                 type='http', auth="user", website=True, methods=['POST'], csrf=True)
     def portal_checkout_borrowing(self, **kw):
-        """Xác nhận mượn"""
+        """Xác nhận mượn - Show instruction page"""
 
         partner = request.env.user.partner_id
 
@@ -272,14 +293,17 @@ class LibraryPortal(CustomerPortal):
         if not borrowing.borrowing_line_ids:
             return request.redirect('/my/borrowing-cart?error=empty_cart')
 
-        try:
-            # Confirm borrowing (this will validate and change state)
-            borrowing.action_confirm()
+        # Generate checkout code if not exists
+        checkout_code = borrowing.generate_checkout_code()
 
-            return request.redirect('/my/borrowing/%s?message=confirmed' % borrowing.id)
+        # Show instruction page (don't confirm yet - librarian will do it)
+        values = {
+            'borrowing': borrowing,
+            'checkout_code': checkout_code,
+            'page_name': 'borrowing_checkout',
+        }
 
-        except Exception as e:
-            return request.redirect('/my/borrowing-cart?error=%s' % str(e))
+        return request.render("entro_library_website.portal_borrowing_checkout_instruction", values)
 
     # ========== BORROWING HISTORY & STATS ==========
 

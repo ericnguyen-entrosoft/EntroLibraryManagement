@@ -1,6 +1,11 @@
 # -*- coding: utf-8 -*-
 from odoo import models, fields, api, exceptions
 from datetime import datetime, timedelta
+import uuid
+import secrets
+import qrcode
+import io
+import base64
 
 
 class LibraryBorrowing(models.Model):
@@ -8,6 +13,7 @@ class LibraryBorrowing(models.Model):
     _description = 'Quản lý mượn sách'
     _order = 'borrow_date desc, id desc'
     _inherit = ['mail.thread', 'mail.activity.mixin', 'library.sequence.mixin', 'barcodes.barcode_events_mixin']
+    _rec_names_search = ['name', 'checkout_code', 'access_token']
 
     # Override sequence.mixin settings
     _sequence_field = "name"
@@ -24,6 +30,25 @@ class LibraryBorrowing(models.Model):
         default=False,
         copy=False,
         help="Technical field to track if borrowing was ever confirmed"
+    )
+    checkout_code = fields.Char(
+        string='Mã xác nhận',
+        copy=False,
+        index=True,
+        help='Mã UUID để người mượn xuất trình khi đến thư viện nhận sách'
+    )
+    access_token = fields.Char(
+        string='Access Token',
+        copy=False,
+        index=True,
+        groups='base.group_user',
+        help='Token for public access to borrowing record via QR code'
+    )
+    qr_code = fields.Binary(
+        string='QR Code',
+        attachment=True,
+        copy=False,
+        help='QR code for quick access to borrowing record'
     )
     borrower_id = fields.Many2one(
         'res.partner', string='Người mượn', required=True, tracking=True)
@@ -81,6 +106,62 @@ class LibraryBorrowing(models.Model):
         related='borrower_id.phone', string='Số điện thoại')
 
     active = fields.Boolean(string='Hoạt động', default=True)
+
+    def generate_checkout_code(self):
+        """Generate unique checkout code using UUID"""
+        self.ensure_one()
+        if not self.checkout_code:
+            # Generate short UUID code (8 characters)
+            self.checkout_code = str(uuid.uuid4())[:8].upper()
+        return self.checkout_code
+
+    def _generate_access_token(self):
+        """Generate unique access token for secure public access and QR code"""
+        self.ensure_one()
+        if not self.access_token:
+            # Generate secure random token (32 bytes = 43 characters in URL-safe base64)
+            self.access_token = secrets.token_urlsafe(32)
+
+        # Generate QR code after token is created and record has ID
+        if self.id and self.access_token:
+            self._generate_qr_code()
+
+        return self.access_token
+
+    def _generate_qr_code(self):
+        """Generate QR code image for borrowing access"""
+        self.ensure_one()
+        if not self.access_token or not self.id:
+            return
+
+        try:
+            # Get base URL
+            base_url = self.get_base_url()
+            url = f"{base_url}/my/borrowing/{self.id}?access_token={self.access_token}"
+
+            # Generate QR code
+            qr = qrcode.QRCode(
+                version=1,
+                error_correction=qrcode.constants.ERROR_CORRECT_L,
+                box_size=10,
+                border=2,
+            )
+            qr.add_data(url)
+            qr.make(fit=True)
+
+            # Create image
+            img = qr.make_image(fill_color="black", back_color="white")
+
+            # Convert to binary
+            buffer = io.BytesIO()
+            img.save(buffer, format='PNG')
+            self.qr_code = base64.b64encode(buffer.getvalue())
+        except Exception as e:
+            # Log error but don't fail
+            import logging
+            _logger = logging.getLogger(__name__)
+            _logger.warning(f"Failed to generate QR code for borrowing {self.id}: {e}")
+            self.qr_code = False
 
     @api.depends('state', 'borrow_date', 'posted_before', 'sequence_number', 'sequence_prefix')
     def _compute_name(self):
@@ -314,6 +395,10 @@ class LibraryBorrowing(models.Model):
 
             # Mark as posted before (for sequence logic)
             record.posted_before = True
+
+            # Generate access token if not exists (for QR code access)
+            if not record.access_token:
+                record._generate_access_token()
 
             # Confirm all quant lines - line and borrowing states will be computed automatically
             for line in record.borrowing_line_ids:

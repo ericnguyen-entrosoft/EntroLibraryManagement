@@ -1,4 +1,4 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_library_signup_request_manager,library.signup.request.manager,model_library_signup_request,entro_library.group_library_manager,1,1,1,1
 access_library_signup_request_user,library.signup.request.user,model_library_signup_request,entro_library.group_library_user,1,0,0,0
-access_library_signup_request_public,library.signup.request.public,model_library_signup_request,base.group_public,0,0,1,0
+access_library_signup_request_public,library.signup.request.public,model_library_signup_request,base.group_public,1,1,1,0

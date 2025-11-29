@@ -67,7 +67,7 @@ class LibraryBorrowerType(models.Model):
         for record in self:
             record.borrower_count = self.env['res.partner'].search_count([
                 ('is_borrower', '=', True),
-                ('borrower_type', '=', record.id)
+                ('borrower_type_id', '=', record.id)
             ])
 
     _sql_constraints = [

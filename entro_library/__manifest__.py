@@ -21,6 +21,9 @@
     'author': 'Entro',
     'website': 'https://www.entro.vn',
     'depends': ['base', 'mail', 'barcodes'],
+    'external_dependencies': {
+        'python': ['qrcode', 'PIL'],
+    },
     'data': [
         # Data
         'data/library_data.xml',

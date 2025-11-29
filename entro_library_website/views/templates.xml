@@ -370,10 +370,6 @@
                             <div class="book-stock-info mb-3 p-3 bg-light rounded">
                                 <div class="d-flex justify-content-between align-items-center">
                                     <div>
-                                        <i class="fa fa-map-marker text-primary me-2"/>
-                                        <span class="fw-bold"><t t-esc="len(book.borrow_location_ids)"/> kho có sách</span>
-                                    </div>
-                                    <div>
                                         <span class="badge bg-success" t-if="book.available_quant_count > 0">
                                             <t t-esc="book.available_quant_count"/> bản có sẵn
                                         </span>

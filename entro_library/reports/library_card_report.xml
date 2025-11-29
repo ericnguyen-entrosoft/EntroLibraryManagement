@@ -170,7 +170,7 @@
                                     </div>
                                     <div class="info-row">
                                         <span class="info-label">Loại độc giả:</span>
-                                        <span class="info-value"><t t-esc="partner.borrower_type.name if partner.borrower_type else 'N/A'"/></span>
+                                        <span class="info-value"><t t-esc="partner.borrower_type_id.name if partner.borrower_type_id else 'N/A'"/></span>
                                     </div>
                                     <div class="info-row">
                                         <span class="info-label">Email:</span>
@@ -196,24 +196,24 @@
                             </div>
 
                             <!-- Privileges Box -->
-                            <t t-if="partner.borrower_type">
+                            <t t-if="partner_id">
                                 <div class="privileges-box">
                                     <div class="privileges-title">Quyền lợi / Privileges</div>
                                     <div class="privilege-item">
                                         <span>Số sách tối đa:</span>
-                                        <strong><t t-esc="partner.max_books or partner.borrower_type.max_books"/> cuốn</strong>
+                                        <strong><t t-esc="partner.max_books or partner.borrower_type_id.max_books"/> cuốn</strong>
                                     </div>
                                     <div class="privilege-item">
                                         <span>Thời gian mượn:</span>
-                                        <strong><t t-esc="partner.max_days or partner.borrower_type.max_days"/> ngày</strong>
+                                        <strong><t t-esc="partner.max_days or partner.borrower_type_id.max_days"/> ngày</strong>
                                     </div>
                                     <div class="privilege-item">
                                         <span>Được đặt trước:</span>
-                                        <strong><t t-esc="'Có' if partner.borrower_type.can_reserve else 'Không'"/></strong>
+                                        <strong><t t-esc="'Có' if partner.borrower_type_id.can_reserve else 'Không'"/></strong>
                                     </div>
                                     <div class="privilege-item">
                                         <span>Được gia hạn:</span>
-                                        <strong><t t-esc="'Có' if partner.borrower_type.can_extend else 'Không'"/></strong>
+                                        <strong><t t-esc="'Có' if partner.borrower_type_id.can_extend else 'Không'"/></strong>
                                     </div>
                                 </div>
                             </t>

@@ -48,12 +48,14 @@
 
         <!-- ================================================================ -->
         <!-- RESERVATIONS                                                     -->
+        <!-- Note: Portal users can see all reservations for browsing books   -->
+        <!-- but in practice, they typically only access their own            -->
         <!-- ================================================================ -->
 
         <record id="library_reservation_portal_rule" model="ir.rule">
-            <field name="name">Portal Users: Own Reservations Only</field>
+            <field name="name">Portal Users: All Reservations (for book browsing)</field>
             <field name="model_id" ref="model_library_reservation"/>
-            <field name="domain_force">[('borrower_id.user_id', '=', user.id)]</field>
+            <field name="domain_force">[(1, '=', 1)]</field>
             <field name="groups" eval="[(4, ref('base.group_portal'))]"/>
             <field name="perm_read" eval="True"/>
             <field name="perm_write" eval="False"/>
@@ -74,6 +76,97 @@
             <field name="perm_write" eval="False"/>
             <field name="perm_create" eval="False"/>
             <field name="perm_unlink" eval="False"/>
+        </record>
+
+        <!-- ================================================================ -->
+        <!-- MASTER DATA ACCESS - Portal users can see ALL master data       -->
+        <!-- ================================================================ -->
+
+        <!-- Books - All records -->
+        <record id="library_book_portal_all_rule" model="ir.rule">
+            <field name="name">Portal Users: All Books</field>
+            <field name="model_id" ref="model_library_book"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('base.group_portal'))]"/>
+        </record>
+
+        <!-- Book Quants - All records -->
+        <record id="library_book_quant_portal_all_rule" model="ir.rule">
+            <field name="name">Portal Users: All Book Quants</field>
+            <field name="model_id" ref="model_library_book_quant"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('base.group_portal'))]"/>
+        </record>
+
+        <!-- Book Images - All records -->
+        <record id="library_book_image_portal_all_rule" model="ir.rule">
+            <field name="name">Portal Users: All Book Images</field>
+            <field name="model_id" ref="model_library_book_image"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('base.group_portal'))]"/>
+        </record>
+
+        <!-- Authors - All records -->
+        <record id="library_author_portal_all_rule" model="ir.rule">
+            <field name="name">Portal Users: All Authors</field>
+            <field name="model_id" ref="model_library_author"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('base.group_portal'))]"/>
+        </record>
+
+        <!-- Publishers - All records -->
+        <record id="library_publisher_portal_all_rule" model="ir.rule">
+            <field name="name">Portal Users: All Publishers</field>
+            <field name="model_id" ref="model_library_publisher"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('base.group_portal'))]"/>
+        </record>
+
+        <!-- Categories - All records -->
+        <record id="library_category_portal_all_rule" model="ir.rule">
+            <field name="name">Portal Users: All Categories</field>
+            <field name="model_id" ref="model_library_category"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('base.group_portal'))]"/>
+        </record>
+
+        <!-- Series - All records -->
+        <record id="library_series_portal_all_rule" model="ir.rule">
+            <field name="name">Portal Users: All Series</field>
+            <field name="model_id" ref="model_library_series"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('base.group_portal'))]"/>
+        </record>
+
+        <!-- Locations - All records -->
+        <record id="library_location_portal_all_rule" model="ir.rule">
+            <field name="name">Portal Users: All Locations</field>
+            <field name="model_id" ref="model_library_location"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('base.group_portal'))]"/>
+        </record>
+
+        <!-- Resources - All records -->
+        <record id="library_resource_portal_all_rule" model="ir.rule">
+            <field name="name">Portal Users: All Resources</field>
+            <field name="model_id" ref="model_library_resource"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('base.group_portal'))]"/>
+        </record>
+
+        <!-- Media Categories - All records -->
+        <record id="library_media_category_portal_all_rule" model="ir.rule">
+            <field name="name">Portal Users: All Media Categories</field>
+            <field name="model_id" ref="model_library_media_category"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('base.group_portal'))]"/>
+        </record>
+
+        <!-- Character Mapping - All records -->
+        <record id="character_mapping_portal_all_rule" model="ir.rule">
+            <field name="name">Public: All Character Mappings</field>
+            <field name="model_id" ref="model_character_mapping"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
         </record>
 
         <!-- ================================================================ -->

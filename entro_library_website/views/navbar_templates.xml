@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Borrowing Cart Link Template -->
+    <template id="header_borrowing_cart_link" name="Header Borrowing Cart Link">
+        <t t-nocache="The number of books is dynamic, this rendering cannot be cached."
+           t-nocache-_icon="_icon"
+           t-nocache-_text="_text"
+           t-nocache-_badge="_badge"
+           t-nocache-_badge_class="_badge_class"
+           t-nocache-_icon_wrap_class="_icon_wrap_class"
+           t-nocache-_text_class="_text_class"
+           t-nocache-_item_class="_item_class"
+           t-nocache-_link_class="_link_class">
+            <t t-set="borrowing_cart_count" t-value="0"/>
+            <t t-if="not request.env.user._is_public()">
+                <t t-set="draft_borrowing" t-value="request.env['library.borrowing'].search([('borrower_id', '=', request.env.user.partner_id.id), ('state', '=', 'draft')], limit=1)"/>
+                <t t-set="borrowing_cart_count" t-value="draft_borrowing.book_count if draft_borrowing else 0"/>
+            </t>
+            <t t-set="show_cart" t-value="not request.env.user._is_public()"/>
+            <li t-attf-class="#{_item_class} divider d-none"/>
+            <li t-attf-class="o_library_my_cart #{not show_cart and 'd-none'} #{_item_class}">
+                <a href="/my/borrowing-cart" t-attf-class="#{_link_class}" aria-label="Library borrowing cart">
+                    <div t-attf-class="#{_icon_wrap_class}">
+                        <i t-if="_icon" class="fa fa-shopping-cart fa-stack"/>
+                        <sup t-attf-class="my_cart_quantity badge bg-primary #{_badge_class} #{'d-none' if (borrowing_cart_count == 0) else ''}" t-esc="borrowing_cart_count"/>
+                    </div>
+                    <span t-if="_text" t-attf-class="#{_text_class}">Giỏ mượn</span>
+                </a>
+            </li>
+        </t>
+    </template>
+
+    <!-- Add to header_default -->
+    <template id="template_header_default" inherit_id="website.template_header_default">
+        <xpath expr="//t[@t-call='website.placeholder_header_search_box']" position="before">
+            <t t-call="entro_library_website.header_borrowing_cart_link">
+                <t t-set="_icon" t-value="True"/>
+                <t t-set="_link_class" t-value="'o_navlink_background btn position-relative rounded-circle p-1 text-center text-reset'"/>
+                <t t-set="_badge_class" t-value="'position-absolute top-0 end-0 mt-n1 me-n1 rounded-pill'"/>
+            </t>
+        </xpath>
+    </template>
+
+    <!-- Add to header_hamburger -->
+    <template id="template_header_hamburger" inherit_id="website.template_header_hamburger">
+        <xpath expr="//t[@t-call='portal.placeholder_user_sign_in']" position="before">
+            <t t-call="entro_library_website.header_borrowing_cart_link">
+                <t t-set="_icon" t-value="True"/>
+                <t t-set="_link_class" t-value="'o_navlink_background_hover btn position-relative rounded-pill p-1 text-reset'"/>
+                <t t-set="_badge_class" t-value="'position-absolute top-0 end-0 mt-n1 me-n1 rounded'"/>
+            </t>
+        </xpath>
+    </template>
+
+    <!-- Add to header_mobile -->
+    <template id="template_header_mobile" inherit_id="website.template_header_mobile">
+        <xpath expr="//ul[hasclass('o_header_mobile_buttons_wrap')]//li" position="before">
+            <t t-call="entro_library_website.header_borrowing_cart_link">
+                <t t-set="_icon" t-value="True"/>
+                <t t-set="_link_class" t-value="'o_navlink_background_hover btn position-relative rounded-circle border-0 p-1 text-reset'"/>
+                <t t-set="_badge_class" t-value="'position-absolute top-0 end-0 mt-n1 me-n1 rounded-pill'"/>
+            </t>
+        </xpath>
+    </template>
+
+</odoo>

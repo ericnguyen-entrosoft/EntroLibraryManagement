@@ -18,7 +18,7 @@
 
             <xpath expr="//field[@name='category_id']" position="after">
                 <field name="is_borrower"/>
-                <field name="borrower_type" invisible="not is_borrower"/>
+                <field name="borrower_type_id" invisible="not is_borrower"/>
             </xpath>
 
             <xpath expr="//notebook" position="inside">
@@ -71,7 +71,7 @@
             <list string="Danh sách độc giả">
                 <field name="borrower_code"/>
                 <field name="name"/>
-                <field name="borrower_type"/>
+                <field name="borrower_type_id"/>
                 <field name="email"/>
                 <field name="phone"/>
                 <field name="current_borrowing_count"/>
@@ -90,7 +90,7 @@
             <kanban>
                 <field name="name"/>
                 <field name="borrower_code"/>
-                <field name="borrower_type"/>
+                <field name="borrower_type_id"/>
                 <field name="current_borrowing_count"/>
                 <field name="overdue_count"/>
                 <field name="is_membership_active"/>
@@ -107,7 +107,7 @@
                                 <span t-else="" class="badge badge-danger">Hết hạn</span>
                             </div>
                             <div class="o_kanban_record_body">
-                                <field name="borrower_type"/>
+                                <field name="borrower_type_id"/>
                             </div>
                             <div class="o_kanban_record_bottom">
                                 <div class="oe_kanban_bottom_left">
@@ -141,7 +141,7 @@
                 <filter string="Có sách quá hạn" name="has_overdue" domain="[('overdue_count', '>', 0)]"/>
                 <separator/>
                 <group expand="0" string="Nhóm theo">
-                    <filter string="Loại độc giả" name="group_type" context="{'group_by': 'borrower_type'}"/>
+                    <filter string="Loại độc giả" name="group_type" context="{'group_by': 'borrower_type_id'}"/>
                 </group>
             </search>
         </field>

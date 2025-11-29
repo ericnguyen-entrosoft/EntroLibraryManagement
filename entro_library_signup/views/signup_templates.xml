@@ -10,7 +10,7 @@
                         <div class="col-lg-8">
                             <div class="card shadow">
                                 <div class="card-header bg-primary text-white">
-                                    <h3 class="mb-0"><i class="fa fa-user-plus me-2"/>Đăng ký thành viên thư viện</h3>
+                                    <h4 class="mb-0"><i class="fa fa-user-plus me-2"/>Đăng ký thẻ thư viện</h4>
                                 </div>
                                 <div class="card-body">
                                     
@@ -28,10 +28,16 @@
                                         <!-- Personal Information -->
                                         <h5 class="mt-4 mb-3"><i class="fa fa-user me-2"/>Thông tin cá nhân</h5>
                                         <div class="row">
-                                            <div class="col-md-12 mb-3">
+                                            <div class="col-md-6 mb-3">
                                                 <label class="form-label">Họ và tên <span class="text-danger">*</span></label>
                                                 <input type="text" name="full_name" class="form-control" required="required" placeholder="Nguyễn Văn A"/>
                                             </div>
+
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label">CMND/CCCD</label>
+                                                <input type="text" name="id_card_number" class="form-control" placeholder="079012345678"/>
+                                            </div>
+
                                             
                                             <div class="col-md-6 mb-3">
                                                 <label class="form-label">Email <span class="text-danger">*</span></label>
@@ -62,34 +68,18 @@
                                         <!-- Member Type -->
                                         <h5 class="mt-4 mb-3"><i class="fa fa-id-card me-2"/>Loại thành viên</h5>
                                         <div class="row">
-                                            <div class="col-md-6 mb-3">
+                                            <div class="col-md-12 mb-3">
                                                 <label class="form-label">Loại độc giả <span class="text-danger">*</span></label>
-                                                <select name="borrower_type_id" class="form-select" required="required">
-                                                    <option value="">-- Chọn loại độc giả --</option>
+                                                <div class="mt-2">
                                                     <t t-foreach="borrower_types" t-as="btype">
-                                                        <option t-att-value="btype.id" t-esc="btype.name"/>
+                                                        <div class="form-check form-check-inline">
+                                                            <input class="form-check-input" type="radio" name="borrower_type_id" t-att-id="'borrower_type_%s' % btype.id" t-att-value="btype.id" required="required"/>
+                                                            <label class="form-check-label" t-att-for="'borrower_type_%s' % btype.id">
+                                                                <t t-esc="btype.name"/>
+                                                            </label>
+                                                        </div>
                                                     </t>
-                                                </select>
-                                                <small class="form-text text-muted">Chọn loại độc giả phù hợp (Sinh viên, Học sinh, Giáo viên, v.v.)</small>
-                                            </div>
-                                            
-                                            <div class="col-md-6 mb-3">
-                                                <label class="form-label">Đơn vị/Trường học</label>
-                                                <input type="text" name="organization" class="form-control" placeholder="Trường Đại học ABC"/>
-                                            </div>
-                                        </div>
-
-                                        <!-- ID Documents -->
-                                        <h5 class="mt-4 mb-3"><i class="fa fa-file-text me-2"/>Giấy tờ</h5>
-                                        <div class="row">
-                                            <div class="col-md-6 mb-3">
-                                                <label class="form-label">CMND/CCCD</label>
-                                                <input type="text" name="id_card_number" class="form-control" placeholder="079012345678"/>
-                                            </div>
-                                            
-                                            <div class="col-md-6 mb-3">
-                                                <label class="form-label">Mã sinh viên/học sinh</label>
-                                                <input type="text" name="student_id" class="form-control" placeholder="SV123456"/>
+                                                </div>
                                             </div>
                                         </div>
 
@@ -171,7 +161,7 @@
                                 <div class="card-body p-5">
                                     <i class="fa fa-check-circle text-success" style="font-size: 5rem;"/>
                                     <h2 class="mt-4 mb-3">Đăng ký thành công!</h2>
-                                    <p class="lead">Cảm ơn bạn đã đăng ký thành viên thư viện.</p>
+                                    <p class="lead">Cảm ơn bạn đã đăng ký.</p>
                                     <p>Yêu cầu của bạn đang được xem xét. Quản lý thư viện sẽ duyệt và gửi thông báo qua email trong thời gian sớm nhất.</p>
                                     <hr class="my-4"/>
                                     <p class="text-muted"><strong>Lưu ý:</strong> Vui lòng kiểm tra hộp thư email (cả mục spam) để nhận thông báo kích hoạt tài khoản.</p>
@@ -187,14 +177,13 @@
         </t>
     </template>
 
-    <!-- Add signup link to website header -->
-    <template id="signup_link_header" inherit_id="website.layout" name="Library Signup Link">
-        <xpath expr="//header//ul[@id='top_menu']" position="inside">
-            <li class="nav-item">
-                <a href="/web/library/signup" class="nav-link">
-                    <i class="fa fa-user-plus me-1"/>Đăng ký
-                </a>
-            </li>
+    <!-- Add Register Link to Login Page -->
+    <template id="library_signup_login_link" inherit_id="web.login" name="Library Signup Link">
+        <xpath expr="//div[hasclass('oe_login_buttons')]" position="after">
+            <div class="text-center mt-3">
+                <span>Chưa có thẻ thư viện? </span>
+                <a href="/web/library/signup">Đăng ký</a>
+            </div>
         </xpath>
     </template>
 

@@ -7,11 +7,15 @@
         <field name="model">res.partner</field>
         <field name="inherit_id" ref="entro_library.view_partner_form_library"/>
         <field name="arch" type="xml">
-            <xpath expr="//group[@name='library_info']" position="after">
+            <xpath expr="//page[@name='library_borrower']/group[1]" position="after">
                 <group string="Giấy tờ &amp; Thông tin bổ sung">
-                    <field name="id_card_number"/>
-                    <field name="student_id"/>
-                    <field name="date_of_birth"/>
+                    <group>
+                        <field name="id_card_number"/>
+                        <field name="student_id"/>
+                    </group>
+                    <group>
+                        <field name="date_of_birth"/>
+                    </group>
                 </group>
             </xpath>
         </field>

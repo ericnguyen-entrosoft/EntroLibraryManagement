@@ -99,7 +99,7 @@ class LibrarySignupRequest(models.Model):
             'state_id': self.state_id.id,
             'zip': self.zip,
             'country_id': self.country_id.id,
-            'is_library_member': True,
+            'is_borrower': True,
             'borrower_type_id': self.borrower_type_id.id,
             'id_card_number': self.id_card_number,
             'student_id': self.student_id,
@@ -120,8 +120,8 @@ class LibrarySignupRequest(models.Model):
 
         user = self.env['res.users'].sudo().create(user_vals)
 
-        # Send welcome email with password reset link
-        user.sudo().action_reset_password()
+        # Generate signup token for password setup
+        user.sudo().signup_prepare()
 
         # Update request
         self.write({
@@ -132,7 +132,7 @@ class LibrarySignupRequest(models.Model):
             'approved_date': fields.Datetime.now(),
         })
 
-        # Send approval email
+        # Send approval email with password reset link
         self._send_approval_email()
 
         return {

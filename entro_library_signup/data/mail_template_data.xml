@@ -1,42 +1,123 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <record id="mail_template_signup_approved" model="mail.template">
-        <field name="name">Library Signup: Approved</field>
-        <field name="model_id" ref="model_library_signup_request"/>
-        <field name="subject">Tài khoản thư viện đã được kích hoạt</field>
-        <field name="email_to">${object.email}</field>
-        <field name="body_html" type="html"><![CDATA[
-<div style="font-family: Arial; max-width: 600px; margin: 0 auto;">
-    <div style="background-color: #4CAF50; color: white; padding: 20px; text-align: center;">
-        <h2>Chào mừng đến với thư viện!</h2>
-    </div>
-    <div style="padding: 20px;">
-        <p>Xin chào <strong>${object.full_name}</strong>,</p>
-        <p>Tài khoản của bạn đã được phê duyệt. Email: <strong>${object.email}</strong></p>
-        <p>Chúng tôi đã gửi email với link đặt mật khẩu.</p>
-        <a href="/web/login" style="background-color: #4CAF50; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px;">Đăng nhập</a>
-    </div>
-</div>
-]]></field>
-    </record>
+    <data noupdate="1">
+        <!-- Email template for approved library signup -->
+        <record id="mail_template_signup_approved" model="mail.template">
+            <field name="name">Library Signup: Approved</field>
+            <field name="model_id" ref="model_library_signup_request"/>
+            <field name="subject">Tài khoản thư viện đã được kích hoạt - Thiết lập mật khẩu</field>
+            <field name="email_to">{{ object.email }}</field>
+            <field name="auto_delete" eval="True"/>
+            <field name="body_html" type="html">
+<table border="0" cellpadding="0" cellspacing="0" style="padding-top: 16px; background-color: #FFFFFF; font-family:Verdana, Arial,sans-serif; color: #454748; width: 100%; border-collapse:separate;"><tr><td align="center">
+<table border="0" cellpadding="0" cellspacing="0" width="590" style="padding: 16px; background-color: #FFFFFF; color: #454748; border-collapse:separate;">
+<tbody>
+    <!-- HEADER -->
+    <tr>
+        <td align="center" style="min-width: 590px;">
+            <table border="0" cellpadding="0" cellspacing="0" width="590" style="min-width: 590px; background-color: #4CAF50; color: white; padding: 20px 8px; border-collapse:separate;">
+                <tr><td valign="middle" align="center">
+                    <span style="font-size: 24px; font-weight: bold; color: white;">
+                        Chào mừng đến với thư viện!
+                    </span>
+                </td></tr>
+            </table>
+        </td>
+    </tr>
+    <!-- CONTENT -->
+    <tr>
+        <td align="center" style="min-width: 590px;">
+            <table border="0" cellpadding="0" cellspacing="0" width="590" style="min-width: 590px; background-color: white; padding: 20px 8px; border-collapse:separate;">
+                <tr><td valign="top" style="font-size: 13px;">
+                    <div>
+                        Xin chào <strong><t t-out="object.full_name or ''">User</t></strong>,<br/><br/>
+                        Tài khoản của bạn đã được phê duyệt!<br/>
+                        <strong>Email đăng nhập:</strong> <t t-out="object.email or ''">user@example.com</t><br/><br/>
+                        Để hoàn tất kích hoạt tài khoản, vui lòng nhấn vào nút bên dưới để thiết lập mật khẩu của bạn:
+                        <div style="margin: 16px 0px 16px 0px; text-align: center;">
+                            <t t-if="object.user_id and object.user_id.signup_token">
+                                <a t-att-href="'%s/web/signup?token=%s&amp;db=%s' % (object.get_base_url(), object.user_id.signup_token, object.env.cr.dbname)"
+                                    style="background-color: #4CAF50; padding: 12px 30px; text-decoration: none; color: #fff; border-radius: 5px; font-size: 13px; display: inline-block;">
+                                    Thiết lập mật khẩu
+                                </a>
+                            </t>
+                            <t t-else="">
+                                <a t-attf-href="{{ object.get_base_url() }}/web/login"
+                                    style="background-color: #4CAF50; padding: 12px 30px; text-decoration: none; color: #fff; border-radius: 5px; font-size: 13px; display: inline-block;">
+                                    Đăng nhập
+                                </a>
+                            </t>
+                        </div>
+                        <p style="color: #666; font-size: 11px; margin-top: 20px;">
+                            <strong>Lưu ý:</strong> Link này chỉ có hiệu lực trong 24 giờ. Nếu bạn không yêu cầu tạo tài khoản, vui lòng bỏ qua email này.
+                        </p>
+                        <br/>
+                        Chúc bạn có trải nghiệm tốt tại thư viện!<br/>
+                        --<br/>Đội ngũ thư viện
+                    </div>
+                </td></tr>
+            </table>
+        </td>
+    </tr>
+</tbody>
+</table>
+</td></tr>
+</table></field>
+        </record>
 
-    <record id="mail_template_signup_rejected" model="mail.template">
-        <field name="name">Library Signup: Rejected</field>
-        <field name="model_id" ref="model_library_signup_request"/>
-        <field name="subject">Thông báo yêu cầu đăng ký</field>
-        <field name="email_to">${object.email}</field>
-        <field name="body_html" type="html"><![CDATA[
-<div style="font-family: Arial; max-width: 600px; margin: 0 auto;">
-    <div style="background-color: #f44336; color: white; padding: 20px; text-align: center;">
-        <h2>Thông báo yêu cầu đăng ký</h2>
-    </div>
-    <div style="padding: 20px;">
-        <p>Xin chào <strong>${object.full_name}</strong>,</p>
-        <p>Yêu cầu đăng ký không được chấp nhận.</p>
-        <p><strong>Lý do:</strong> ${object.rejection_reason or ''}</p>
-        <a href="/web/library/signup">Đăng ký lại</a>
-    </div>
-</div>
-]]></field>
-    </record>
+        <!-- Email template for rejected library signup -->
+        <record id="mail_template_signup_rejected" model="mail.template">
+            <field name="name">Library Signup: Rejected</field>
+            <field name="model_id" ref="model_library_signup_request"/>
+            <field name="subject">Thông báo yêu cầu đăng ký</field>
+            <field name="email_to">{{ object.email }}</field>
+            <field name="auto_delete" eval="True"/>
+            <field name="body_html" type="html">
+<table border="0" cellpadding="0" cellspacing="0" style="padding-top: 16px; background-color: #FFFFFF; font-family:Verdana, Arial,sans-serif; color: #454748; width: 100%; border-collapse:separate;"><tr><td align="center">
+<table border="0" cellpadding="0" cellspacing="0" width="590" style="padding: 16px; background-color: #FFFFFF; color: #454748; border-collapse:separate;">
+<tbody>
+    <!-- HEADER -->
+    <tr>
+        <td align="center" style="min-width: 590px;">
+            <table border="0" cellpadding="0" cellspacing="0" width="590" style="min-width: 590px; background-color: #f44336; color: white; padding: 20px 8px; border-collapse:separate;">
+                <tr><td valign="middle" align="center">
+                    <span style="font-size: 24px; font-weight: bold; color: white;">
+                        Thông báo yêu cầu đăng ký
+                    </span>
+                </td></tr>
+            </table>
+        </td>
+    </tr>
+    <!-- CONTENT -->
+    <tr>
+        <td align="center" style="min-width: 590px;">
+            <table border="0" cellpadding="0" cellspacing="0" width="590" style="min-width: 590px; background-color: white; padding: 20px 8px; border-collapse:separate;">
+                <tr><td valign="top" style="font-size: 13px;">
+                    <div>
+                        Xin chào <strong><t t-out="object.full_name or ''">User</t></strong>,<br/><br/>
+                        Rất tiếc, yêu cầu đăng ký của bạn không được chấp nhận.<br/><br/>
+                        <t t-if="object.rejection_reason">
+                            <strong>Lý do:</strong> <t t-out="object.rejection_reason or ''"></t><br/><br/>
+                        </t>
+                        Bạn có thể đăng ký lại bằng cách truy cập:
+                        <div style="margin: 16px 0px 16px 0px;">
+                            <a t-attf-href="{{ object.get_base_url() }}/web/library/signup"
+                                style="background-color: #875A7B; padding: 12px 30px; text-decoration: none; color: #fff; border-radius: 5px; font-size: 13px; display: inline-block;">
+                                Đăng ký lại
+                            </a>
+                        </div>
+                        Trân trọng,<br/>
+                        --<br/>Đội ngũ thư viện
+                    </div>
+                </td></tr>
+            </table>
+        </td>
+    </tr>
+</tbody>
+</table>
+</td></tr>
+</table></field>
+        </record>
+
+    </data>
 </odoo>

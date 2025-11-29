@@ -36,6 +36,7 @@
         'views/library_book_views.xml',
         'views/templates.xml',
         'views/portal_templates.xml',
+        'views/navbar_templates.xml',
     ],
     'assets': {
         'web.assets_frontend': [
