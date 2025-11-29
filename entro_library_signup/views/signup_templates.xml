@@ -63,11 +63,7 @@
                                                     <option value="other">Khác</option>
                                                 </select>
                                             </div>
-                                        </div>
 
-                                        <!-- Member Type -->
-                                        <h5 class="mt-4 mb-3"><i class="fa fa-id-card me-2"/>Loại thành viên</h5>
-                                        <div class="row">
                                             <div class="col-md-12 mb-3">
                                                 <label class="form-label">Loại độc giả <span class="text-danger">*</span></label>
                                                 <div class="mt-2">
