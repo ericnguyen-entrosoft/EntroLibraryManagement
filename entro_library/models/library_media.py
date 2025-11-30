@@ -47,13 +47,6 @@ class LibraryMedia(models.Model):
         'book_id',
         string='Sách liên quan'
     )
-    resource_ids = fields.Many2many(
-        'library.resource',
-        'library_media_resource_rel',
-        'media_id',
-        'resource_id',
-        string='Tài nguyên'
-    )
     category_id = fields.Many2one('library.media.category', string='Danh mục', tracking=True)
     playlist_ids = fields.Many2many(
         'library.media.playlist',

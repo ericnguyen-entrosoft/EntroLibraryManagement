@@ -144,16 +144,3 @@ class ResPartner(models.Model):
             })
 
         return draft_borrowing
-
-    def get_resource_borrowing_stats(self):
-        """Get borrowing statistics per resource for this borrower"""
-        self.ensure_one()
-
-        resources = self.env['library.resource'].search([('active', '=', True)])
-        stats = []
-
-        for resource in resources:
-            resource_stats = resource.get_borrower_stats(self.id)
-            stats.append(resource_stats)
-
-        return stats

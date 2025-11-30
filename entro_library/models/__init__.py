@@ -17,7 +17,6 @@ from . import library_borrowing
 from . import library_borrowing_line
 from . import library_borrowing_quant_line
 from . import library_reservation
-from . import library_resource
 from . import library_media
 from . import library_media_category
 from . import library_media_playlist

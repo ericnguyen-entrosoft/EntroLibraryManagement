@@ -9,8 +9,10 @@ access_library_category_portal,library.category.portal,entro_library.model_libra
 access_library_category_public,library.category.public,entro_library.model_library_category,base.group_public,1,0,0,0
 access_library_author_portal,library.author.portal,entro_library.model_library_author,base.group_portal,1,0,0,0
 access_library_author_public,library.author.public,entro_library.model_library_author,base.group_public,1,0,0,0
-access_library_resource_portal,library.resource.portal,entro_library.model_library_resource,base.group_portal,1,0,0,0
-access_library_resource_public,library.resource.public,entro_library.model_library_resource,base.group_public,1,0,0,0
+access_library_website_category_user,library.website.category.user,model_library_website_category,entro_library.group_library_user,1,1,1,1
+access_library_website_category_manager,library.website.category.manager,model_library_website_category,entro_library.group_library_manager,1,1,1,1
+access_library_website_category_portal,library.website.category.portal,model_library_website_category,base.group_portal,1,0,0,0
+access_library_website_category_public,library.website.category.public,model_library_website_category,base.group_public,1,0,0,0
 access_library_location_portal,library.location.portal,entro_library.model_library_location,base.group_portal,1,0,0,0
 access_library_location_public,library.location.public,entro_library.model_library_location,base.group_public,1,0,0,0
 access_library_book_quant_portal,library.book.quant.portal,entro_library.model_library_book_quant,base.group_portal,1,0,0,0

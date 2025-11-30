@@ -73,10 +73,6 @@ access_library_return_confirmation_line_user,library.return.confirmation.line.us
 access_library_quant_type_internal,library.quant.type.internal,model_library_quant_type,base.group_user,1,0,0,0
 access_library_quant_type_user,library.quant.type.user,model_library_quant_type,group_library_user,1,0,0,0
 access_library_quant_type_manager,library.quant.type.manager,model_library_quant_type,group_library_manager,1,1,1,1
-access_library_resource_internal,library.resource.internal,model_library_resource,base.group_user,1,0,0,0
-access_library_resource_user,library.resource.user,model_library_resource,group_library_user,1,1,1,0
-access_library_resource_manager,library.resource.manager,model_library_resource,group_library_manager,1,1,1,1
-access_library_resource_portal,library.resource.portal,model_library_resource,,1,0,0,0
 access_library_media_internal,library.media.internal,model_library_media,base.group_user,1,0,0,0
 access_library_media_user,library.media.user,model_library_media,group_library_user,1,1,1,0
 access_library_media_manager,library.media.manager,model_library_media,group_library_manager,1,1,1,1

@@ -13,6 +13,8 @@
                 <field name="publication_year" />
                 <field name="quant_count" />
                 <field name="available_quant_count" />
+                <field name="can_borrow_quant_count" />
+                <field name="no_borrow_quant_count" />
                 <field name="total_reservation_count" />
                 <field name="category_id" />
                 <field name="borrow_location_ids" />

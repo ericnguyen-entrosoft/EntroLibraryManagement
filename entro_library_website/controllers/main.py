@@ -10,8 +10,8 @@ class LibraryWebsite(http.Controller):
     @http.route([
         '/thu-vien',
         '/thu-vien/trang/<int:page>',
-        '/thu-vien/danh-muc/<model("library.category"):category>',
-        '/thu-vien/danh-muc/<model("library.category"):category>/trang/<int:page>',
+        '/thu-vien/danh-muc/<model("library.website.category"):category>',
+        '/thu-vien/danh-muc/<model("library.website.category"):category>/trang/<int:page>',
     ], type='http', auth='public', website=True, sitemap=True)
     def library_books(self, page=1, category=None, search='', sortby=None, **kwargs):
         """Trang danh sách sách"""
@@ -28,9 +28,9 @@ class LibraryWebsite(http.Controller):
                 ('parallel_title', 'ilike', search),
             ]
 
-        # Lọc theo danh mục
+        # Lọc theo danh mục website
         if category:
-            domain += [('category_id', 'child_of', category.id)]
+            domain += [('website_category_id', '=', category.id)]
 
         # Sorting
         sort_options = {
@@ -64,9 +64,8 @@ class LibraryWebsite(http.Controller):
             order=order
         )
 
-        # Lấy danh mục và kho tài nguyên
-        categories = request.env['library.category'].search([])
-        resources = request.env['library.resource'].search([])
+        # Lấy website categories
+        website_categories = request.env['library.website.category'].search([('active', '=', True)], order='sequence, name')
 
         # Keep query parameters
         keep = QueryURL(
@@ -82,8 +81,7 @@ class LibraryWebsite(http.Controller):
             'pager': pager,
             'search': search,
             'category': category,
-            'categories': categories,
-            'resources': resources,
+            'website_categories': website_categories,
             'page_name': 'library_books',
             'keep': keep,
             'sortby': sortby,
@@ -138,95 +136,6 @@ class LibraryWebsite(http.Controller):
         values.update(meta_data)
 
         return request.render("entro_library_website.library_book_detail", values)
-
-    @http.route([
-        '/thu-vien/kho-tai-nguyen/<model("library.resource"):resource>',
-        '/thu-vien/kho-tai-nguyen/<model("library.resource"):resource>/trang/<int:page>',
-    ], type='http', auth='public', website=True, sitemap=True)
-    def library_resource(self, resource, page=1, category=None, search='', sortby=None, **kwargs):
-        """Trang sách theo kho tài nguyên"""
-
-        domain = [
-            ('website_published', '=', True),
-            ('resource_ids', 'in', resource.id),
-        ]
-
-        if search:
-            domain += [
-                '|', '|',
-                ('name', 'ilike', search),
-                ('author_names', 'ilike', search),
-                ('keywords', 'ilike', search),
-            ]
-
-        if category:
-            domain += [('category_id', 'child_of', category.id)]
-
-        # Sorting
-        sort_options = {
-            'date_desc': 'registration_date desc, name',
-            'name_asc': 'name asc',
-            'author_asc': 'author_names asc, name',
-        }
-        if not sortby or sortby not in sort_options:
-            sortby = 'date_desc'
-        order = sort_options[sortby]
-
-        Book = request.env['library.book']
-        books_count = Book.search_count(domain)
-
-        ppg = 20
-        pager = request.website.pager(
-            url=f'/thu-vien/kho-tai-nguyen/{resource.id}',
-            total=books_count,
-            page=page,
-            step=ppg,
-        )
-
-        books = Book.search(
-            domain,
-            limit=ppg,
-            offset=pager['offset'],
-            order=order
-        )
-
-        categories = request.env['library.category'].search([])
-        resources = request.env['library.resource'].search([])
-
-        values = {
-            'resource': resource,
-            'books': books,
-            'books_count': books_count,
-            'pager': pager,
-            'search': search,
-            'category': category,
-            'categories': categories,
-            'resources': resources,
-            'page_name': 'library_resource',
-            'sortby': sortby,
-        }
-
-        return request.render("entro_library_website.library_resource_books", values)
-
-    @http.route(['/thu-vien/cac-kho'], type='http', auth='public', website=True, sitemap=True)
-    def library_resources_list(self, **kwargs):
-        """Trang danh sách các kho tài nguyên"""
-
-        resources = request.env['library.resource'].search([])
-
-        # Đếm số sách cho mỗi kho
-        for resource in resources:
-            resource.book_count = request.env['library.book'].search_count([
-                ('website_published', '=', True),
-                ('resource_ids', 'in', resource.id),
-            ])
-
-        values = {
-            'resources': resources,
-            'page_name': 'library_resources',
-        }
-
-        return request.render("entro_library_website.library_resources_list", values)
 
     @http.route(['/thu-vien/them-vao-gio'], type='json', auth='user', website=True)
     def add_to_borrowing_cart(self, book_id, **kwargs):

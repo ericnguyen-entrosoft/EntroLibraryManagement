@@ -25,14 +25,6 @@ class LibraryLocation(models.Model):
     parent_path = fields.Char(index=True, unaccent=False)
     child_ids = fields.One2many('library.location', 'parent_id', string='Vị trí con')
 
-    # Resource
-    resource_id = fields.Many2one(
-        'library.resource',
-        string='Kho tài nguyên',
-        index=True,
-        help='Kho tài nguyên thư viện mà vị trí này thuộc về'
-    )
-
     # Thông tin vị trí
     location_type = fields.Selection([
         ('area', 'Khu vực'),

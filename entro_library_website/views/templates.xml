@@ -51,47 +51,27 @@
                     <div class="row">
                         <!-- Sidebar -->
                         <div class="col-lg-3 mb-4">
-                            <!-- Categories -->
-                            <!-- <div class="categories_filter mb-4">
+                            <!-- Website Categories Filter -->
+                            <div class="website_categories_filter mb-4" t-if="website_categories">
                                 <h5>Danh mục</h5>
                                 <ul class="list-unstyled">
                                     <li>
                                         <a href="/thu-vien"
                                            t-attf-class="#{not category and 'fw-bold text-primary'}">
-                                            Tất cả danh mục
+                                            Tất cả
                                         </a>
                                     </li>
-                                    <t t-foreach="categories" t-as="cat">
+                                    <t t-foreach="website_categories" t-as="web_cat">
                                         <li>
-                                            <a t-attf-href="/thu-vien/danh-muc/#{cat.id}"
-                                               t-attf-class="#{category and category.id == cat.id and 'fw-bold text-primary'}">
-                                                <t t-esc="cat.name"/>
-                                            </a>
-                                        </li>
-                                    </t>
-                                </ul>
-                            </div> -->
-
-                            <!-- Resource filter -->
-                            <div class="resource_selector mb-4" t-if="resources">
-                                <h5>Kho tài nguyên</h5>
-                                <ul class="list-unstyled">
-                                    <li>
-                                        <a href="/thu-vien"
-                                           t-attf-class="#{not request.params.get('resource') and 'fw-bold text-primary'}">
-                                            Tất cả kho
-                                        </a>
-                                    </li>
-                                    <t t-foreach="resources" t-as="res">
-                                        <li>
-                                            <a t-attf-href="/thu-vien/kho-tai-nguyen/#{res.id}"
-                                               class="text-decoration-none">
-                                                <t t-esc="res.name"/>
+                                            <a t-attf-href="/thu-vien/danh-muc/#{web_cat.id}"
+                                               t-attf-class="#{category and category.id == web_cat.id and 'fw-bold text-primary'}">
+                                                <t t-esc="web_cat.name"/>
                                             </a>
                                         </li>
                                     </t>
                                 </ul>
                             </div>
+
                         </div>
 
                         <!-- Main content -->
@@ -214,9 +194,9 @@
                             <li class="breadcrumb-item">
                                 <a href="/thu-vien">Thư viện</a>
                             </li>
-                            <li class="breadcrumb-item" t-if="book.category_id">
-                                <a t-attf-href="/thu-vien/danh-muc/#{book.category_id.id}">
-                                    <t t-esc="book.category_id.name"/>
+                            <li class="breadcrumb-item" t-if="book.website_category_id">
+                                <a t-attf-href="/thu-vien/danh-muc/#{book.website_category_id.id}">
+                                    <t t-esc="book.website_category_id.name"/>
                                 </a>
                             </li>
                             <li class="breadcrumb-item active" t-esc="book.name"/>
@@ -368,13 +348,21 @@
 
                             <!-- Availability count -->
                             <div class="book-stock-info mb-3 p-3 bg-light rounded">
-                                <div class="d-flex justify-content-between align-items-center">
+                                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
                                     <div>
-                                        <span class="badge bg-success" t-if="book.available_quant_count > 0">
-                                            <t t-esc="book.available_quant_count"/> bản có sẵn
+                                        <span class="badge bg-success me-2" t-if="book.available_quant_count > 0">
+                                            <i class="fa fa-check-circle"/> <t t-esc="book.available_quant_count"/> bản có sẵn
                                         </span>
-                                        <span class="badge bg-danger" t-else="">
-                                            Hết sách
+                                        <span class="badge bg-danger me-2" t-else="">
+                                            <i class="fa fa-times-circle"/> Hết sách
+                                        </span>
+                                    </div>
+                                    <div>
+                                        <span class="badge bg-primary me-2" t-if="book.can_borrow_quant_count > 0">
+                                           Có thể mượn về
+                                        </span>
+                                        <span class="badge bg-info" t-if="book.no_borrow_quant_count > 0">
+                                            Đọc tại chỗ
                                         </span>
                                     </div>
                                 </div>
@@ -509,182 +497,6 @@
                     </div>
 
                 </div>
-            </div>
-        </t>
-    </template>
-
-
-    <!-- ========== RESOURCES LIST PAGE ========== -->
-
-    <template id="library_resources_list" name="Các Kho Tài Nguyên">
-        <t t-call="website.layout">
-            <div class="container mt-5">
-                <h1 class="text-center display-4 mb-5">Các Kho Tài Nguyên</h1>
-
-                <div class="row">
-                    <t t-foreach="resources" t-as="resource">
-                        <div class="col-md-6 col-lg-4 mb-4">
-                            <div class="card resource_card h-100 shadow-sm">
-                                <div class="card-body">
-                                    <h3 class="card-title" t-esc="resource.name"/>
-                                    <p class="card-text text-muted" t-if="resource.description" t-esc="resource.description"/>
-
-                                    <div class="resource_stats mt-3 mb-3">
-                                        <p class="mb-1">
-                                            <i class="fa fa-book text-primary me-2"/>
-                                            <strong t-esc="resource.book_count"/> cuốn sách
-                                        </p>
-                                        <p class="mb-1">
-                                            <i class="fa fa-clock text-primary me-2"/>
-                                            Mượn <strong t-esc="resource.default_borrowing_days"/> ngày
-                                        </p>
-                                        <p class="mb-0">
-                                            <i class="fa fa-list text-primary me-2"/>
-                                            Tối đa <strong t-esc="resource.max_books_per_borrower"/> cuốn/lần
-                                        </p>
-                                    </div>
-
-                                    <a t-attf-href="/thu-vien/kho-tai-nguyen/#{resource.id}"
-                                       class="btn btn-primary w-100">
-                                        <i class="fa fa-eye me-2"/>
-                                        Xem sách
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    </t>
-                </div>
-            </div>
-        </t>
-    </template>
-
-
-    <!-- ========== RESOURCE BOOKS PAGE ========== -->
-
-    <template id="library_resource_books" name="Sách theo Kho Tài Nguyên">
-        <t t-call="website.layout">
-            <div class="container mt-4">
-
-                <!-- Resource header -->
-                <div class="resource_header mb-4 p-4 bg-light rounded">
-                    <h3 t-esc="resource.name"/>
-
-                    <!-- Description (HTML parsed) -->
-                    <div class="resource-description mt-3" t-if="resource.description">
-                        <div t-field="resource.description" class="resource-description-content"/>
-                    </div>
-
-                    <!-- Policy (HTML parsed) -->
-                    <div class="resource-policy mt-3" t-if="resource.policy">
-                        <h5 class="text-primary">Nội quy</h5>
-                        <div t-field="resource.policy" class="resource-policy-content"/>
-                    </div>
-                </div>
-
-                <!-- Breadcrumb -->
-                <nav aria-label="breadcrumb">
-                    <ol class="breadcrumb">
-                        <li class="breadcrumb-item">
-                            <a href="/thu-vien">Thư viện</a>
-                        </li>
-                        <li class="breadcrumb-item">
-                            <a href="/thu-vien/cac-kho">Các kho</a>
-                        </li>
-                        <li class="breadcrumb-item active" t-esc="resource.name"/>
-                    </ol>
-                </nav>
-
-                <!-- Search box (centered) -->
-                <div class="search_box mb-5">
-                    <div class="row justify-content-center">
-                        <div class="col-lg-6 col-md-8">
-                            <form method="get" class="input-group input-group-lg">
-                                <input type="text" name="search"
-                                       class="form-control"
-                                       placeholder="Tìm kiếm sách..."
-                                       t-att-value="search"/>
-                                <button class="btn btn-primary" type="submit">
-                                    <i class="fa fa-search me-2"/>
-                                </button>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Books grid (reuse from library_books) -->
-                <div class="row">
-                    <div class="col-lg-3 mb-4">
-                        <!-- Categories -->
-                        <!-- <div class="categories_filter mb-4">
-                            <h5>Danh mục</h5>
-                            <ul class="list-unstyled">
-                                <li>
-                                    <a t-attf-href="/thu-vien/kho-tai-nguyen/#{resource.id}"
-                                       t-attf-class="#{not category and 'fw-bold text-primary'}">
-                                        Tất cả
-                                    </a>
-                                </li>
-                                <t t-foreach="categories" t-as="cat">
-                                    <li>
-                                        <a t-attf-href="/thu-vien/kho-tai-nguyen/#{resource.id}?category=#{cat.id}"
-                                           t-attf-class="#{category and category.id == cat.id and 'fw-bold text-primary'}">
-                                            <t t-esc="cat.name"/>
-                                        </a>
-                                    </li>
-                                </t>
-                            </ul>
-                        </div> -->
-
-                        <!-- Resource filter -->
-                        <div class="resource_selector mb-4" t-if="resources">
-                            <h5>Kho tài nguyên</h5>
-                            <ul class="list-unstyled">
-                                <li>
-                                    <a href="/thu-vien"
-                                       class="text-decoration-none">
-                                        Tất cả kho
-                                    </a>
-                                </li>
-                                <t t-foreach="resources" t-as="res">
-                                    <li>
-                                        <a t-attf-href="/thu-vien/kho-tai-nguyen/#{res.id}"
-                                           t-attf-class="#{resource.id == res.id and 'fw-bold text-primary' or ''}">
-                                            <t t-esc="res.name"/>
-                                        </a>
-                                    </li>
-                                </t>
-                            </ul>
-                        </div>
-                    </div>
-
-                    <div class="col-lg-9">
-                        <div class="d-flex justify-content-between align-items-center mb-3">
-                            <p class="text-muted mb-0">
-                                <strong t-esc="books_count"/> cuốn sách
-                            </p>
-                        </div>
-
-                        <div class="row books_grid" t-if="books">
-                            <t t-foreach="books" t-as="book">
-                                <div class="col-md-4 col-sm-6 mb-4">
-                                    <t t-call="entro_library_website.library_book_card"/>
-                                </div>
-                            </t>
-                        </div>
-
-                        <div t-if="not books" class="alert alert-info text-center">
-                            <i class="fa fa-info-circle fa-2x mb-2 d-block"/>
-                            <p class="mb-0">Không có sách nào.</p>
-                        </div>
-
-                        <div t-if="pager" class="mt-4">
-                            <t t-call="website.pager">
-                                <t t-set="classname">justify-content-center</t>
-                            </t>
-                        </div>
-                    </div>
-                </div>
-
             </div>
         </t>
     </template>

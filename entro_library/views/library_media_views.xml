@@ -77,7 +77,6 @@
                                 </group>
                                 <group string="Thông tin phân loại">
                                     <field name="category_id" />
-                                    <field name="resource_ids" widget="many2many_tags" />
                                     <field name="keywords"
                                         placeholder="Nhập từ khóa, cách nhau bởi dấu phẩy" />
                                 </group>
@@ -130,7 +129,6 @@
                 <field name="file_size" />
                 <field name="publication_date" />
                 <field name="is_downloadable" />
-                <field name="resource_ids" />
                 <templates>
                     <t t-name="card" class="flex-row">
                         <aside class="o_kanban_aside_full">
@@ -179,9 +177,6 @@
                             <div class="text-muted" t-if="record.author.raw_value">
                                 <field name="author" />
                             </div>
-
-                            <!-- Resource Tags -->
-                            <field name="resource_ids" widget="many2many_tags" class="mb-2" />
 
                             <!-- Footer -->
                             <footer

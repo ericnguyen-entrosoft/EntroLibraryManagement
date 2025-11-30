@@ -428,13 +428,25 @@
                                 <div class="list-group mb-4">
                                     <t t-foreach="borrowing.borrowing_line_ids" t-as="line">
                                         <div class="list-group-item">
-                                            <div class="d-flex align-items-center">
+                                            <div class="d-flex align-items-start">
                                                 <img t-att-src="'/web/image/library.book/%s/image_128' % line.book_id.id"
                                                      class="img-thumbnail me-3"
                                                      style="width: 60px;"/>
                                                 <div class="flex-grow-1">
                                                     <h6 class="mb-1" t-esc="line.book_id.name"/>
-                                                    <small class="text-muted" t-esc="line.book_id.author_names"/>
+                                                    <small class="text-muted d-block mb-2" t-esc="line.book_id.author_names"/>
+                                                    <t t-if="line.book_id.borrow_location_ids">
+                                                        <div class="mt-2">
+                                                            <small class="text-muted me-2">
+                                                                <i class="fa fa-map-marker text-primary"/> Vị trí:
+                                                            </small>
+                                                            <t t-foreach="line.book_id.borrow_location_ids" t-as="location">
+                                                                <span class="badge bg-info me-1">
+                                                                    <t t-esc="location.complete_name"/>
+                                                                </span>
+                                                            </t>
+                                                        </div>
+                                                    </t>
                                                 </div>
                                             </div>
                                         </div>

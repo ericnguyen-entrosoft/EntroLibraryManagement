@@ -3,18 +3,10 @@
 
     <!-- Website menu for library -->
     <record id="menu_library" model="website.menu">
-        <field name="name">Kho tài nguyên</field>
+        <field name="name">Thư viện</field>
         <field name="url">/thu-vien</field>
         <field name="parent_id" ref="website.main_menu"/>
         <field name="sequence">50</field>
-    </record>
-
-    <!-- Sub-menu: All Resources -->
-    <record id="menu_library_resources" model="website.menu">
-        <field name="name">Các Kho Tài Nguyên</field>
-        <field name="url">/thu-vien/cac-kho</field>
-        <field name="parent_id" ref="menu_library"/>
-        <field name="sequence">10</field>
     </record>
 
     <!-- Sub-menu: My Borrowings (visible only when logged in) -->

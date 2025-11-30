@@ -21,6 +21,7 @@
                         <group>
                             <field name="website_published"/>
                             <field name="is_published" readonly="1"/>
+                            <field name="website_category_id"/>
                             <field name="website_url" widget="url" readonly="1"/>
                             <field name="website_sequence"/>
                         </group>

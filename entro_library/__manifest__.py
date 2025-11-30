@@ -27,7 +27,6 @@
     'data': [
         # Data
         'data/library_data.xml',
-        'data/library_resource_actions.xml',
         'data/library_paper_format.xml',
 
         # Security
@@ -70,21 +69,13 @@
         'views/library_dashboard_views.xml',
 
         # Menus (must be loaded before dashboard)
-        'views/library_resource_views.xml',
         'views/library_menus.xml',
-
-
-        # Home (must be loaded after menus)
-        'views/library_home_views.xml'
     ],
     'assets': {
         'web.assets_backend': [
             'entro_library/static/src/js/library_dashboard.js',
             'entro_library/static/src/xml/library_dashboard_templates.xml',
             'entro_library/static/src/scss/library_dashboard.scss',
-            'entro_library/static/src/js/library_home.js',
-            'entro_library/static/src/xml/library_home_templates.xml',
-            'entro_library/static/src/scss/library_home.scss',
             'entro_library/static/src/scss/library_media.scss',
         ],
     },

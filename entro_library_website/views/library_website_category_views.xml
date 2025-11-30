@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Library Website Category List View -->
+    <record id="view_library_website_category_list" model="ir.ui.view">
+        <field name="name">library.website.category.list</field>
+        <field name="model">library.website.category</field>
+        <field name="arch" type="xml">
+            <list string="Danh mục Website" default_order="sequence, name">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="book_count"/>
+                <field name="active" widget="boolean_toggle"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Library Website Category Form View -->
+    <record id="view_library_website_category_form" model="ir.ui.view">
+        <field name="name">library.website.category.form</field>
+        <field name="model">library.website.category</field>
+        <field name="arch" type="xml">
+            <form string="Danh mục Website">
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_books" type="object"
+                                class="oe_stat_button" icon="fa-book">
+                            <field name="book_count" widget="statinfo" string="Sách"/>
+                        </button>
+                    </div>
+                    <widget name="web_ribbon" title="Đã lưu trữ" bg_color="text-bg-danger"
+                            invisible="active"/>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="sequence"/>
+                        </group>
+                        <group>
+                            <field name="color" widget="color_picker"/>
+                            <field name="active" widget="boolean_toggle"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="description" placeholder="Nhập mô tả danh mục..."/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Library Website Category Search View -->
+    <record id="view_library_website_category_search" model="ir.ui.view">
+        <field name="name">library.website.category.search</field>
+        <field name="model">library.website.category</field>
+        <field name="arch" type="xml">
+            <search string="Tìm kiếm danh mục Website">
+                <field name="name"/>
+                <separator/>
+                <filter string="Hoạt động" name="active" domain="[('active','=',True)]"/>
+                <filter string="Đã lưu trữ" name="inactive" domain="[('active','=',False)]"/>
+            </search>
+        </field>
+    </record>
+
+    <!-- Library Website Category Action -->
+    <record id="action_library_website_category" model="ir.actions.act_window">
+        <field name="name">Danh mục Website</field>
+        <field name="res_model">library.website.category</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_library_website_category_search"/>
+        <field name="context">{'search_default_active': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Tạo danh mục website đầu tiên
+            </p>
+            <p>
+                Danh mục website cho phép bạn tổ chức và phân loại sách để hiển thị trên trang web công khai.
+            </p>
+        </field>
+    </record>
+
+    <!-- Menu Item -->
+    <menuitem id="menu_library_website_category"
+              name="Danh mục Website"
+              parent="entro_library.menu_library_config"
+              action="action_library_website_category"
+              sequence="3"/>
+
+</odoo>

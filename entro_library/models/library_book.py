@@ -77,14 +77,6 @@ class LibraryBook(models.Model):
     category_id = fields.Many2one(
         'library.category', string='Nhóm', required=False)
 
-    # Resource assignment (computed from quants' locations)
-    resource_ids = fields.Many2many(
-        'library.resource',
-        string='Kho tài nguyên',
-        compute='_compute_resource_ids',
-        store=True
-    )
-
     # Media relationship
     media_ids = fields.Many2many(
         'library.media',
@@ -125,6 +117,18 @@ class LibraryBook(models.Model):
         compute='_compute_quantities',
         compute_sudo=False,
         help='Tổng số người đang đặt trước sách này'
+    )
+    can_borrow_quant_count = fields.Integer(
+        string='Có thể mượn',
+        compute='_compute_quantities',
+        compute_sudo=False,
+        help='Số lượng bản sao có thể mượn về'
+    )
+    no_borrow_quant_count = fields.Integer(
+        string='Đọc tại chỗ',
+        compute='_compute_quantities',
+        compute_sudo=False,
+        help='Số lượng bản sao chỉ đọc tại chỗ, không cho mượn về'
     )
 
     # Borrow locations
@@ -174,10 +178,10 @@ class LibraryBook(models.Model):
             ['quantity:sum']
         )
 
-        # Get quants count by state and registration_number for available/borrowed
+        # Get quants count by state, registration_number, and can_borrow for available/borrowed/borrowable
         quants_data = self.env['library.book.quant']._read_group(
             [('book_id', 'in', self.ids)],
-            ['book_id', 'state', 'registration_number'],
+            ['book_id', 'state', 'registration_number', 'can_borrow'],
             ['__count']
         )
 
@@ -196,18 +200,28 @@ class LibraryBook(models.Model):
                         quantity_sum in quants_sum_data}
         available_counts = {}
         borrowed_counts = {}
+        can_borrow_counts = {}
+        no_borrow_counts = {}
 
-        for book, state, registration_number, count in quants_data:
+        for book, state, registration_number, can_borrow, count in quants_data:
             book_id = book.id
             if book_id not in available_counts:
                 available_counts[book_id] = 0
                 borrowed_counts[book_id] = 0
+                can_borrow_counts[book_id] = 0
+                no_borrow_counts[book_id] = 0
 
             # Only count as available if has registration_number and state is available
             if state == 'available' and registration_number:
                 available_counts[book_id] += count
             elif state == 'borrowed':
                 borrowed_counts[book_id] += count
+
+            # Count borrowable vs non-borrowable quants (regardless of state)
+            if can_borrow:
+                can_borrow_counts[book_id] += count
+            else:
+                no_borrow_counts[book_id] += count
 
         reservation_counts = {
             book.id: count for book, count in reservations_data}
@@ -218,6 +232,8 @@ class LibraryBook(models.Model):
             book.available_quant_count = available_counts.get(book.id, 0)
             book.borrowed_quant_count = borrowed_counts.get(book.id, 0)
             book.total_reservation_count = reservation_counts.get(book.id, 0)
+            book.can_borrow_quant_count = can_borrow_counts.get(book.id, 0)
+            book.no_borrow_quant_count = no_borrow_counts.get(book.id, 0)
 
     @api.depends('quant_ids', 'quant_ids.location_id', 'quant_ids.location_id.is_borrow_location', 'quant_ids.can_borrow')
     def _compute_borrow_locations(self):
@@ -227,14 +243,6 @@ class LibraryBook(models.Model):
             borrowable_quants = book.quant_ids.filtered(lambda q: q.can_borrow and q.location_id.is_borrow_location)
             # Get unique locations
             book.borrow_location_ids = borrowable_quants.mapped('location_id')
-
-    @api.depends('quant_ids', 'quant_ids.location_id', 'quant_ids.location_id.resource_id')
-    def _compute_resource_ids(self):
-        """Compute resources based on quants' locations"""
-        for book in self:
-            # Get unique resources from all quants' locations
-            resources = book.quant_ids.mapped('location_id.resource_id')
-            book.resource_ids = resources
 
     def action_view_quants(self):
         """View book's physical copies (quants)"""
@@ -448,22 +456,9 @@ class LibraryBook(models.Model):
                 f'Sách "{self.name}" hiện không có bản sao nào khả dụng để mượn.'
             )
 
-        # Check resource limits for each resource this book belongs to
-        for resource in self.resource_ids:
-            can_borrow, message, current_count = resource.check_borrowing_limit(
-                borrower.id,
-                book_id=self.id,
-                exclude_borrowing_id=borrowing.id
-            )
-            if not can_borrow:
-                raise exceptions.UserError(message)
-
-        # Calculate due date based on resource's default borrowing days
-        if self.resource_ids:
-            default_days = self.resource_ids[0].default_borrowing_days
-        else:
-            config = self.env['ir.config_parameter'].sudo()
-            default_days = int(config.get_param('library.default_borrowing_days', default=14))
+        # Calculate due date based on default borrowing days
+        config = self.env['ir.config_parameter'].sudo()
+        default_days = int(config.get_param('library.default_borrowing_days', default=14))
 
         due_date = borrowing.borrow_date + timedelta(days=default_days)
 

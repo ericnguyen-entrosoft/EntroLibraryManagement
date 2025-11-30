@@ -7,6 +7,14 @@ import unicodedata
 class LibraryBook(models.Model):
     _inherit = 'library.book'
 
+    # Website category
+    website_category_id = fields.Many2one(
+        'library.website.category',
+        string='Danh mục Website',
+        index=True,
+        help='Danh mục để hiển thị và lọc trên website'
+    )
+
     # Website visibility
     website_published = fields.Boolean(
         string='Xuất bản lên Website',

@@ -33,6 +33,7 @@
         'data/website_menu.xml',
 
         # Views
+        'views/library_website_category_views.xml',
         'views/library_book_views.xml',
         'views/templates.xml',
         'views/portal_templates.xml',
