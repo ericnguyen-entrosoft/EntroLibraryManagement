@@ -98,7 +98,7 @@
                             <!-- Books grid -->
                             <div class="row books_grid" t-if="books">
                                 <t t-foreach="books" t-as="book">
-                                    <div class="col-md-4 col-sm-6 mb-4">
+                                    <div class="col-md-3 col-sm-6 mb-4">
                                         <t t-call="entro_library_website.library_book_card"/>
                                     </div>
                                 </t>
@@ -111,7 +111,7 @@
                             </div>
 
                             <!-- Pagination -->
-                            <div t-if="pager" class="mt-4">
+                            <div t-if="pager" class="mt-4 mb-4">
                                 <t t-call="website.pager">
                                     <t t-set="classname">justify-content-center</t>
                                 </t>
@@ -488,7 +488,7 @@
                             <h3 class="mb-4">Có thể bạn cũng thích</h3>
                             <div class="row">
                                 <t t-foreach="related_books" t-as="book">
-                                    <div class="col-lg-2 col-md-3 col-sm-4 col-6 mb-4">
+                                    <div class="col-lg-2 col-md-3 col-sm-4 col-6 mb-4" style="margin-left:15px">
                                         <t t-call="entro_library_website.library_book_card"/>
                                     </div>
                                 </t>

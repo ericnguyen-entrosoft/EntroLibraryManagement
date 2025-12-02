@@ -63,8 +63,17 @@ class LibraryWebsite(http.Controller):
 
         # Phân trang
         ppg = 20  # products per page
+        # Construct base URL based on whether we have a category filter
+        if category:
+            url = f'/thu-vien/danh-muc/{category.id}'
+            url_args = {'search': search, 'sortby': sortby}
+        else:
+            url = '/thu-vien'
+            url_args = {'search': search, 'sortby': sortby}
+
         pager = request.website.pager(
-            url='/thu-vien',
+            url=url,
+            url_args=url_args,
             total=books_count,
             page=page,
             step=ppg,
