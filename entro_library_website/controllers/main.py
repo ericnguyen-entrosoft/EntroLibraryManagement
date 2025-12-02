@@ -9,9 +9,9 @@ class LibraryWebsite(http.Controller):
 
     @http.route([
         '/thu-vien',
-        '/thu-vien/trang/<int:page>',
+        '/thu-vien/page/<int:page>',
         '/thu-vien/danh-muc/<model("library.website.category"):category>',
-        '/thu-vien/danh-muc/<model("library.website.category"):category>/trang/<int:page>',
+        '/thu-vien/danh-muc/<model("library.website.category"):category>/page/<int:page>',
     ], type='http', auth='public', website=True, sitemap=True)
     def library_books(self, page=1, category=None, search='', sortby=None, **kwargs):
         """Trang danh sách sách"""
