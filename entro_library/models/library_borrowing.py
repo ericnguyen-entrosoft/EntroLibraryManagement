@@ -651,11 +651,11 @@ class LibraryBorrowing(models.Model):
 
         # Calculate default due date
         # Try to get from book's resource, otherwise use system default
-        if quant.book_id.resource_ids:
-            default_days = quant.book_id.resource_ids[0].default_borrowing_days
-        else:
-            config = self.env['ir.config_parameter'].sudo()
-            default_days = int(config.get_param('library.default_borrowing_days', default=14))
+        # if quant.book_id.resource_ids:
+        #     default_days = quant.book_id.resource_ids[0].default_borrowing_days
+        # else:
+        config = self.env['ir.config_parameter'].sudo()
+        default_days = int(config.get_param('library.default_borrowing_days', default=14))
 
         due_date = self.borrow_date + timedelta(days=default_days)
 
