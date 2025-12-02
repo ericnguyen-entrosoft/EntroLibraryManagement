@@ -98,7 +98,7 @@
                             <!-- Books grid -->
                             <div class="row books_grid" t-if="books">
                                 <t t-foreach="books" t-as="book">
-                                    <div class="col-md-3 col-sm-6 mb-4">
+                                    <div class="col-md-4 col-sm-6 mb-4">
                                         <t t-call="entro_library_website.library_book_card"/>
                                     </div>
                                 </t>
