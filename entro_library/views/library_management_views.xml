@@ -7,8 +7,8 @@
         <field name="arch" type="xml">
             <list string="Vị trí lưu trữ">
                 <field name="book_id"/>
-                <field name="book_id"/>
                 <field name="registration_number"/>
+                <field name="color" widget="color" string="Loại nhãn"/>
                 <field name="location_id"/>
                 <field name="state" widget="badge"
                        decoration-success="state == 'available'"
