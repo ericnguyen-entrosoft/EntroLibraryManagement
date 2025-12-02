@@ -141,6 +141,29 @@ class LibraryPortal(CustomerPortal):
 
         return request.render("entro_library_website.portal_my_borrowing_detail", values)
 
+    @http.route(['/my/borrowing/<int:borrowing_id>/request-extension'],
+                type='http', auth="user", website=True, methods=['POST'], csrf=True)
+    def portal_request_extension(self, borrowing_id, **kw):
+        """Request to extend borrowing deadline"""
+
+        try:
+            partner = request.env.user.partner_id
+            borrowing = request.env['library.borrowing'].browse(borrowing_id)
+
+            # Check access
+            if borrowing.borrower_id.id != partner.id:
+                raise AccessError(_('Bạn không có quyền gia hạn phiếu mượn này'))
+
+            # Call the extension method
+            borrowing.action_request_extension()
+
+            return request.redirect(f'/my/borrowing/{borrowing_id}?message=extension_success')
+
+        except exceptions.UserError as e:
+            return request.redirect(f'/my/borrowing/{borrowing_id}?error={str(e)}')
+        except Exception as e:
+            return request.redirect(f'/my/borrowing/{borrowing_id}?error=Có lỗi xảy ra khi gia hạn')
+
     # ========== MY RESERVATIONS ==========
 
     @http.route(['/my/reservations', '/my/reservations/page/<int:page>'],

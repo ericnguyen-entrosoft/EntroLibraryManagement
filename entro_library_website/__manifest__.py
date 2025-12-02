@@ -35,6 +35,7 @@
         # Views
         'views/library_website_category_views.xml',
         'views/library_book_views.xml',
+        'views/library_media_views.xml',
         'views/templates.xml',
         'views/portal_templates.xml',
         'views/navbar_templates.xml',

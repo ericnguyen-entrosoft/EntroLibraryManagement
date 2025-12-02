@@ -64,8 +64,33 @@ class LibraryBorrowing(models.Model):
     # Dates
     borrow_date = fields.Date(
         string='Ngày mượn', default=fields.Date.today, required=True, tracking=True)
-    due_date = fields.Date(string='Ngày hạn trả', compute='_compute_due_date', store=True)
+    due_date = fields.Date(
+        string='Ngày hạn trả',
+        default=lambda self: self._default_due_date(),
+        required=True,
+        tracking=True,
+        help='Ngày hẹn trả sách - áp dụng chung cho tất cả sách trong phiếu mượn'
+    )
     return_date = fields.Date(string='Ngày trả thực tế', tracking=True)
+
+    # Extension fields
+    extension_requested = fields.Boolean(
+        string='Đã yêu cầu gia hạn',
+        default=False,
+        copy=False,
+        tracking=True,
+        help='Người mượn đã yêu cầu gia hạn một lần'
+    )
+    extension_date = fields.Date(
+        string='Ngày yêu cầu gia hạn',
+        copy=False,
+        tracking=True
+    )
+    original_due_date = fields.Date(
+        string='Hạn trả gốc',
+        copy=False,
+        help='Ngày hạn trả ban đầu trước khi gia hạn'
+    )
 
     # State
     state = fields.Selection([
@@ -235,15 +260,12 @@ class LibraryBorrowing(models.Model):
             return f'PM/{self.borrow_date.year}/{self.borrow_date.month:02d}/00000'
         return 'PM/00000'
 
-    @api.depends('borrowing_line_ids.due_date')
-    def _compute_due_date(self):
-        """Compute due date as max due date from all lines"""
-        for record in self:
-            if record.borrowing_line_ids:
-                due_dates = record.borrowing_line_ids.mapped('due_date')
-                record.due_date = max(due_dates) if due_dates else False
-            else:
-                record.due_date = False
+    @api.model
+    def _default_due_date(self):
+        """Calculate default due date based on system configuration"""
+        config = self.env['ir.config_parameter'].sudo()
+        default_days = int(config.get_param('library.default_borrowing_days', default=14))
+        return fields.Date.today() + timedelta(days=default_days)
 
     @api.depends('borrowing_line_ids.late_days', 'borrowing_line_ids.is_overdue', 'state')
     def _compute_late_info(self):
@@ -296,16 +318,12 @@ class LibraryBorrowing(models.Model):
 
     @api.onchange('borrow_date')
     def _onchange_borrow_date(self):
-        """Update due dates for all lines when borrow date changes"""
-        if self.borrow_date:
+        """Update due date when borrow date changes"""
+        if self.borrow_date and not self.due_date:
             config = self.env['ir.config_parameter'].sudo()
             default_days = int(config.get_param(
                 'library.default_borrowing_days', default=14))
-            default_due_date = self.borrow_date + timedelta(days=default_days)
-            # Update all lines
-            for line in self.borrowing_line_ids:
-                if not line.due_date:
-                    line.due_date = default_due_date
+            self.due_date = self.borrow_date + timedelta(days=default_days)
 
     @api.constrains('borrower_id', 'borrowing_line_ids')
     def _check_borrowing_constraints(self):
@@ -464,6 +482,70 @@ class LibraryBorrowing(models.Model):
                             'current_borrowing_id': False
                         })
                     quant_line.state = 'draft'
+
+    def action_request_extension(self):
+        """Request to extend borrowing deadline (one-time only)"""
+        self.ensure_one()
+
+        # Validation checks
+        if self.state not in ('borrowed', 'overdue'):
+            raise exceptions.UserError('Chỉ có thể gia hạn khi đang mượn sách.')
+
+        if self.extension_requested:
+            raise exceptions.UserError(
+                'Bạn đã yêu cầu gia hạn một lần rồi. Mỗi phiếu mượn chỉ được gia hạn một lần duy nhất.'
+            )
+
+        # Check if there are active reservations for any books in this borrowing
+        reserved_books = self.env['library.reservation'].search([
+            ('book_id', 'in', self.borrowing_line_ids.mapped('book_id').ids),
+            ('state', 'in', ['active', 'available'])
+        ])
+
+        if reserved_books:
+            book_names = ', '.join(reserved_books.mapped('book_id.name')[:3])
+            raise exceptions.UserError(
+                f'Không thể gia hạn vì có người đang đặt trước các sách: {book_names}...'
+            )
+
+        # Get extension days from config
+        config = self.env['ir.config_parameter'].sudo()
+        extension_days = int(config.get_param('library.extension_days', default=7))
+
+        # Save original due date if not already saved
+        if not self.original_due_date:
+            self.original_due_date = self.due_date
+
+        # Extend due date
+        new_due_date = self.due_date + timedelta(days=extension_days)
+
+        self.write({
+            'due_date': new_due_date,
+            'extension_requested': True,
+            'extension_date': fields.Date.today()
+        })
+
+        # Log the extension in chatter
+        self.message_post(
+            body=f'<p>Người mượn đã yêu cầu gia hạn.</p>'
+                 f'<ul>'
+                 f'<li>Hạn trả gốc: <strong>{self.original_due_date}</strong></li>'
+                 f'<li>Hạn trả mới: <strong>{new_due_date}</strong></li>'
+                 f'<li>Gia hạn thêm: <strong>{extension_days} ngày</strong></li>'
+                 f'</ul>',
+            subject='Yêu cầu gia hạn'
+        )
+
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'title': 'Gia hạn thành công!',
+                'message': f'Hạn trả mới của bạn là {new_due_date.strftime("%d/%m/%Y")}',
+                'type': 'success',
+                'sticky': False,
+            }
+        }
 
     def _send_borrowing_email(self):
         """Send email notification to borrower"""

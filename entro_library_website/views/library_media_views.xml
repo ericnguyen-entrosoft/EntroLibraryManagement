@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Inherit Library Media Form View to add access control -->
+    <record id="view_library_media_form_website" model="ir.ui.view">
+        <field name="name">library.media.form.website</field>
+        <field name="model">library.media</field>
+        <field name="inherit_id" ref="entro_library.view_library_media_form"/>
+        <field name="arch" type="xml">
+            <!-- Add access control field after access_level -->
+            <xpath expr="//field[@name='access_level']" position="after">
+                <field name="allowed_borrower_type_ids" widget="many2many_tags"
+                       placeholder="Để trống để cho phép tất cả loại độc giả"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

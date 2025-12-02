@@ -15,6 +15,16 @@ class LibraryBook(models.Model):
         help='Danh mục để hiển thị và lọc trên website'
     )
 
+    # Access control by borrower type
+    allowed_borrower_type_ids = fields.Many2many(
+        'library.borrower.type',
+        'library_book_borrower_type_website_rel',
+        'book_id',
+        'borrower_type_id',
+        string='Loại độc giả được phép',
+        help='Chỉ những loại độc giả này mới được xem sách trên website. Để trống nếu cho phép tất cả.'
+    )
+
     # Website visibility
     website_published = fields.Boolean(
         string='Xuất bản lên Website',

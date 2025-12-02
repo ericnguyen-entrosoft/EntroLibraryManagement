@@ -69,10 +69,13 @@ class LibraryBorrowingLine(models.Model):
         store=True
     )
 
-    # Dates (default for all quants under this line)
+    # Dates (inherited from borrowing header - all books have same due date)
     due_date = fields.Date(
         string='Hạn trả',
-        required=True
+        related='borrowing_id.due_date',
+        store=True,
+        readonly=True,
+        help='Ngày hạn trả được kế thừa từ phiếu mượn - tất cả sách có cùng hạn trả'
     )
 
     # State (computed from quant lines)

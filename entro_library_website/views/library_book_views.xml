@@ -35,6 +35,11 @@
                         </group>
                     </group>
 
+                    <group string="Kiểm soát truy cập">
+                        <field name="allowed_borrower_type_ids" widget="many2many_tags"
+                               placeholder="Để trống để cho phép tất cả loại độc giả"/>
+                    </group>
+
                     <group string="SEO">
                         <field name="website_meta_title" placeholder="Tối ưu cho tìm kiếm Google"/>
                         <field name="website_meta_description"

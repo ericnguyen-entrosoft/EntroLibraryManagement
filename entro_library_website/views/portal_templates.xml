@@ -108,6 +108,22 @@
                         </h5>
                     </div>
                     <div class="card-body">
+                        <!-- Alert Messages -->
+                        <t t-if="request.params.get('message') == 'extension_success'">
+                            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                <i class="fa fa-check-circle me-2"/>
+                                <strong>Gia hạn thành công!</strong> Hạn trả mới của bạn đã được cập nhật.
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"/>
+                            </div>
+                        </t>
+                        <t t-if="request.params.get('error')">
+                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                <i class="fa fa-exclamation-circle me-2"/>
+                                <strong>Lỗi:</strong> <t t-esc="request.params.get('error')"/>
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"/>
+                            </div>
+                        </t>
+
                         <div class="row mb-4">
                             <!-- Left Column: Dates -->
                             <div class="col-md-6">
@@ -117,12 +133,35 @@
                                 </div>
                                 <div class="mb-3">
                                     <strong>Ngày hẹn trả:</strong>
-                                    <div class="text-muted"><span t-field="borrowing.due_date"/></div>
+                                    <div class="text-muted">
+                                        <span t-field="borrowing.due_date"/>
+                                        <t t-if="borrowing.extension_requested">
+                                            <span class="badge bg-success ms-2">
+                                                <i class="fa fa-clock-o me-1"/>Đã gia hạn
+                                            </span>
+                                        </t>
+                                    </div>
+                                    <t t-if="borrowing.original_due_date and borrowing.extension_requested">
+                                        <small class="text-muted d-block mt-1">
+                                            Hạn gốc: <span t-field="borrowing.original_due_date"/>
+                                        </small>
+                                    </t>
                                 </div>
                                 <div class="mb-3">
                                     <strong>Tổng số sách:</strong>
                                     <div class="text-muted"><t t-esc="borrowing.book_count"/> cuốn</div>
                                 </div>
+
+                                <!-- Extension Button -->
+                                <t t-if="borrowing.state in ['borrowed', 'overdue'] and not borrowing.extension_requested and not token_access">
+                                    <form t-attf-action="/my/borrowing/#{borrowing.id}/request-extension" method="POST" class="mt-3">
+                                        <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                                        <button type="submit" class="btn btn-warning btn-sm"
+                                                onclick="return confirm('Bạn có chắc muốn gia hạn phiếu mượn này? Mỗi phiếu chỉ được gia hạn một lần.')">
+                                            <i class="fa fa-calendar-plus-o me-2"/>Yêu cầu gia hạn
+                                        </button>
+                                    </form>
+                                </t>
                             </div>
 
                             <!-- Right Column: Checkout Code & QR Code -->

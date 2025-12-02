@@ -18,6 +18,19 @@ class LibraryWebsite(http.Controller):
 
         domain = [('website_published', '=', True)]
 
+        # Filter by borrower type access control
+        if not request.env.user._is_public():
+            partner = request.env.user.partner_id
+            if partner.borrower_type_id:
+                # Show books that either:
+                # 1. Have no type restrictions (allowed_borrower_type_ids is empty), OR
+                # 2. Include the user's borrower type in allowed list
+                domain += [
+                    '|',
+                    ('allowed_borrower_type_ids', '=', False),
+                    ('allowed_borrower_type_ids', 'in', partner.borrower_type_id.id)
+                ]
+
         # Tìm kiếm
         if search:
             domain += [
@@ -98,6 +111,14 @@ class LibraryWebsite(http.Controller):
 
         if not book.website_published or not book.active:
             return request.redirect('/thu-vien')
+
+        # Check borrower type access
+        if not request.env.user._is_public():
+            partner = request.env.user.partner_id
+            if partner.borrower_type_id and book.allowed_borrower_type_ids:
+                # If book has type restrictions, check if user's type is allowed
+                if partner.borrower_type_id not in book.allowed_borrower_type_ids:
+                    return request.redirect('/thu-vien')
 
         # Tìm sách liên quan (cùng danh mục hoặc cùng tác giả)
         related_books = request.env['library.book'].search([
