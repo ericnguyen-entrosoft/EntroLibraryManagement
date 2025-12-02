@@ -448,7 +448,7 @@
                     <div class="row mt-4">
                         <div class="col-12">
                             <div class="block-content-product-detail">
-                                <h2 class="block-content-product-detail-title h4 mb-4">Mô tả sản phẩm</h2>
+                                <h2 class="block-content-product-detail-title h4 mb-4">Tóm tắt nội dung</h2>
                                 <div id="book_description_content" class="book-description-content p-4 bg-white rounded border">
                                     <div t-if="book.summary" t-field="book.summary" class="book_summary"/>
                                     <p t-else="" class="text-muted text-center py-4">
