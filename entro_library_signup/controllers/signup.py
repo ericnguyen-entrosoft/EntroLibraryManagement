@@ -62,6 +62,7 @@ class LibrarySignup(AuthSignupHome):
             # Create signup request
             vals = {
                 'full_name': post.get('full_name'),
+                'dharma_name': post.get('dharma_name') or False,
                 'email': post.get('email'),
                 'phone': post.get('phone'),
                 'date_of_birth': post.get('date_of_birth') or False,

@@ -6,6 +6,9 @@ import secrets
 import qrcode
 import io
 import base64
+import logging
+
+_logger = logging.getLogger(__name__)
 
 
 class LibraryBorrowing(models.Model):
@@ -183,8 +186,6 @@ class LibraryBorrowing(models.Model):
             self.qr_code = base64.b64encode(buffer.getvalue())
         except Exception as e:
             # Log error but don't fail
-            import logging
-            _logger = logging.getLogger(__name__)
             _logger.warning(f"Failed to generate QR code for borrowing {self.id}: {e}")
             self.qr_code = False
 
@@ -619,6 +620,15 @@ class LibraryBorrowing(models.Model):
         Handle barcode scanning event - adds quant to borrowing
         Supports two-layer structure: finds or creates book line, then adds quant line
         """
+        # Validate borrowing state first
+        if self.state not in ('draft',):
+            return {
+                'warning': {
+                    'title': 'Trạng thái không hợp lệ',
+                    'message': f'Không thể thêm sách vào phiếu mượn ở trạng thái "{dict(self._fields["state"].selection)[self.state]}".'
+                }
+            }
+
         # Search for quant with matching registration_number
         quant = self.env['library.book.quant'].search([
             ('registration_number', '=', barcode),
@@ -634,7 +644,7 @@ class LibraryBorrowing(models.Model):
                 }
             }
 
-        # Check if quant already exists in current borrowing
+        # Check if quant already exists in current borrowing (excluding cancelled)
         existing_quant_line = self.env['library.borrowing.quant.line'].search([
             ('borrowing_id', '=', self.id),
             ('quant_id', '=', quant.id),
@@ -649,41 +659,47 @@ class LibraryBorrowing(models.Model):
                 }
             }
 
-        # Calculate default due date
-        # Try to get from book's resource, otherwise use system default
-        # if quant.book_id.resource_ids:
-        #     default_days = quant.book_id.resource_ids[0].default_borrowing_days
-        # else:
-        config = self.env['ir.config_parameter'].sudo()
-        default_days = int(config.get_param('library.default_borrowing_days', default=14))
-
-        due_date = self.borrow_date + timedelta(days=default_days)
+        # Calculate default due date from borrowing's due_date
+        due_date = self.due_date
 
         # Find or create book line for this book
         book_line = self.borrowing_line_ids.filtered(
-            lambda l: l.book_id.id == quant.book_id.id
+            lambda l: l.book_id.id == quant.book_id.id and l.state != 'cancelled'
         )
 
         if not book_line:
-            # Create new book line
+            # Create new book line with initial requested_quantity = 1
             book_line = self.env['library.borrowing.line'].create({
                 'borrowing_id': self.id,
                 'book_id': quant.book_id.id,
                 'requested_quantity': 1,
-                'due_date': due_date,
             })
         else:
             book_line = book_line[0]
-            # Increment requested quantity
-            book_line.requested_quantity += 1
+            # Don't increment requested_quantity - just add the quant line
 
         # Add quant line under the book line
-        self.env['library.borrowing.quant.line'].create({
-            'line_id': book_line.id,
-            'quant_id': quant.id,
-            'due_date': due_date,
-            'state': 'draft'
-        })
+        try:
+            self.env['library.borrowing.quant.line'].create({
+                'line_id': book_line.id,
+                'quant_id': quant.id,
+                'due_date': due_date,
+                'state': 'draft'
+            })
+        except Exception as e:
+            # Rollback book line creation if quant line creation fails
+            if not book_line.quant_line_ids:
+                book_line.unlink()
+
+            # Return error message
+            _logger.error(f"Failed to create quant line for barcode {barcode}: {e}")
+
+            return {
+                'warning': {
+                    'title': 'Lỗi',
+                    'message': f'Không thể thêm sách: {str(e)}'
+                }
+            }
 
         return {
             'type': 'ir.actions.client',

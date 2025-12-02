@@ -13,6 +13,7 @@ class LibrarySignupRequest(models.Model):
 
     # Personal Information
     full_name = fields.Char(string='Họ và tên', required=True, tracking=True)
+    dharma_name = fields.Char(string='Pháp Danh', tracking=True)
     email = fields.Char(string='Email', required=True, tracking=True)
     phone = fields.Char(string='Số điện thoại', required=True, tracking=True)
     date_of_birth = fields.Date(string='Ngày sinh', tracking=True)
@@ -91,6 +92,7 @@ class LibrarySignupRequest(models.Model):
         # Create partner
         partner_vals = {
             'name': self.full_name,
+            'dharma_name': self.dharma_name,
             'email': self.email,
             'phone': self.phone,
             'street': self.street,

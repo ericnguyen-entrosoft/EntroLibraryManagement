@@ -10,6 +10,7 @@ class ResPartner(models.Model):
     borrower_type_id = fields.Many2one('library.borrower.type', string='Loại độc giả')
 
     borrower_code = fields.Char(string='Mã độc giả', copy=False)
+    dharma_name = fields.Char(string='Pháp danh', help='Tên pháp của độc giả')
     membership_date = fields.Date(string='Ngày đăng ký')
     membership_expiry = fields.Date(string='Hạn thẻ')
     is_membership_active = fields.Boolean(

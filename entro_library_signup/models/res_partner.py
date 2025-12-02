@@ -6,6 +6,7 @@ class ResPartner(models.Model):
     _inherit = 'res.partner'
 
     # Additional fields for library members
+    dharma_name = fields.Char(string='Pháp Danh')
     id_card_number = fields.Char(string='CMND/CCCD')
     student_id = fields.Char(string='Mã sinh viên/học sinh')
     date_of_birth = fields.Date(string='Ngày sinh')

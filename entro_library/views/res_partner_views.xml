@@ -26,6 +26,7 @@
                     <group>
                         <group string="Thông tin thành viên">
                             <field name="borrower_code" readonly="1"/>
+                            <field name="dharma_name"/>
                             <field name="membership_date"/>
                             <field name="membership_expiry"/>
                             <field name="is_membership_active" readonly="1"/>

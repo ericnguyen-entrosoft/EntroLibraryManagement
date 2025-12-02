@@ -181,7 +181,7 @@
                                     <field name="publication_city_id"
                                         options="{'no_create_edit': False}"
                                         domain="[('country_id', '=', publication_country_id)]" />
-                                    <field name="publication_year" required="1" />
+                                    <field name="publication_year" required="0" />
                                     <field name="language_id" options="{'no_create_edit': False}"
                                         required="1" />
                                     <field name="page_count" required="1" />
