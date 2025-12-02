@@ -399,14 +399,6 @@
                                                 <th class="table-label bg-light">Năm xuất bản</th>
                                                 <td class="data" t-esc="book.publication_year"/>
                                             </tr>
-                                            <tr t-if="book.publication_country_id">
-                                                <th class="table-label bg-light">Quốc gia</th>
-                                                <td class="data" t-esc="book.publication_country_id.name"/>
-                                            </tr>
-                                            <tr t-if="book.publication_city_id">
-                                                <th class="table-label bg-light">Thành phố XB</th>
-                                                <td class="data" t-esc="book.publication_city_id.name"/>
-                                            </tr>
                                             <tr t-if="book.page_count">
                                                 <th class="table-label bg-light">Số trang</th>
                                                 <td class="data" t-esc="book.page_count"/>
@@ -426,14 +418,6 @@
                                             <tr t-if="book.ddc_number">
                                                 <th class="table-label bg-light">Số DDC</th>
                                                 <td class="data" t-esc="book.ddc_number"/>
-                                            </tr>
-                                            <tr t-if="book.cutter_number">
-                                                <th class="table-label bg-light">Mã Cutter</th>
-                                                <td class="data" t-esc="book.cutter_number"/>
-                                            </tr>
-                                            <tr t-if="book.keywords">
-                                                <th class="table-label bg-light">Từ khóa</th>
-                                                <td class="data" t-esc="book.keywords"/>
                                             </tr>
                                         </tbody>
                                     </table>
