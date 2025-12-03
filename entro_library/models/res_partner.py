@@ -2,10 +2,21 @@
 from odoo import models, fields, api
 
 
+class ResUser(models.Model):
+    _inherit = 'res.users'
+    _rec_name = 'display_name'
+
+    display_name = fields.Char(compute='_compute_display_name')
+    def _compute_display_name(self):
+        for record in self:
+            record.display_name = record.dharma_name or record.name
+
 class ResPartner(models.Model):
     _inherit = 'res.partner'
+    _rec_name = 'display_name'
 
     # Borrower information
+    display_name = fields.Char(compute='_compute_display_name')
     is_borrower = fields.Boolean(string='Là độc giả', default=False)
     borrower_type_id = fields.Many2one('library.borrower.type', string='Loại độc giả')
 
@@ -43,6 +54,10 @@ class ResPartner(models.Model):
     # Notes
     borrower_notes = fields.Text(string='Ghi chú độc giả')
 
+    def _compute_display_name(self):
+        for record in self:
+            record.display_name = record.dharma_name or record.name
+    
     @api.depends('membership_expiry')
     def _compute_membership_active(self):
         today = fields.Date.today()
