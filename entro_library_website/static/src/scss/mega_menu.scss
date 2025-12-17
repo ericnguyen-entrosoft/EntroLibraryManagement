@@ -1,0 +1,117 @@
+/* Mega Menu Styling */
+
+/* Mega Menu Container */
+.s_mega_menu_library_resources {
+    background-color: #ffffff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Section Titles */
+.s_mega_menu_library_resources h5 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #333;
+    border-bottom: 2px solid #e9ecef;
+}
+
+.s_mega_menu_library_resources h5 i {
+    color: #007bff;
+}
+
+.s_mega_menu_library_resources h5 a {
+    color: #333;
+    transition: color 0.2s;
+}
+
+.s_mega_menu_library_resources h5 a:hover {
+    color: #007bff;
+}
+
+/* Subtitles */
+.s_mega_menu_library_resources h6 {
+    font-weight: 600;
+    color: #6c757d;
+    margin-top: 0.75rem;
+}
+
+/* Navigation Links */
+.s_mega_menu_library_resources .nav-link {
+    color: #495057;
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.25rem;
+    transition: all 0.2s ease;
+    border-left: 3px solid transparent;
+}
+
+.s_mega_menu_library_resources .nav-link:hover {
+    background-color: #f8f9fa;
+    color: #007bff;
+    text-decoration: none;
+    border-left-color: #007bff;
+    padding-left: 1rem;
+}
+
+.s_mega_menu_library_resources .nav-link i {
+    color: #6c757d;
+    width: 20px;
+    text-align: center;
+    transition: color 0.2s;
+}
+
+.s_mega_menu_library_resources .nav-link:hover i {
+    color: #007bff;
+}
+
+/* Small Links */
+.s_mega_menu_library_resources .nav-link.small {
+    font-size: 0.875rem;
+    opacity: 0.9;
+}
+
+/* Horizontal Rule */
+.s_mega_menu_library_resources hr {
+    opacity: 0.3;
+    margin: 0.5rem 0;
+}
+
+/* Dropdown Menu Positioning */
+.dropdown-menu.o_mega_menu {
+    background-color: #ffffff;
+    border: none;
+    border-top: 3px solid #007bff;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+    margin-top: 0;
+    padding: 0;
+}
+
+/* Make sure mega menu content has proper background */
+.o_mega_menu .s_mega_menu_library_resources {
+    background-color: #ffffff;
+}
+
+/* Responsive */
+@media (max-width: 991px) {
+    .s_mega_menu_library_resources .nav-link:hover {
+        padding-left: 0.75rem;
+    }
+
+    .s_mega_menu_library_resources .col-md-6 {
+        margin-bottom: 1rem;
+    }
+}
+
+/* Animation for dropdown */
+.dropdown-menu.o_mega_menu {
+    animation: fadeInDown 0.3s ease-out;
+}
+
+@keyframes fadeInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

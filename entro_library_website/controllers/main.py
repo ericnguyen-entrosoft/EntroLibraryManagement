@@ -11,11 +11,23 @@ class LibraryWebsite(http.Controller):
     @http.route([
         '/thu-vien',
         '/thu-vien/page/<int:page>',
+        '/thu-vien/<string:category_slug>',
+        '/thu-vien/<string:category_slug>/page/<int:page>',
         '/thu-vien/danh-muc/<model("library.website.category"):category>',
         '/thu-vien/danh-muc/<model("library.website.category"):category>/page/<int:page>',
     ], type='http', auth='public', website=True, sitemap=True)
-    def library_books(self, page=1, category=None, search='', sortby=None, **kwargs):
+    def library_books(self, page=1, category=None, category_slug=None, search='', sortby=None, **kwargs):
         """Trang danh sách sách"""
+
+        # Handle category slug mapping
+        if category_slug and not category:
+            slug_mapping = {
+                'phat-hoc': 'entro_library_website.website_category_phat_hoc',
+                'tong-hop': 'entro_library_website.website_category_tong_hop',
+                'ngoai-ngu': 'entro_library_website.website_category_ngoai_ngu',
+            }
+            if category_slug in slug_mapping:
+                category = request.env.ref(slug_mapping[category_slug], raise_if_not_found=False)
 
         domain = [('website_published', '=', True)]
 

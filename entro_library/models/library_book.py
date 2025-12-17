@@ -25,7 +25,7 @@ class LibraryBook(models.Model):
         'book_id',
         'author_id',
         string='Tác giả',
-        required=True
+        required=False
     )
     author_names = fields.Char(
         string='Tên tác giả',

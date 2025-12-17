@@ -45,7 +45,6 @@
         'views/media_templates.xml',
         'views/portal_templates.xml',
         'views/navbar_templates.xml',
-        'views/custom_mega_menu.xml',
     ],
     'assets': {
         'web.assets_frontend': [
@@ -53,6 +52,7 @@
             'entro_library_website/static/src/scss/library_website.scss',
             'entro_library_website/static/src/scss/book_detail_gallery.scss',
             'entro_library_website/static/src/scss/library_media.scss',
+            'entro_library_website/static/src/scss/mega_menu.scss',
             'entro_library_website/static/src/js/library_website.js',
             'entro_library_website/static/src/js/book_detail_gallery.js',
             'entro_library_website/static/src/js/library_media.js',
