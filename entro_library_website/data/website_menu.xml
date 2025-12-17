@@ -8,7 +8,6 @@
     <record id="menu_kho_tai_nguyen" model="website.menu">
         <field name="name">Kho tài nguyên</field>
         <field name="url">/thu-vien</field>
-        <field name="parent_id" ref="website.main_menu"/>
         <field name="sequence">50</field>
         <field name="mega_menu_content"><![CDATA[
             <section class="s_mega_menu_library_resources py-3">
