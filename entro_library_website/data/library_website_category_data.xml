@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Website Categories for Library Books and Media -->
+
+    <!-- Book Categories -->
+    <record id="website_category_phat_hoc" model="library.website.category">
+        <field name="name">Phật Học</field>
+        <field name="sequence">10</field>
+        <field name="active" eval="True"/>
+    </record>
+
+    <record id="website_category_tong_hop" model="library.website.category">
+        <field name="name">Tổng Hợp</field>
+        <field name="sequence">20</field>
+        <field name="active" eval="True"/>
+    </record>
+
+    <record id="website_category_ngoai_ngu" model="library.website.category">
+        <field name="name">Ngoại Ngữ</field>
+        <field name="sequence">30</field>
+        <field name="active" eval="True"/>
+    </record>
+
+</odoo>

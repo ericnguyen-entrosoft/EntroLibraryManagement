@@ -1,27 +1,84 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
-    <!-- Website menu for library -->
-    <record id="menu_library" model="website.menu">
-        <field name="name">Thư viện</field>
+    <!-- ========================================== -->
+    <!-- LEVEL 1: MAIN MENUS (only 2 levels allowed!) -->
+    <!-- ========================================== -->
+
+    <!-- Sách Menu -->
+    <record id="menu_sach" model="website.menu">
+        <field name="name">Sách</field>
         <field name="url">/thu-vien</field>
         <field name="parent_id" ref="website.main_menu"/>
         <field name="sequence">50</field>
     </record>
 
-    <!-- Sub-menu: My Borrowings (visible only when logged in) -->
-    <record id="menu_my_borrowings" model="website.menu">
-        <field name="name">Phiếu Mượn Của Tôi</field>
-        <field name="url">/my/borrowings</field>
-        <field name="parent_id" ref="menu_library"/>
+    <!-- Book Sub-menus (Level 2) -->
+    <record id="menu_sach_phat_hoc" model="website.menu">
+        <field name="name">Khu Phật học</field>
+        <field name="url">/thu-vien/danh-muc/phat-hoc</field>
+        <field name="parent_id" ref="menu_sach"/>
+        <field name="sequence">10</field>
+    </record>
+
+    <record id="menu_sach_tong_hop" model="website.menu">
+        <field name="name">Khu tổng hợp</field>
+        <field name="url">/thu-vien/danh-muc/tong-hop</field>
+        <field name="parent_id" ref="menu_sach"/>
         <field name="sequence">20</field>
     </record>
 
-    <!-- Sub-menu: My Borrowing Cart -->
+    <record id="menu_sach_ngoai_ngu" model="website.menu">
+        <field name="name">Khu ngoại ngữ</field>
+        <field name="url">/thu-vien/danh-muc/ngoai-ngu</field>
+        <field name="parent_id" ref="menu_sach"/>
+        <field name="sequence">30</field>
+    </record>
+
+    <record id="menu_my_borrowings" model="website.menu">
+        <field name="name">Phiếu Mượn Của Tôi</field>
+        <field name="url">/my/borrowings</field>
+        <field name="parent_id" ref="menu_sach"/>
+        <field name="sequence">100</field>
+    </record>
+
     <record id="menu_borrowing_cart" model="website.menu">
         <field name="name">Giỏ Mượn Sách</field>
         <field name="url">/my/borrowing-cart</field>
-        <field name="parent_id" ref="menu_library"/>
+        <field name="parent_id" ref="menu_sach"/>
+        <field name="sequence">110</field>
+    </record>
+
+    <!-- ========================================== -->
+    <!-- Đa phương tiện Menu -->
+    <!-- ========================================== -->
+
+    <record id="menu_da_phuong_tien" model="website.menu">
+        <field name="name">Đa phương tiện</field>
+        <field name="url">/media</field>
+        <field name="parent_id" ref="website.main_menu"/>
+        <field name="sequence">51</field>
+    </record>
+
+    <!-- Media Sub-menus (Level 2) -->
+    <record id="menu_media_chu_ni" model="website.menu">
+        <field name="name">Chư Ni</field>
+        <field name="url">/media/chu-ni</field>
+        <field name="parent_id" ref="menu_da_phuong_tien"/>
+        <field name="sequence">10</field>
+    </record>
+
+    <record id="menu_media_thien_sinh" model="website.menu">
+        <field name="name">Thiền sinh</field>
+        <field name="url">/media/thien-sinh</field>
+        <field name="parent_id" ref="menu_da_phuong_tien"/>
+        <field name="sequence">20</field>
+    </record>
+
+    <record id="menu_media_phat_tu" model="website.menu">
+        <field name="name">Phật tử</field>
+        <field name="url">/media/phat-tu</field>
+        <field name="parent_id" ref="menu_da_phuong_tien"/>
         <field name="sequence">30</field>
     </record>
 

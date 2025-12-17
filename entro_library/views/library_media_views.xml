@@ -51,14 +51,6 @@
                         </h1>
                     </div>
                     <div name="options">
-                        <span class="d-inline-flex">
-                            <field name="is_downloadable" />
-                            <label for="is_downloadable" />
-                        </span>
-                        <span class="d-inline-flex">
-                            <label for="access_level" />
-                            <field name="access_level" options="{'horizontal': true}" widget="radio"/>
-                        </span>
                     </div>
                     <notebook>
                         <page string="Thông tin chung" name="general">
@@ -91,10 +83,8 @@
                                     <field name="duration_display"
                                         invisible="media_type not in ['video', 'audio']" />
                                 </group>
-                                <group string="Thống kê">
-                                    <field name="view_count" />
-                                    <field name="download_count" />
-                                    <field name="active" widget="boolean_toggle" />
+                                <group string="Kiểm soát truy cập">
+                                    <field name="access_level" options="{'horizontal': true}" widget="radio"/>
                                 </group>
                             </group>
                             <group string="Mô tả">

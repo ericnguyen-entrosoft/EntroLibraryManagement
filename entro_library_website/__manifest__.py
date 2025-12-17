@@ -3,7 +3,7 @@
     'name': 'Entro: Thư Viện Website',
     'version': '18.0.1.0.0',
     'category': 'Library',
-    'summary': 'Trang web công khai cho thư viện sách',
+    'summary': 'Trang web công khai cho thư viện sách và phương tiện',
     'description': """
         Module website cho thư viện
         =============================
@@ -13,6 +13,10 @@
         * Portal cho độc giả xem lịch sử mượn sách
         * Giỏ mượn sách trực tuyến
         * Quản lý đặt trước
+        * Trang phương tiện với video, âm thanh, hình ảnh, tài liệu PDF
+        * Trình phát video (HTML5, YouTube, Vimeo)
+        * Trình xem PDF, hình ảnh với lightbox
+        * Trình phát âm thanh
         * Giao diện tiếng Việt
         * SEO-friendly URLs
         * Responsive design
@@ -30,6 +34,7 @@
         'security/ir.model.access.csv',
 
         # Data
+        'data/library_website_category_data.xml',
         'data/website_menu.xml',
 
         # Views
@@ -37,16 +42,20 @@
         'views/library_book_views.xml',
         'views/library_media_views.xml',
         'views/templates.xml',
+        'views/media_templates.xml',
         'views/portal_templates.xml',
         'views/navbar_templates.xml',
+        'views/custom_mega_menu.xml',
     ],
     'assets': {
         'web.assets_frontend': [
             # External libraries (CDN in template)
             'entro_library_website/static/src/scss/library_website.scss',
             'entro_library_website/static/src/scss/book_detail_gallery.scss',
+            'entro_library_website/static/src/scss/library_media.scss',
             'entro_library_website/static/src/js/library_website.js',
             'entro_library_website/static/src/js/book_detail_gallery.js',
+            'entro_library_website/static/src/js/library_media.js',
         ],
     },
     'installable': True,

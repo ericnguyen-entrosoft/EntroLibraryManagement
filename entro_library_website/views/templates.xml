@@ -448,7 +448,7 @@
                         <div class="col-12">
                             <div class="block-content-product-detail">
                                 <h2 class="block-content-product-detail-title h4 mb-4">
-                                    Phương tiện liên quan (<t t-esc="len(book.media_ids)"/>)
+                                    Liên quan (<t t-esc="len(book.media_ids)"/>)
                                 </h2>
                                 <div class="row">
                                     <t t-foreach="book.media_ids" t-as="media">

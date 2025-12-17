@@ -1,15 +1,48 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <!-- Inherit Library Media Form View to add access control -->
+    <!-- Inherit Library Media Form View to add website fields -->
     <record id="view_library_media_form_website" model="ir.ui.view">
         <field name="name">library.media.form.website</field>
         <field name="model">library.media</field>
         <field name="inherit_id" ref="entro_library.view_library_media_form"/>
         <field name="arch" type="xml">
-            <!-- Add access control field after access_level -->
+            <!-- Add website published toggle to header -->
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="action_publish" type="object"
+                        class="oe_stat_button" icon="fa-globe" string="Đăng website" invisible="website_published">
+                </button>
+                <button name="action_unpublish" type="object"
+                        class="oe_stat_button" icon="fa-globe" string="Gỡ website" invisible="not website_published">
+                </button>
+            </xpath>
+
+            <!-- Add website category field in general info -->
+            <xpath expr="//field[@name='category_id']" position="after">
+                <field name="website_category_id"/>
+            </xpath>
+
+            <!-- Add website fields in access control section -->
             <xpath expr="//field[@name='access_level']" position="after">
                 <field name="allowed_borrower_type_ids" widget="many2many_tags"
                        placeholder="Để trống để cho phép tất cả loại độc giả"/>
+            </xpath>
+
+            <!-- Add new page for website settings -->
+            <xpath expr="//notebook" position="inside">
+                <page string="Website" name="website">
+                    <group>
+                        <group string="Cài đặt">
+                            <field name="website_published"/>
+                            <field name="website_sequence"/>
+                            <field name="website_url" widget="url" readonly="1"/>
+                        </group>
+                        <group string="SEO">
+                            <field name="website_meta_title"/>
+                            <field name="website_meta_description"/>
+                            <field name="website_meta_keywords"/>
+                        </group>
+                    </group>
+                </page>
             </xpath>
         </field>
     </record>

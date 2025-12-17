@@ -1,0 +1,566 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ========== MEDIA LISTING PAGE ========== -->
+
+    <template id="library_media_list" name="Phương Tiện - Danh Sách">
+        <t t-call="website.layout">
+            <div id="wrap" class="js_library_media">
+                <div class="container mt-4 library_media_container">
+
+                    <!-- Header -->
+                    <div class="library_media_header text-center mb-4">
+                        <h1 class="display-3">Thư Viện Phương Tiện</h1>
+                        <p class="lead">Khám phá video, tài liệu, hình ảnh và âm thanh</p>
+                    </div>
+
+                    <!-- Search box (centered, below header) -->
+                    <div class="search_box mb-5">
+                        <div class="row justify-content-center">
+                            <div class="col-lg-6 col-md-8">
+                                <form method="get" class="input-group input-group-lg"
+                                    t-att-action="keep()">
+                                    <input type="text" name="search"
+                                        class="form-control"
+                                        placeholder="Tìm kiếm..."
+                                        t-att-value="search" />
+                                    <button class="btn btn-primary" type="submit">
+                                        <i class="fa fa-search me-2" />
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <!-- Sidebar -->
+                        <div class="col-lg-3 mb-4">
+                            <!-- Media Type Filter -->
+                            <div class="media_type_filter mb-4">
+                                <h5>Loại</h5>
+                                <ul class="list-unstyled">
+                                    <li>
+                                        <a href="/media"
+                                            t-attf-class="#{not media_type and 'fw-bold text-primary'}">
+                                            <i class="fa fa-th me-2" /> Tất cả </a>
+                                    </li>
+                                    <li>
+                                        <a t-attf-href="#{keep(media_type='video')}"
+                                            t-attf-class="#{media_type == 'video' and 'fw-bold text-primary'}">
+                                            <i class="fa fa-video-camera me-2" /> Video </a>
+                                    </li>
+                                    <li>
+                                        <a t-attf-href="#{keep(media_type='audio')}"
+                                            t-attf-class="#{media_type == 'audio' and 'fw-bold text-primary'}">
+                                            <i class="fa fa-music me-2" /> Âm thanh </a>
+                                    </li>
+                                    <li>
+                                        <a t-attf-href="#{keep(media_type='image')}"
+                                            t-attf-class="#{media_type == 'image' and 'fw-bold text-primary'}">
+                                            <i class="fa fa-image me-2" /> Hình ảnh </a>
+                                    </li>
+                                    <li>
+                                        <a t-attf-href="#{keep(media_type='document')}"
+                                            t-attf-class="#{media_type == 'document' and 'fw-bold text-primary'}">
+                                            <i class="fa fa-file-pdf-o me-2" /> Tài liệu </a>
+                                    </li>
+                                </ul>
+                            </div>
+
+                            <!-- Website Categories Filter -->
+                            <div class="website_categories_filter mb-4" t-if="website_categories">
+                                <h5>Danh mục</h5>
+                                <ul class="list-unstyled">
+                                    <li>
+                                        <a href="/media"
+                                            t-attf-class="#{not category and 'fw-bold text-primary'}">
+                                            Tất cả
+                                        </a>
+                                    </li>
+                                    <t t-foreach="website_categories" t-as="web_cat">
+                                        <li>
+                                            <a t-attf-href="/media/danh-muc/#{web_cat.id}"
+                                                t-attf-class="#{category and category.id == web_cat.id and 'fw-bold text-primary'}">
+                                                <t t-esc="web_cat.name" />
+                                            </a>
+                                        </li>
+                                    </t>
+                                </ul>
+                            </div>
+
+                        </div>
+
+                        <!-- Main content -->
+                        <div class="col-lg-9">
+
+                            <!-- Info bar -->
+                            <div
+                                class="d-flex justify-content-between align-items-center mb-3 flex-wrap">
+                                <p class="text-muted mb-0"> Tìm thấy <strong t-esc="media_count" />
+                                    tài liệu </p>
+                                <!-- Sort -->
+                                <form method="get" class="d-flex align-items-center"
+                                    t-att-action="keep()">
+                                    <label class="me-2 mb-0">Sắp xếp:</label>
+                                    <select class="form-select form-select-sm w-auto" name="sortby"
+                                        onchange="this.form.submit()">
+                                        <option value="date_desc"
+                                            t-att-selected="'selected' if sortby == 'date_desc' else None">Mới
+                                            nhất</option>
+                                        <option value="date_asc"
+                                            t-att-selected="'selected' if sortby == 'date_asc' else None">Cũ
+                                            nhất</option>
+                                        <option value="name_asc"
+                                            t-att-selected="'selected' if sortby == 'name_asc' else None">Tên
+                                            A-Z</option>
+                                        <option value="name_desc"
+                                            t-att-selected="'selected' if sortby == 'name_desc' else None">Tên
+                                            Z-A</option>
+                                        <option value="views_desc"
+                                            t-att-selected="'selected' if sortby == 'views_desc' else None">Xem
+                                            nhiều nhất</option>
+                                        <option value="downloads_desc"
+                                            t-att-selected="'selected' if sortby == 'downloads_desc' else None">Tải
+                                            nhiều nhất</option>
+                                    </select>
+                                </form>
+                            </div>
+
+                            <!-- Media grid -->
+                            <div class="row media_grid" t-if="media_items">
+                                <t t-foreach="media_items" t-as="media">
+                                    <div class="col-md-4 col-sm-6 mb-4">
+                                        <t t-call="entro_library_website.library_media_card" />
+                                    </div>
+                                </t>
+                            </div>
+
+                            <!-- No results -->
+                            <div t-if="not media_items" class="alert alert-info text-center">
+                                <i class="fa fa-info-circle fa-2x mb-2 d-block" />
+                                <p class="mb-0">Không tìm thấy tài liệu nào phù hợp.</p>
+                            </div>
+
+                            <!-- Pagination -->
+                            <div t-if="pager" class="mt-4 mb-4">
+                                <t t-call="website.pager">
+                                    <t t-set="classname">justify-content-center</t>
+                                </t>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </t>
+    </template>
+
+
+    <!-- ========== MEDIA CARD COMPONENT ========== -->
+
+    <template id="library_media_card" name="Thẻ Phương Tiện">
+        <div class="card media_card shadow-sm h-100">
+            <a t-attf-href="/media/#{media.id}"
+                class="text-decoration-none text-dark d-flex flex-column h-100">
+                <div class="card-img-top media_thumbnail position-relative overflow-hidden"
+                    style="height: 200px;">
+                    <!-- Thumbnail -->
+                    <t t-if="media.thumbnail">
+                        <img t-att-src="'/web/image/library.media/%s/thumbnail' % media.id"
+                            t-att-alt="media.name"
+                            class="img-fluid w-100 h-100"
+                            style="object-fit: cover;" />
+                    </t>
+                    <t t-else="">
+                        <div
+                            class="bg-gradient d-flex align-items-center justify-content-center h-100"
+                            t-attf-style="background: linear-gradient(135deg, #{media.media_type == 'video' and '#667eea 0%, #764ba2 100%' or media.media_type == 'audio' and '#f093fb 0%, #f5576c 100%' or media.media_type == 'image' and '#4facfe 0%, #00f2fe 100%' or '#43e97b 0%, #38f9d7 100%'});">
+                            <t t-if="media.media_type == 'video'">
+                                <i class="fa fa-video-camera fa-4x text-white" />
+                            </t>
+                            <t t-elif="media.media_type == 'audio'">
+                                <i class="fa fa-music fa-4x text-white" />
+                            </t>
+                            <t t-elif="media.media_type == 'image'">
+                                <i class="fa fa-image fa-4x text-white" />
+                            </t>
+                            <t t-else="">
+                                <i class="fa fa-file-pdf-o fa-4x text-white" />
+                            </t>
+                        </div>
+                    </t>
+
+                    <!-- Media Type Badge -->
+                    <span class="badge position-absolute top-0 start-0 m-2"
+                        t-attf-class="bg-#{media.media_type == 'video' and 'primary' or media.media_type == 'audio' and 'danger' or media.media_type == 'image' and 'info' or 'success'}">
+                        <t t-if="media.media_type == 'video'">
+                            <i class="fa fa-video-camera me-1" /> Video </t>
+                        <t t-elif="media.media_type == 'audio'">
+                            <i class="fa fa-music me-1" /> Âm thanh </t>
+                        <t t-elif="media.media_type == 'image'">
+                            <i class="fa fa-image me-1" /> Hình ảnh </t>
+                        <t t-else="">
+                            <i class="fa fa-file-pdf-o me-1" /> Tài liệu </t>
+                    </span>
+
+                    <!-- Duration Badge (for video/audio) -->
+                    <t t-if="media.duration_display and media.media_type in ['video', 'audio']">
+                        <span class="badge bg-dark position-absolute bottom-0 end-0 m-2 opacity-75">
+                            <i class="fa fa-clock-o me-1" />
+                            <t t-esc="media.duration_display" />
+                        </span>
+                    </t>
+
+                    <!-- Access Level Badge -->
+                    <t t-if="media.access_level != 'public'">
+                        <span class="badge bg-warning position-absolute top-0 end-0 m-2">
+                            <i class="fa fa-lock me-1" />
+                            <t t-if="media.access_level == 'members'">Thành viên</t>
+                            <t t-elif="media.access_level == 'restricted'">Hạn chế</t>
+                        </span>
+                    </t>
+                </div>
+
+                <div class="card-body d-flex flex-column">
+                    <h5 class="card-title media_title text-truncate mb-2" t-att-title="media.name"
+                        t-esc="media.name" />
+
+                    <p class="card-text text-muted small mb-2 text-truncate" t-if="media.author">
+                        <i class="fa fa-user" />
+                        <t t-esc="media.author" />
+                    </p>
+
+                    <p class="card-text text-muted small mb-2 text-truncate"
+                        t-if="media.category_id">
+                        <i class="fa fa-tag" />
+                        <t t-esc="media.category_id.name" />
+                    </p>
+
+                    <!-- Stats -->
+                    <div class="mt-auto">
+                        <div
+                            class="d-flex justify-content-between align-items-center text-muted small">
+                            <span>
+                                <i class="fa fa-eye" />
+                                <t t-esc="media.view_count" />
+                            </span>
+                            <span t-if="media.is_downloadable">
+                                <i class="fa fa-download" />
+                                <t t-esc="media.download_count" />
+                            </span>
+                            <span t-if="media.storage_type == 'file' and media.file_size">
+                                <i class="fa fa-hdd-o" /> <t t-esc="'%.1f' % media.file_size" /> MB </span>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </template>
+
+
+    <!-- ========== MEDIA DETAIL PAGE ========== -->
+
+    <template id="library_media_detail" name="Chi Tiết Phương Tiện">
+        <t t-call="website.layout">
+            <div id="wrap" class="js_library_media_detail" t-att-data-media-id="media.id">
+                <div class="container mt-4 mb-5">
+
+                    <!-- Breadcrumb -->
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item">
+                                <a href="/media">Tài liệu số</a>
+                            </li>
+                            <li class="breadcrumb-item" t-if="media.website_category_id">
+                                <a t-attf-href="/media/danh-muc/#{media.website_category_id.id}">
+                                    <t t-esc="media.website_category_id.name" />
+                                </a>
+                            </li>
+                            <li class="breadcrumb-item active" aria-current="page">
+                                <t t-esc="media.name" />
+                            </li>
+                        </ol>
+                    </nav>
+
+                    <div class="row">
+                        <!-- Main Content -->
+                        <div class="col-lg-8">
+                            <!-- Media Title -->
+                            <h1 class="mb-3" t-esc="media.name" />
+
+                            <!-- Media Info Bar -->
+                            <div class="d-flex flex-wrap gap-3 mb-4 text-muted small">
+                                <span>
+                                    <i class="fa fa-user" />
+                                    <t t-esc="media.author or 'Không rõ'" />
+                                </span>
+                                <span>
+                                    <i class="fa fa-eye" /> <t t-esc="media.view_count" /> lượt xem </span>
+                                <span t-if="media.is_downloadable">
+                                    <i class="fa fa-download" /> <t t-esc="media.download_count" />
+                                    lượt tải </span>
+                                <span t-if="media.publication_date">
+                                    <i class="fa fa-calendar" />
+                                    <t t-esc="media.publication_date" />
+                                </span>
+                                <span
+                                    t-if="media.duration_display and media.media_type in ['video', 'audio']">
+                                    <i class="fa fa-clock-o" />
+                                    <t t-esc="media.duration_display" />
+                                </span>
+                            </div>
+
+                            <!-- Media Player/Viewer -->
+                            <div class="media_player_container mb-4">
+                                <!-- VIDEO PLAYER -->
+                                <t t-if="media.media_type == 'video'">
+                                    <t t-call="entro_library_website.media_video_player" />
+                                </t>
+
+                                <!-- AUDIO PLAYER -->
+                                <t t-elif="media.media_type == 'audio'">
+                                    <t t-call="entro_library_website.media_audio_player" />
+                                </t>
+
+                                <!-- IMAGE VIEWER -->
+                                <t t-elif="media.media_type == 'image'">
+                                    <t t-call="entro_library_website.media_image_viewer" />
+                                </t>
+
+                                <!-- PDF VIEWER -->
+                                <t t-elif="media.media_type == 'document'">
+                                    <t t-call="entro_library_website.media_pdf_viewer" />
+                                </t>
+                            </div>
+
+                            <!-- Action Buttons -->
+                            <div class="media_actions mb-4">
+                                <t t-if="media.is_downloadable and media.storage_type == 'file'">
+                                    <a t-attf-href="/media/#{media.id}/tai-xuong"
+                                        class="btn btn-primary">
+                                        <i class="fa fa-download me-2" /> Tải xuống </a>
+                                </t>
+                            </div>
+
+                            <!-- Description -->
+                            <div class="media_description mb-4" t-if="media.description">
+                                <h4>Mô tả</h4>
+                                <div t-field="media.description" class="oe_structure" />
+                            </div>
+
+                            <!-- Metadata -->
+                            <div class="media_metadata mb-4">
+                                <h4>Thông tin chi tiết</h4>
+                                <table class="table table-sm">
+                                    <tbody>
+                                        <tr t-if="media.category_id">
+                                            <th style="width: 30%;">Danh mục:</th>
+                                            <td>
+                                                <t t-esc="media.category_id.name" />
+                                            </td>
+                                        </tr>
+                                        <tr t-if="media.language_id">
+                                            <th>Ngôn ngữ:</th>
+                                            <td>
+                                                <t t-esc="media.language_id.name" />
+                                            </td>
+                                        </tr>
+                                        <tr t-if="media.keywords">
+                                            <th>Từ khóa:</th>
+                                            <td>
+                                                <t t-esc="media.keywords" />
+                                            </td>
+                                        </tr>
+                                        <tr t-if="media.storage_type == 'file' and media.file_size">
+                                            <th>Kích thước:</th>
+                                            <td><t t-esc="'%.2f' % media.file_size" /> MB</td>
+                                        </tr>
+                                        <tr t-if="media.storage_type == 'file' and media.mime_type">
+                                            <th>Định dạng:</th>
+                                            <td>
+                                                <t t-esc="media.mime_type" />
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                        </div>
+
+                        <!-- Sidebar -->
+                        <div class="col-lg-4">
+                            <!-- Related Media -->
+                            <div class="related_media" t-if="related_media">
+                                <h4 class="mb-3">Liên quan</h4>
+                                <div class="list-group">
+                                    <t t-foreach="related_media" t-as="rel_media">
+                                        <a t-attf-href="/media/#{rel_media.id}"
+                                            class="list-group-item list-group-item-action">
+                                            <div class="d-flex align-items-start">
+                                                <div class="me-2"
+                                                    style="width: 80px; height: 60px; flex-shrink: 0;">
+                                                    <t t-if="rel_media.thumbnail">
+                                                        <img
+                                                            t-att-src="'/web/image/library.media/%s/thumbnail' % rel_media.id"
+                                                            class="img-fluid rounded"
+                                                            style="width: 100%; height: 100%; object-fit: cover;" />
+                                                    </t>
+                                                    <t t-else="">
+                                                        <div
+                                                            class="bg-secondary rounded d-flex align-items-center justify-content-center h-100">
+                                                            <i class="fa fa-file text-white" />
+                                                        </div>
+                                                    </t>
+                                                </div>
+                                                <div class="flex-grow-1 min-w-0">
+                                                    <h6 class="mb-1 text-truncate"
+                                                        t-esc="rel_media.name" />
+                                                    <small class="text-muted">
+                                                        <i class="fa fa-eye" />
+                                                        <t t-esc="rel_media.view_count" />
+                                                    </small>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </t>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </t>
+    </template>
+
+
+    <!-- ========== VIDEO PLAYER ========== -->
+
+    <template id="media_video_player" name="Video Player">
+        <div class="video_player_wrapper">
+            <!-- YouTube Video -->
+            <t t-if="youtube_id">
+                <div class="ratio ratio-16x9">
+                    <iframe t-attf-src="https://www.youtube.com/embed/#{youtube_id}"
+                        frameborder="0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowfullscreen="" />
+                </div>
+            </t>
+
+            <!-- Vimeo Video -->
+            <t t-elif="vimeo_id">
+                <div class="ratio ratio-16x9">
+                    <iframe t-attf-src="https://player.vimeo.com/video/#{vimeo_id}"
+                        frameborder="0"
+                        allow="autoplay; fullscreen; picture-in-picture"
+                        allowfullscreen="" />
+                </div>
+            </t>
+
+            <!-- HTML5 Video (uploaded file) -->
+            <t t-elif="media.storage_type == 'file' and media.file">
+                <div class="ratio ratio-16x9">
+                    <video controls="" class="w-100">
+                        <source t-attf-src="/web/content/library.media/#{media.id}/file"
+                            t-att-type="media.mime_type or 'video/mp4'" /> Trình duyệt của bạn không
+                        hỗ trợ phát video. </video>
+                </div>
+            </t>
+
+            <!-- External URL (direct video link) -->
+            <t t-elif="media.storage_type == 'url' and media.file_url">
+                <div class="ratio ratio-16x9">
+                    <video controls="" class="w-100">
+                        <source t-att-src="media.file_url"
+                            t-att-type="media.mime_type or 'video/mp4'" /> Trình duyệt của bạn không
+                        hỗ trợ phát video. </video>
+                </div>
+            </t>
+        </div>
+    </template>
+
+
+    <!-- ========== AUDIO PLAYER ========== -->
+
+    <template id="media_audio_player" name="Audio Player">
+        <div class="audio_player_wrapper p-4 bg-light rounded">
+            <!-- HTML5 Audio (uploaded file) -->
+            <t t-if="media.storage_type == 'file' and media.file">
+                <audio controls="" class="w-100">
+                    <source t-attf-src="/web/content/library.media/#{media.id}/file"
+                        t-att-type="media.mime_type or 'audio/mpeg'" /> Trình duyệt của bạn không hỗ
+                    trợ phát âm thanh. </audio>
+            </t>
+
+            <!-- External URL (direct audio link) -->
+            <t t-elif="media.storage_type == 'url' and media.file_url">
+                <audio controls="" class="w-100">
+                    <source t-att-src="media.file_url"
+                        t-att-type="media.mime_type or 'audio/mpeg'" /> Trình duyệt của bạn không hỗ
+                    trợ phát âm thanh. </audio>
+            </t>
+
+            <!-- Display thumbnail if available -->
+            <div class="text-center mt-3" t-if="media.thumbnail">
+                <img t-att-src="'/web/image/library.media/%s/thumbnail' % media.id"
+                    class="img-fluid rounded"
+                    style="max-width: 300px;" />
+            </div>
+        </div>
+    </template>
+
+
+    <!-- ========== IMAGE VIEWER ========== -->
+
+    <template id="media_image_viewer" name="Image Viewer">
+        <div class="image_viewer_wrapper">
+            <t t-if="media.storage_type == 'file' and media.file">
+                <div id="lightgallery" class="text-center">
+                    <a t-attf-href="/web/content/library.media/#{media.id}/file"
+                        data-lg-size="1920-1080">
+                        <img t-attf-src="/web/content/library.media/#{media.id}/file"
+                            t-att-alt="media.name"
+                            class="img-fluid rounded shadow-sm"
+                            style="max-height: 600px; cursor: pointer;" />
+                    </a>
+                </div>
+            </t>
+
+            <t t-elif="media.storage_type == 'url' and media.file_url">
+                <div id="lightgallery" class="text-center">
+                    <a t-att-href="media.file_url" data-lg-size="1920-1080">
+                        <img t-att-src="media.file_url"
+                            t-att-alt="media.name"
+                            class="img-fluid rounded shadow-sm"
+                            style="max-height: 600px; cursor: pointer;" />
+                    </a>
+                </div>
+            </t>
+        </div>
+    </template>
+
+
+    <!-- ========== PDF VIEWER ========== -->
+
+    <template id="media_pdf_viewer" name="PDF Viewer">
+        <div class="pdf_viewer_wrapper">
+            <t t-if="media.storage_type == 'file' and media.file">
+                <div class="ratio" style="padding-bottom: 100%;">
+                    <iframe t-attf-src="/web/content/library.media/#{media.id}/file"
+                        type="application/pdf"
+                        class="border rounded" />
+                </div>
+            </t>
+
+            <t t-elif="media.storage_type == 'url' and media.file_url">
+                <div class="ratio" style="padding-bottom: 100%;">
+                    <iframe t-att-src="media.file_url"
+                        type="application/pdf"
+                        class="border rounded" />
+                </div>
+            </t>
+        </div>
+    </template>
+
+</odoo>

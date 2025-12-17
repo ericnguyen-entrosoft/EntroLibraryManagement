@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Borrower Types for Library -->
+
+    <record id="borrower_type_chu_ni" model="library.borrower.type">
+        <field name="name">Chư Ni</field>
+        <field name="code">chu_ni</field>
+        <field name="sequence">10</field>
+        <field name="description">Chư Ni - Ni sư</field>
+    </record>
+
+    <record id="borrower_type_thien_sinh" model="library.borrower.type">
+        <field name="name">Thiền sinh</field>
+        <field name="code">thien_sinh</field>
+        <field name="sequence">20</field>
+        <field name="description">Thiền sinh - Người tham gia thiền tu</field>
+    </record>
+
+    <record id="borrower_type_phat_tu" model="library.borrower.type">
+        <field name="name">Phật tử</field>
+        <field name="code">phat_tu</field>
+        <field name="sequence">30</field>
+        <field name="description">Phật tử - Tín đồ Phật giáo</field>
+    </record>
+
+</odoo>

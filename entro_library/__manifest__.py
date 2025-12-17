@@ -27,6 +27,7 @@
     'data': [
         # Data
         'data/library_data.xml',
+        'data/library_borrower_type_data.xml',
         'data/library_paper_format.xml',
 
         # Security

@@ -1,0 +1,220 @@
+// Library Media Styles
+
+// ========== MEDIA LISTING PAGE ==========
+
+.library_media_container {
+    .library_media_header {
+        margin-top: 2rem;
+        margin-bottom: 2rem;
+    }
+
+    .media_type_filter,
+    .website_categories_filter {
+        h5 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: #333;
+        }
+
+        ul {
+            li {
+                margin-bottom: 0.5rem;
+
+                a {
+                    color: #666;
+                    text-decoration: none;
+                    transition: color 0.2s;
+
+                    &:hover {
+                        color: #007bff;
+                    }
+
+                    &.fw-bold {
+                        color: #007bff;
+                    }
+
+                    i {
+                        width: 20px;
+                    }
+                }
+            }
+        }
+    }
+}
+
+// ========== MEDIA CARD ==========
+
+.media_card {
+    transition: transform 0.2s, box-shadow 0.2s;
+    border: none;
+    height: 100%;
+
+    &:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15) !important;
+    }
+
+    .media_thumbnail {
+        position: relative;
+        overflow: hidden;
+        background: #f8f9fa;
+
+        img {
+            transition: transform 0.3s;
+        }
+
+        .badge {
+            font-size: 0.7rem;
+            font-weight: 500;
+        }
+    }
+
+    &:hover .media_thumbnail img {
+        transform: scale(1.05);
+    }
+
+    .card-body {
+        padding: 1rem;
+
+        .media_title {
+            font-size: 1rem;
+            font-weight: 600;
+            line-height: 1.4;
+            color: #333;
+        }
+    }
+}
+
+// ========== MEDIA DETAIL PAGE ==========
+
+.js_library_media_detail {
+    .media_player_container {
+        background: #000;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+
+        video,
+        audio,
+        iframe {
+            border-radius: 8px;
+        }
+    }
+
+    .video_player_wrapper,
+    .audio_player_wrapper {
+        .ratio {
+            background: #000;
+        }
+    }
+
+    .audio_player_wrapper {
+        audio {
+            &::-webkit-media-controls-panel {
+                background-color: #f8f9fa;
+            }
+        }
+    }
+
+    .image_viewer_wrapper {
+        img {
+            transition: transform 0.2s;
+
+            &:hover {
+                transform: scale(1.02);
+            }
+        }
+    }
+
+    .pdf_viewer_wrapper {
+        .ratio {
+            min-height: 800px;
+
+            iframe {
+                background: #fff;
+            }
+        }
+    }
+
+    .media_actions {
+        .btn {
+            padding: 0.75rem 1.5rem;
+            font-weight: 500;
+        }
+    }
+
+    .media_description {
+        h4 {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: #333;
+        }
+    }
+
+    .media_metadata {
+        h4 {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: #333;
+        }
+
+        table {
+            th {
+                font-weight: 600;
+                color: #555;
+            }
+
+            td {
+                color: #666;
+            }
+        }
+    }
+
+    .related_media {
+        h4 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .list-group-item {
+            border: 1px solid #e0e0e0;
+            padding: 0.75rem;
+            transition: background-color 0.2s, border-color 0.2s;
+
+            &:hover {
+                background-color: #f8f9fa;
+                border-color: #007bff;
+            }
+
+            h6 {
+                font-size: 0.9rem;
+                font-weight: 600;
+                color: #333;
+            }
+        }
+    }
+}
+
+// ========== RESPONSIVE ==========
+
+@media (max-width: 768px) {
+    .library_media_container {
+        .library_media_header {
+            h1 {
+                font-size: 2rem;
+            }
+        }
+    }
+
+    .js_library_media_detail {
+        .pdf_viewer_wrapper {
+            .ratio {
+                min-height: 500px;
+            }
+        }
+    }
+}
