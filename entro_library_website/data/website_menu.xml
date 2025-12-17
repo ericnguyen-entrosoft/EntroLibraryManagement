@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
+    <!-- Delete old menu records first to avoid conflicts -->
+    <delete model="website.menu" search="[('name', '=', 'Kho tài nguyên')]"/>
+    <delete model="website.menu" search="[('name', '=', 'Sách')]"/>
+    <delete model="website.menu" search="[('name', '=', 'Tài liệu số')]"/>
+    <delete model="website.menu" search="[('name', '=', 'Đa phương tiện')]"/>
+
     <!-- ========================================== -->
     <!-- MAIN MENU: Kho tài nguyên with Mega Menu -->
     <!-- ========================================== -->
