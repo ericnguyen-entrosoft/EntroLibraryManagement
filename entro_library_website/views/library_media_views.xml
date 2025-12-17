@@ -7,14 +7,14 @@
         <field name="inherit_id" ref="entro_library.view_library_media_form"/>
         <field name="arch" type="xml">
             <!-- Add website published toggle to header -->
-            <!-- <xpath expr="//div[@name='button_box']" position="inside">
+            <xpath expr="//div[@name='button_box']" position="inside">
                 <button name="action_publish" type="object"
                         class="oe_stat_button" icon="fa-globe" string="Đăng website" invisible="website_published">
                 </button>
                 <button name="action_unpublish" type="object"
                         class="oe_stat_button" icon="fa-globe" string="Gỡ website" invisible="not website_published">
                 </button>
-            </xpath> -->
+            </xpath>
 
             <!-- Add website category field in general info -->
             <xpath expr="//field[@name='category_id']" position="after">
