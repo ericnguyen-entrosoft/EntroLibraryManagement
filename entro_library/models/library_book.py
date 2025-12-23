@@ -3,51 +3,7 @@ from odoo import models, fields, api, exceptions
 from datetime import timedelta
 import re
 import unicodedata
-
-def generate_cutter_from_title(title):
-    """
-    Tạo mã Cutter từ tiêu đề sách
-    Tự động bỏ mạo từ ở đầu
-    """
-    # Danh sách mạo từ cần bỏ qua (tiếng Việt và tiếng Anh)
-    articles = [
-        'the', 'a', 'an',           # Tiếng Anh
-        'các', 'những', 'mọi',      # Tiếng Việt
-        'một', 'hai', 'ba',         # Số đếm
-        'cuốn', 'quyển', 'tập'      # Từ đếm sách
-    ]
-    
-    # Chuẩn hóa tiêu đề
-    title = title.strip().lower()
-    words = title.split()
-    
-    # Bỏ mạo từ ở đầu
-    while words and words[0] in articles:
-        words.pop(0)
-    
-    if not words:
-        return ""
-    
-    # Lấy từ đầu tiên sau khi bỏ mạo từ
-    main_word = words[0]
-    
-    # Tạo mã Cutter
-    first_letter = main_word[0].upper()
-    
-    if len(main_word) > 1:
-        second_char = main_word[1] if len(main_word) > 1 else 'a'
-        third_char = main_word[2] if len(main_word) > 2 else 'a'
-        
-        num2 = ord(second_char) - ord('a') if second_char.isalpha() else 0
-        num3 = ord(third_char) - ord('a') if third_char.isalpha() else 0
-        
-        cutter_number = (num2 * 38) + (num3 * 1.5)
-        cutter_number = int(cutter_number) % 1000
-        
-        return f"{first_letter}{cutter_number:03d}"
-    else:
-        return f"{first_letter}000"
-
+from ..utils.cutter_generator import CutterGenerator
 class LibraryBook(models.Model):
     _name = 'library.book'
     _description = 'Quản lý sách'
@@ -356,8 +312,8 @@ class LibraryBook(models.Model):
             if not record.name:
                 record.cutter_number = ''
                 continue
-
-            record.cutter_number = generate_cutter_from_title(record.name)
+            generator = CutterGenerator()
+            record.cutter_number = generator.generate_cutter_code(record.name)
 
     @api.depends('author_ids.name')
     def _compute_author_names(self):
