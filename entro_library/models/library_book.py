@@ -4,6 +4,49 @@ from datetime import timedelta
 import re
 import unicodedata
 
+def generate_cutter_from_title(title):
+    """
+    Tạo mã Cutter từ tiêu đề sách
+    Tự động bỏ mạo từ ở đầu
+    """
+    # Danh sách mạo từ cần bỏ qua (tiếng Việt và tiếng Anh)
+    articles = [
+        'the', 'a', 'an',           # Tiếng Anh
+        'các', 'những', 'mọi',      # Tiếng Việt
+        'một', 'hai', 'ba',         # Số đếm
+        'cuốn', 'quyển', 'tập'      # Từ đếm sách
+    ]
+    
+    # Chuẩn hóa tiêu đề
+    title = title.strip().lower()
+    words = title.split()
+    
+    # Bỏ mạo từ ở đầu
+    while words and words[0] in articles:
+        words.pop(0)
+    
+    if not words:
+        return ""
+    
+    # Lấy từ đầu tiên sau khi bỏ mạo từ
+    main_word = words[0]
+    
+    # Tạo mã Cutter
+    first_letter = main_word[0].upper()
+    
+    if len(main_word) > 1:
+        second_char = main_word[1] if len(main_word) > 1 else 'a'
+        third_char = main_word[2] if len(main_word) > 2 else 'a'
+        
+        num2 = ord(second_char) - ord('a') if second_char.isalpha() else 0
+        num3 = ord(third_char) - ord('a') if third_char.isalpha() else 0
+        
+        cutter_number = (num2 * 38) + (num3 * 1.5)
+        cutter_number = int(cutter_number) % 1000
+        
+        return f"{first_letter}{cutter_number:03d}"
+    else:
+        return f"{first_letter}000"
 
 class LibraryBook(models.Model):
     _name = 'library.book'
@@ -71,7 +114,7 @@ class LibraryBook(models.Model):
     cutter_number = fields.Char(
         string='Mã Cutter',
         compute='_compute_cutter_number',
-        store=False,
+        store=True,
         help='Mã Cutter được tính tự động từ tên tác giả'
     )
     category_id = fields.Many2one(
@@ -307,72 +350,14 @@ class LibraryBook(models.Model):
         normalized = self._remove_accents(first_word).lower()
         return normalized
 
-    @api.depends('name', 'language_id')
+    @api.depends('name')
     def _compute_cutter_number(self):
         for record in self:
             if not record.name:
                 record.cutter_number = ''
                 continue
 
-            book_name = record.name.strip()
-            words = book_name.split()
-
-            if not words:
-                record.cutter_number = ''
-                continue
-
-            # Bước 1: Lấy chữ cái đầu của từ đầu tiên (viết hoa, không dấu)
-            first_word = words[0]
-            first_letter = self._remove_accents(first_word[0]).upper()
-
-            # Bước 2: Lấy vần đầu từ từ đầu tiên
-            # Ví dụ: "Rộng" -> remove accents -> "rong" -> remove first consonant(s) -> "ong"
-            # But we need the full syllable with accent for mapping lookup
-            # So we keep the original first word and extract vần (everything after first consonant cluster)
-            first_word_normalized = self._remove_accents(first_word).lower()
-
-            # Extract vần (rhyme) by removing initial consonant cluster
-            # For "rộng" -> normalized "rong" -> extract "ong"
-            # But we need the accented version for mapping
-            # So we find where the vần starts in normalized, then take from original
-            consonant_match = re.match(
-                r'^[bcdfghjklmnpqrstvwxyz]+', first_word_normalized)
-            consonant_len = len(consonant_match.group(0)
-                                ) if consonant_match else 0
-
-            # Get the vần (with accents) from original word
-            van = first_word[consonant_len:].lower() if consonant_len < len(
-                first_word) else first_word.lower()
-
-            # Tìm mã vần từ character.mapping
-            van_code = ''
-            if van and record.language_id:
-                # Search in character.mapping with the accented vần
-                mapping = self.env['character.mapping'].search([
-                    ('van', '=', van),
-                    ('language_id', '=', record.language_id.id)
-                ], limit=1)
-
-                if mapping:
-                    van_code = mapping.ma_so
-
-            # Bước 3: Lấy chữ cái đầu của từ thứ 2 (viết hoa, không dấu)
-            second_letter = ''
-            if len(words) > 1:
-                second_word = words[1]
-                if second_word:
-                    second_letter = self._remove_accents(second_word[0]).upper()
-
-            # Tạo mã Cutter: Chữ cái đầu + mã vần + chữ cái đầu từ 2
-            # Ví dụ: "Rộng mở cửa trái tim" -> R + 100 + M = R100M
-            # Tất cả chữ cái đều không dấu
-            cutter = first_letter
-            if van_code:
-                cutter += van_code
-            if second_letter:
-                cutter += second_letter
-
-            record.cutter_number = cutter
+            record.cutter_number = generate_cutter_from_title(record.name)
 
     @api.depends('author_ids.name')
     def _compute_author_names(self):
