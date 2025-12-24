@@ -4,7 +4,17 @@ from odoo import http, _, exceptions
 from odoo.http import request
 from odoo.addons.website.controllers.main import QueryURL
 from werkzeug.exceptions import NotFound
+from odoo.addons.portal.controllers.web import Home
 
+class Website(Home):
+
+    def _login_redirect(self, uid, redirect=None):
+        if not redirect and request.params.get('login_success'):
+            if request.env['res.users'].browse(uid)._is_internal():
+                redirect = '/odoo?' + request.httprequest.query_string.decode()
+            else:
+                redirect = '/'
+        return super()._login_redirect(uid, redirect=redirect)
 
 class LibraryWebsite(http.Controller):
 
