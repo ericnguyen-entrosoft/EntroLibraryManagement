@@ -16,18 +16,12 @@ publicWidget.registry.HeroSlider = publicWidget.Widget.extend({
     },
 
     _initSlider() {
-        console.log('Banner Carousel: Initializing...');
-        console.log('Banner Carousel element:', this.el);
-
         const carouselEl = this.el;
         const slideElements = carouselEl.querySelectorAll('.carousel-item');
         const indicatorElements = carouselEl.querySelectorAll('.carousel-indicators li');
 
         let currentSlide = 0;
         let slideInterval;
-
-        console.log('Banner Carousel: Found ' + slideElements.length + ' slides');
-        console.log('Banner Carousel: Found ' + indicatorElements.length + ' indicators');
 
         if (slideElements.length > 1) {
             const showSlide = (index) => {
@@ -54,9 +48,8 @@ publicWidget.registry.HeroSlider = publicWidget.Widget.extend({
             };
 
             const startSlideshow = () => {
-                console.log('Starting carousel auto-advance');
                 stopSlideshow();
-                slideInterval = setInterval(nextSlide, 5000);
+                slideInterval = setInterval(nextSlide, 3000);
             };
 
             const stopSlideshow = () => {
