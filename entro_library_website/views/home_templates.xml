@@ -542,6 +542,7 @@
                         margin: 0 auto;
                         overflow: hidden;
                         position: relative;
+                        padding-bottom:20px
                     }
 
                     .popular-items-carousel {
