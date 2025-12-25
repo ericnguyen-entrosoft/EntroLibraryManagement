@@ -1146,7 +1146,7 @@
                             <p class="tagline">THIỀN VIỆN PHÁP SƠN</p>
                             <h1>THƯ VIỆN PHÁP ĐĂNG</h1>
                             <p class="hero-subtitle">
-                                Khám phá kho tàng tri thức với hơn <t t-esc="total_books"/> đầu sách, tài liệu số chất lượng cao và dịch vụ thư viện hiện đại.
+                                Khám phá kho tàng tri thức với hơn <t t-esc="total_books"/> đầu sách, tài liệu số chất lượng cao và không gian trao đổi, tu học.
                             </p>
                             <div class="hero-services">
                                 <div class="hero-service-item">Trao đổi nhóm</div>
