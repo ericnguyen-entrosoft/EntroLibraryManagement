@@ -27,6 +27,7 @@
         'entro_library',
         'website',
         'portal',
+        'website_blog',
     ],
     'data': [
         # Security
@@ -39,8 +40,10 @@
 
         # Views
         'views/library_website_category_views.xml',
+        'views/library_website_slider_views.xml',
         'views/library_book_views.xml',
         'views/library_media_views.xml',
+        'views/home_templates.xml',
         'views/templates.xml',
         'views/media_templates.xml',
         'views/portal_templates.xml',
@@ -56,6 +59,7 @@
             'entro_library_website/static/src/js/library_website.js',
             'entro_library_website/static/src/js/book_detail_gallery.js',
             'entro_library_website/static/src/js/library_media.js',
+            'entro_library_website/static/src/js/hero_slider.js',
         ],
     },
     'installable': True,

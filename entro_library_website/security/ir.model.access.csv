@@ -23,3 +23,7 @@ access_library_media_portal,library.media.portal,entro_library.model_library_med
 access_library_media_public,library.media.public,entro_library.model_library_media,base.group_public,1,0,0,0
 access_library_book_image_portal,library.book.image.portal,entro_library.model_library_book_image,base.group_portal,1,0,0,0
 access_library_book_image_public,library.book.image.public,entro_library.model_library_book_image,base.group_public,1,0,0,0
+access_library_website_slider_user,library.website.slider.user,model_library_website_slider,base.group_user,1,0,0,0
+access_library_website_slider_manager,library.website.slider.manager,model_library_website_slider,entro_library.group_library_manager,1,1,1,1
+access_library_website_slider_portal,library.website.slider.portal,model_library_website_slider,base.group_portal,1,0,0,0
+access_library_website_slider_public,library.website.slider.public,model_library_website_slider,base.group_public,1,0,0,0

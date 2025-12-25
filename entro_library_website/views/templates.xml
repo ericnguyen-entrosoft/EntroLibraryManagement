@@ -4,6 +4,11 @@
     <!-- Include external libraries for image gallery in layout head -->
     <template id="library_external_assets" name="Library External Assets" inherit_id="website.layout">
         <xpath expr="//head" position="inside">
+            <!-- Google Fonts -->
+            <link rel="preconnect" href="https://fonts.googleapis.com"/>
+            <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin=""/>
+            <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&amp;family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
+
             <!-- Swiper CSS -->
             <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@8/swiper-bundle.min.css"/>
             <!-- lightGallery CSS -->
@@ -475,6 +480,147 @@
                                     <div class="col-lg-2 col-md-3 col-sm-4 col-6 mb-4" style="margin-left:15px">
                                         <t t-call="entro_library_website.library_book_card"/>
                                     </div>
+                                </t>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <!-- ========== UNIFIED CATALOG PAGE (BOOKS + MEDIA) ========== -->
+
+    <template id="unified_catalog" name="Kho Tài Nguyên - Sách &amp; Phương Tiện">
+        <t t-call="website.layout">
+            <div id="wrap" class="js_unified_catalog">
+                <div class="container mt-4 unified_catalog_container">
+
+                    <!-- Header -->
+                    <div class="catalog_header text-center mb-4">
+                        <h1 class="display-3">Kho Tài Nguyên</h1>
+                        <p class="lead">Khám phá sách và phương tiện của chúng tôi</p>
+                    </div>
+
+                    <!-- Search box (centered, below header) -->
+                    <div class="search_box mb-5">
+                        <div class="row justify-content-center">
+                            <div class="col-lg-6 col-md-8">
+                                <form method="get" class="input-group input-group-lg" t-att-action="keep()">
+                                    <input type="text" name="search"
+                                           class="form-control"
+                                           placeholder="Tìm kiếm sách, phương tiện..."
+                                           t-att-value="search"/>
+                                    <button class="btn btn-primary" type="submit">
+                                        <i class="fa fa-search me-2"/>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <!-- Sidebar -->
+                        <div class="col-lg-3 mb-4">
+                            <!-- Item Type Filter -->
+                            <div class="item_type_filter mb-4">
+                                <h5>Loại tài nguyên</h5>
+                                <ul class="list-unstyled">
+                                    <li>
+                                        <a t-attf-href="#{keep(item_type=False)}"
+                                           t-attf-class="#{not item_type and 'fw-bold text-primary'}">
+                                            <i class="fa fa-th me-2"/> Tất cả (<t t-esc="total_count"/>)
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a t-attf-href="#{keep(item_type='book')}"
+                                           t-attf-class="#{item_type == 'book' and 'fw-bold text-primary'}">
+                                            <i class="fa fa-book me-2"/> Sách (<t t-esc="books_count"/>)
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a t-attf-href="#{keep(item_type='media')}"
+                                           t-attf-class="#{item_type == 'media' and 'fw-bold text-primary'}">
+                                            <i class="fa fa-video-camera me-2"/> Phương tiện (<t t-esc="media_count"/>)
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+
+                            <!-- Website Categories Filter -->
+                            <div class="website_categories_filter mb-4" t-if="website_categories">
+                                <h5>Danh mục</h5>
+                                <ul class="list-unstyled">
+                                    <li>
+                                        <a href="/kho-tai-nguyen"
+                                           t-attf-class="#{not category and 'fw-bold text-primary'}">
+                                            Tất cả
+                                        </a>
+                                    </li>
+                                    <t t-foreach="website_categories" t-as="web_cat">
+                                        <li>
+                                            <a t-attf-href="/kho-tai-nguyen/danh-muc/#{web_cat.id}"
+                                               t-attf-class="#{category and category.id == web_cat.id and 'fw-bold text-primary'}">
+                                                <t t-esc="web_cat.name"/>
+                                            </a>
+                                        </li>
+                                    </t>
+                                </ul>
+                            </div>
+
+                        </div>
+
+                        <!-- Main content -->
+                        <div class="col-lg-9">
+
+                            <!-- Info bar -->
+                            <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap">
+                                <p class="text-muted mb-0">
+                                    Tìm thấy <strong t-esc="total_count"/> tài nguyên
+                                    <span t-if="item_type == 'book'"> (Sách)</span>
+                                    <span t-if="item_type == 'media'"> (Phương tiện)</span>
+                                </p>
+                                <!-- Sort -->
+                                <form method="get" class="d-flex align-items-center" t-att-action="keep()">
+                                    <label class="me-2 mb-0">Sắp xếp:</label>
+                                    <select class="form-select form-select-sm w-auto" name="sortby" onchange="this.form.submit()">
+                                        <option value="date_desc" t-att-selected="'selected' if sortby == 'date_desc' else None">Mới nhất</option>
+                                        <option value="date_asc" t-att-selected="'selected' if sortby == 'date_asc' else None">Cũ nhất</option>
+                                        <option value="name_asc" t-att-selected="'selected' if sortby == 'name_asc' else None">Tên A-Z</option>
+                                        <option value="name_desc" t-att-selected="'selected' if sortby == 'name_desc' else None">Tên Z-A</option>
+                                    </select>
+                                </form>
+                            </div>
+
+                            <!-- Mixed grid (books and media) -->
+                            <div class="row catalog_grid" t-if="all_items">
+                                <t t-foreach="all_items" t-as="item_data">
+                                    <div class="col-md-4 col-sm-6 mb-4">
+                                        <!-- Book Card -->
+                                        <t t-if="item_data['type'] == 'book'">
+                                            <t t-set="book" t-value="item_data['item']"/>
+                                            <t t-call="entro_library_website.library_book_card"/>
+                                        </t>
+                                        <!-- Media Card -->
+                                        <t t-if="item_data['type'] == 'media'">
+                                            <t t-set="media" t-value="item_data['item']"/>
+                                            <t t-call="entro_library_website.library_media_card"/>
+                                        </t>
+                                    </div>
+                                </t>
+                            </div>
+
+                            <!-- No results -->
+                            <div t-if="not all_items" class="alert alert-info text-center">
+                                <i class="fa fa-info-circle fa-2x mb-2 d-block"/>
+                                <p class="mb-0">Không tìm thấy tài nguyên nào phù hợp.</p>
+                            </div>
+
+                            <!-- Pagination -->
+                            <div t-if="pager" class="mt-4 mb-4">
+                                <t t-call="website.pager">
+                                    <t t-set="classname">justify-content-center</t>
                                 </t>
                             </div>
                         </div>

@@ -1,5 +1,23 @@
 // Library Website Styles
 
+// Global font families
+body {
+    font-family: 'Inter', 'Noto Sans', Arial, sans-serif !important;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Be Vietnam Pro', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
+}
+
+code, pre, .monospace {
+    font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace !important;
+}
+
+// Footer background
+footer {
+    background-color: #f1ebe1 !important;
+}
+
 // Override Bootstrap button hover
 .btn:hover {
     background-color: white !important;

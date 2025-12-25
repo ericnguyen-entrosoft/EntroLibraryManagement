@@ -1,0 +1,1388 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="library_home" name="Library Home Page">
+        <t t-call="website.layout">
+            <t t-set="pageName" t-value="'library_home'"/>
+
+            <head>
+                <link rel="preconnect" href="https://fonts.googleapis.com"/>
+                <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin=""/>
+                <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&amp;family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
+
+                <style>
+                    :root {
+                        --primary-orange: #8c675a;
+                        --dark-navy: #6b4f45;
+                        --light-navy: #8c675a;
+                        --white: #FFFFFF;
+                        --light-gray: #f2e5d5;
+                        --text-gray: #8c675a;
+                        --text-dark: #4a3933;
+                    }
+
+                    * {
+                        margin: 0;
+                        padding: 0;
+                        box-sizing: border-box;
+                    }
+
+                    body {
+                        font-family: 'Inter', 'Noto Sans', Arial, sans-serif;
+                        color: var(--text-dark);
+                        line-height: 1.7;
+                        overflow-x: hidden;
+                    }
+
+                    h1, h2, h3, h4 {
+                        font-family: 'Be Vietnam Pro', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+                    }
+
+                    code, pre, .monospace {
+                        font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+                    }
+
+                    /* Hero Slider Section */
+                    .hero-slider {
+                        position: relative;
+                        background: var(--light-gray);
+                        padding: 4rem 2rem;
+                        overflow: hidden;
+                        min-height: 600px;
+                    }
+
+                    .carousel-inner {
+                        position: relative;
+                        width: 100%;
+                        min-height: 500px;
+                    }
+
+                    .hero-slide {
+                        position: absolute;
+                        top: 0;
+                        left: 0;
+                        width: 100%;
+                        min-height: 500px;
+                        opacity: 0;
+                        transition: opacity 0.6s ease-in-out;
+                        pointer-events: none;
+                        visibility: hidden;
+                    }
+
+                    .hero-slide.active {
+                        opacity: 1;
+                        pointer-events: auto;
+                        visibility: visible;
+                        position: relative;
+                    }
+
+                    .slide-background {
+                        position: absolute;
+                        top: 0;
+                        left: 0;
+                        width: 100%;
+                        height: 100%;
+                        display: none;
+                    }
+
+                    .slide-background img {
+                        width: 100%;
+                        height: 100%;
+                        object-fit: cover;
+                    }
+
+                    .slide-overlay {
+                        position: absolute;
+                        top: 0;
+                        left: 0;
+                        width: 100%;
+                        height: 100%;
+                        background: transparent;
+                    }
+
+                    .hero-content {
+                        position: relative;
+                        z-index: 2;
+                        max-width: 1400px;
+                        margin: 0 auto;
+                        display: grid;
+                        grid-template-columns: 1fr 1fr;
+                        gap: 4rem;
+                        align-items: center;
+                        color: var(--text-dark);
+                    }
+
+                    .hero-text {
+                        padding-right: 2rem;
+                    }
+
+                    .tagline {
+                        color: var(--text-gray);
+                        font-size: 1rem;
+                        margin-bottom: 1rem;
+                        font-weight: 500;
+                        text-transform: uppercase;
+                        letter-spacing: 0.1em;
+                    }
+
+                    .hero-slide h1 {
+                        font-size: 3.5rem;
+                        font-weight: 700;
+                        line-height: 1.2;
+                        margin-bottom: 1.5rem;
+                        color: var(--dark-navy);
+                    }
+
+                    .hero-slide h1 .highlight {
+                        color: var(--primary-orange);
+                    }
+
+                    .hero-subtitle {
+                        font-size: 1.1rem;
+                        color: var(--text-gray);
+                        margin-bottom: 2rem;
+                        line-height: 1.8;
+                    }
+
+                    .hero-btn {
+                        padding: 0.85rem 2rem;
+                        background: var(--primary-orange);
+                        color: var(--white);
+                        border: none;
+                        border-radius: 30px;
+                        font-weight: 700;
+                        font-size: 0.9rem;
+                        cursor: pointer;
+                        transition: all 0.3s;
+                        text-decoration: none;
+                        display: inline-block;
+                    }
+
+                    .hero-btn:hover {
+                        background: #E85A1F;
+                        transform: translateY(-2px);
+                        box-shadow: 0 8px 20px rgba(89, 18, 2, 0.3);
+                        color: var(--white);
+                    }
+
+                    .hero-services {
+                        display: grid;
+                        grid-template-columns: repeat(2, 1fr);
+                        gap: 1rem;
+                        margin-bottom: 2.5rem;
+                    }
+
+                    .hero-service-item {
+                        display: flex;
+                        align-items: center;
+                        gap: 0.75rem;
+                        font-size: 0.95rem;
+                        font-weight: 500;
+                    }
+
+                    .hero-service-item::before {
+                        content: '✓';
+                        width: 24px;
+                        height: 24px;
+                        background: var(--primary-orange);
+                        color: var(--white);
+                        border-radius: 50%;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        font-weight: 700;
+                        flex-shrink: 0;
+                    }
+
+                    .hero-visual {
+                        position: relative;
+                    }
+
+                    .hero-image-card {
+                        background: var(--white);
+                        padding: 1.5rem;
+                        border-radius: 20px;
+                        box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+                        position: relative;
+                    }
+
+                    .hero-image {
+                        width: 100%;
+                        height: 500px;
+                        border-radius: 15px;
+                        position: relative;
+                        overflow: hidden;
+                    }
+
+                    .hero-image img {
+                        width: 100%;
+                        height: 100%;
+                        object-fit: cover;
+                        border-radius: 15px;
+                    }
+
+                    .stats-boxes {
+                        position: absolute;
+                        right: -20px;
+                        top: 50%;
+                        transform: translateY(-50%);
+                        display: flex;
+                        flex-direction: column;
+                        gap: 0.75rem;
+                        max-height: 100%;
+                    }
+
+                    .stat-box {
+                        background: var(--primary-orange);
+                        color: var(--white);
+                        padding: 1.25rem 1.75rem;
+                        border-radius: 10px;
+                        box-shadow: 0 10px 30px rgba(89, 18, 2, 0.3);
+                        min-width: 180px;
+                        animation: slideInRight 1s ease-out forwards;
+                        opacity: 0;
+                    }
+
+                    .stat-box:nth-child(1) { animation-delay: 0.2s; }
+                    .stat-box:nth-child(2) { animation-delay: 0.4s; }
+                    .stat-box:nth-child(3) { animation-delay: 0.6s; }
+                    .stat-box:nth-child(4) { animation-delay: 0.8s; }
+
+                    @keyframes slideInRight {
+                        to {
+                            opacity: 1;
+                            transform: translateX(0);
+                        }
+                        from {
+                            opacity: 0;
+                            transform: translateX(30px);
+                        }
+                    }
+
+                    .stat-box h3 {
+                        font-size: 2.25rem;
+                        margin-bottom: 0.25rem;
+                        font-weight: 800;
+                        line-height: 1;
+                    }
+
+                    .stat-box p {
+                        font-size: 0.8rem;
+                        opacity: 0.95;
+                        font-weight: 500;
+                        line-height: 1.2;
+                    }
+
+                    .hero-search {
+                        display: flex;
+                        max-width: 600px;
+                        box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+                        border-radius: 10px;
+                        overflow: hidden;
+                    }
+
+                    .hero-search input {
+                        flex: 1;
+                        padding: 1.2rem 1.5rem;
+                        border: none;
+                        font-size: 1rem;
+                        font-family: 'Inter', 'Noto Sans', Arial, sans-serif;
+                    }
+
+                    .hero-search input:focus {
+                        outline: none;
+                    }
+
+                    .hero-search button {
+                        padding: 1.2rem 2.5rem;
+                        background: var(--primary-orange);
+                        color: var(--white);
+                        border: none;
+                        font-weight: 700;
+                        font-size: 1rem;
+                        text-transform: uppercase;
+                        cursor: pointer;
+                        transition: background 0.3s;
+                    }
+
+                    .hero-search button:hover {
+                        background: #E85A1F;
+                    }
+
+                    /* Carousel Controls */
+                    .carousel-control-prev,
+                    .carousel-control-next {
+                        position: absolute;
+                        top: 0;
+                        bottom: 0;
+                        z-index: 10;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        width: 15%;
+                        color: var(--white);
+                        text-align: center;
+                        opacity: 0.5;
+                        transition: opacity 0.15s ease;
+                        text-decoration: none;
+                        font-size: 3rem;
+                    }
+
+                    .carousel-control-prev:hover,
+                    .carousel-control-next:hover {
+                        color: var(--white);
+                        text-decoration: none;
+                        opacity: 0.9;
+                    }
+
+                    .carousel-control-prev {
+                        left: 0;
+                    }
+
+                    .carousel-control-next {
+                        right: 0;
+                    }
+
+                    .carousel-control-prev i,
+                    .carousel-control-next i {
+                        filter: drop-shadow(0 0 10px rgba(0, 0, 0, 0.6));
+                    }
+
+                    /* Carousel Section - About Style */
+                    .carousel-section {
+                        position: relative;
+                        background: var(--white);
+                        padding: 6rem 2rem;
+                        overflow: hidden;
+                    }
+
+                    .carousel-wrapper {
+                        max-width: 1400px;
+                        margin: 0 auto;
+                        position: relative;
+                        min-height: 500px;
+                    }
+
+                    .carousel-item {
+                        position: absolute;
+                        top: 0;
+                        left: 0;
+                        width: 100%;
+                        opacity: 0;
+                        transition: opacity 0.6s ease-in-out;
+                        pointer-events: none;
+                        visibility: hidden;
+                    }
+
+                    .carousel-item.active {
+                        opacity: 1;
+                        pointer-events: auto;
+                        visibility: visible;
+                        position: relative;
+                    }
+
+                    .carousel-content {
+                        display: grid;
+                        grid-template-columns: 1fr 1fr;
+                        gap: 5rem;
+                        align-items: center;
+                    }
+
+                    .carousel-visual {
+                        position: relative;
+                    }
+
+                    .carousel-image-main {
+                        width: 100%;
+                        height: 450px;
+                        background: linear-gradient(135deg, #E2E8F0 0%, #CBD5E1 100%);
+                        border-radius: 20px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        font-size: 4rem;
+                        position: relative;
+                        overflow: hidden;
+                    }
+
+                    .carousel-image-main img {
+                        width: 100%;
+                        height: 100%;
+                        object-fit: cover;
+                        border-radius: 20px;
+                    }
+
+
+                    .carousel-text .section-label {
+                        color: var(--primary-orange);
+                        font-weight: 600;
+                        margin-bottom: 1rem;
+                        text-transform: uppercase;
+                        letter-spacing: 0.1em;
+                        font-size: 0.9rem;
+                    }
+
+                    .carousel-text h2 {
+                        font-size: 3rem;
+                        margin-bottom: 1.5rem;
+                        color: var(--dark-navy);
+                        line-height: 1.2;
+                    }
+
+                    .carousel-text h2 .highlight {
+                        color: var(--primary-orange);
+                    }
+
+                    .carousel-text p {
+                        color: var(--text-gray);
+                        margin-bottom: 2rem;
+                        font-size: 1.05rem;
+                        line-height: 1.8;
+                    }
+
+                    .carousel-actions {
+                        display: flex;
+                        gap: 1.5rem;
+                        align-items: center;
+                    }
+
+                    .play-button {
+                        width: 60px;
+                        height: 60px;
+                        background: var(--dark-navy);
+                        border-radius: 50%;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        color: var(--white);
+                        font-size: 1.5rem;
+                        cursor: pointer;
+                        transition: all 0.3s;
+                        border: none;
+                    }
+
+                    .play-button:hover {
+                        background: var(--primary-orange);
+                        transform: scale(1.1);
+                    }
+
+                    /* Carousel Indicators */
+                    .carousel-indicators {
+                        position: absolute;
+                        left: 25%;
+                        transform: translateX(-50%);
+                        display: flex;
+                        justify-content: center;
+                        padding-left: 0;
+                        list-style: none;
+                        gap: 8px;
+                        margin: 0;
+                        z-index: 100;
+                    }
+
+                    .carousel-indicators li {
+                        box-sizing: border-box;
+                        flex: 0 1 auto;
+                        width: 12px;
+                        height: 12px;
+                        margin: 0 6px;
+                        text-indent: -999px;
+                        cursor: pointer;
+                        background-color: rgba(140, 103, 90, 0.4);
+                        border: 2px solid var(--white);
+                        border-radius: 50%;
+                        opacity: 0.7;
+                        transition: all 0.3s ease;
+                    }
+
+                    .carousel-indicators .active {
+                        opacity: 1;
+                        background-color: var(--primary-orange);
+                        transform: scale(1.2);
+                    }
+
+                    .carousel-indicators li:hover {
+                        opacity: 1;
+                        background-color: var(--primary-orange);
+                        transform: scale(1.1);
+                    }
+
+                    .scroll-indicator {
+                        position: absolute;
+                        bottom: 2rem;
+                        left: 50%;
+                        transform: translateX(-50%);
+                        width: 60px;
+                        height: 60px;
+                        background: var(--primary-orange);
+                        border-radius: 50%;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        font-size: 1.5rem;
+                        color: var(--white);
+                        cursor: pointer;
+                        animation: bounce 2s infinite;
+                        box-shadow: 0 4px 15px rgba(232, 93, 42, 0.4);
+                        z-index: 10;
+                    }
+
+                    @keyframes bounce {
+                        0%, 20%, 50%, 80%, 100% { transform: translateX(-50%) translateY(0); }
+                        40% { transform: translateX(-50%) translateY(-10px); }
+                        60% { transform: translateX(-50%) translateY(-5px); }
+                    }
+
+                    /* In Focus Section */
+                    .in-focus {
+                        background: var(--white);
+                    }
+
+                    .popular-items-carousel-wrapper {
+                        max-width: 1400px;
+                        margin: 0 auto;
+                        overflow: hidden;
+                        position: relative;
+                    }
+
+                    .popular-items-carousel {
+                        display: flex;
+                        gap: 2rem;
+                        animation: scroll-left 60s linear infinite;
+                        width: max-content;
+                    }
+
+                    .popular-items-carousel:hover {
+                        animation-play-state: paused;
+                    }
+
+                    @keyframes scroll-left {
+                        0% {
+                            transform: translateX(0);
+                        }
+                        100% {
+                            transform: translateX(-50%);
+                        }
+                    }
+
+                    .carousel-item-wrapper {
+                        min-width: 280px;
+                        max-width: 280px;
+                        flex-shrink: 0;
+                    }
+
+                    .btn-outline {
+                        padding: 0.8rem 2rem;
+                        border: 2px solid var(--primary-orange);
+                        background: transparent;
+                        color: var(--primary-orange);
+                        font-weight: 600;
+                        border-radius: 30px;
+                        cursor: pointer;
+                        transition: all 0.3s;
+                        text-decoration: none;
+                        display: inline-block;
+                        font-size: 0.9rem;
+                        letter-spacing: 0.05em;
+                    }
+
+                    .btn-outline:hover {
+                        background: var(--primary-orange);
+                        color: var(--white);
+                        transform: translateY(-2px);
+                        box-shadow: 0 8px 20px rgba(89, 18, 2, 0.3);
+                    }
+
+                    .books-carousel {
+                        display: flex;
+                        gap: 2rem;
+                        overflow-x: auto;
+                        padding: 1rem 0;
+                        max-width: 1400px;
+                        margin: 0 auto;
+                        scroll-behavior: smooth;
+                    }
+
+                    .books-carousel::-webkit-scrollbar {
+                        height: 8px;
+                    }
+
+                    .books-carousel::-webkit-scrollbar-track {
+                        background: var(--light-gray);
+                        border-radius: 10px;
+                    }
+
+                    .books-carousel::-webkit-scrollbar-thumb {
+                        background: var(--primary-orange);
+                        border-radius: 10px;
+                    }
+
+                    .book-card {
+                        min-width: 200px;
+                        cursor: pointer;
+                        transition: transform 0.3s;
+                        position: relative;
+                    }
+
+                    .book-card:hover {
+                        transform: translateY(-10px);
+                    }
+
+                    .availability-badge {
+                        position: absolute;
+                        top: 10px;
+                        left: 10px;
+                        padding: 0.4rem 0.8rem;
+                        background: var(--primary-orange);
+                        color: var(--white);
+                        font-size: 0.75rem;
+                        font-weight: 700;
+                        text-transform: uppercase;
+                        z-index: 10;
+                        letter-spacing: 0.05em;
+                    }
+
+                    .book-cover {
+                        width: 100%;
+                        height: 300px;
+                        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                        box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+                        margin-bottom: 1rem;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        font-size: 3rem;
+                        color: var(--white);
+                        overflow: hidden;
+                    }
+
+                    .book-cover img {
+                        width: 100%;
+                        height: 100%;
+                        object-fit: cover;
+                    }
+
+                    .book-info h3 {
+                        font-size: 1rem;
+                        margin-bottom: 0.3rem;
+                        color: var(--text-dark);
+                    }
+
+                    .book-author {
+                        font-size: 0.85rem;
+                        color: #666;
+                        text-transform: uppercase;
+                        font-weight: 600;
+                        letter-spacing: 0.03em;
+                    }
+
+
+                    /* Statistics Section */
+                    .statistics {
+                        background: var(--white);
+                        padding: 6rem 2rem;
+                        position: relative;
+                        overflow: hidden;
+                    }
+
+                    .section-header {
+                        text-align: center;
+                        max-width: 700px;
+                        margin: 0 auto 4rem;
+                    }
+
+                    .section-label {
+                        color: var(--primary-orange);
+                        font-weight: 600;
+                        margin-bottom: 1rem;
+                        text-transform: uppercase;
+                        letter-spacing: 0.1em;
+                        font-size: 0.9rem;
+                    }
+
+                    .section-title {
+                        font-size: 3rem;
+                        margin-bottom: 1rem;
+                        color: var(--dark-navy);
+                    }
+
+                    .section-title .highlight {
+                        color: var(--primary-orange);
+                    }
+
+                    .stats-container {
+                        max-width: 1400px;
+                        margin: 0 auto;
+                        display: grid;
+                        grid-template-columns: repeat(4, 1fr);
+                        gap: 3rem;
+                        position: relative;
+                        z-index: 2;
+                    }
+
+                    .stat-item {
+                        text-align: center;
+                        padding: 2.5rem 2rem;
+                        background: var(--light-gray);
+                        border-radius: 20px;
+                        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+                        border: 2px solid transparent;
+                    }
+
+                    .stat-item:hover {
+                        transform: translateY(-15px);
+                        background: var(--white);
+                        border-color: var(--primary-orange);
+                        box-shadow: 0 20px 50px rgba(89, 18, 2, 0.15);
+                    }
+
+                    .stat-icon {
+                        font-size: 3.5rem;
+                        margin-bottom: 1rem;
+                        display: block;
+                    }
+
+                    .stat-number {
+                        font-size: 3.5rem;
+                        font-weight: 800;
+                        font-family: 'Be Vietnam Pro', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+                        margin-bottom: 0.5rem;
+                        line-height: 1;
+                        color: var(--dark-navy);
+                    }
+
+                    .stat-label {
+                        font-size: 1rem;
+                        font-weight: 500;
+                        color: var(--text-gray);
+                        line-height: 1.4;
+                    }
+
+                    /* Services Section */
+                    .services {
+                        padding: 6rem 2rem;
+                        background: var(--light-gray);
+                    }
+
+                    .services-header {
+                        text-align: center;
+                        margin: 0 auto 4rem;
+                    }
+
+                    .services-header .section-label {
+                        color: var(--primary-orange);
+                        font-weight: 600;
+                        margin-bottom: 1rem;
+                        text-transform: uppercase;
+                        letter-spacing: 0.1em;
+                        font-size: 0.9rem;
+                    }
+
+                    .services-header h2 {
+                        font-size: 3rem;
+                        margin-bottom: 1rem;
+                        color: var(--dark-navy);
+                    }
+
+                    .services-header h2 .highlight {
+                        color: var(--primary-orange);
+                    }
+
+                    .services-grid {
+                        display: grid;
+                        grid-template-columns: repeat(3, 1fr);
+                        gap: 2rem;
+                        max-width: 1400px;
+                        margin: 0 auto;
+                    }
+
+                    .service-card {
+                        background: var(--white);
+                        border-radius: 20px;
+                        overflow: hidden;
+                        transition: all 0.4s;
+                        cursor: pointer;
+                        box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+                        text-decoration: none;
+                        display: block;
+                    }
+
+                    .service-card:hover {
+                        transform: translateY(-15px);
+                        box-shadow: 0 20px 50px rgba(0,0,0,0.15);
+                    }
+
+                    .service-image {
+                        height: 250px;
+                        overflow: hidden;
+                        position: relative;
+                        background: var(--light-gray);
+                    }
+
+                    .service-image img {
+                        width: 100%;
+                        height: 100%;
+                        object-fit: cover;
+                        transition: transform 0.3s ease;
+                    }
+
+                    .service-card:hover .service-image img {
+                        transform: scale(1.05);
+                    }
+
+                    .service-icon {
+                        position: absolute;
+                        bottom: -30px;
+                        left: 30px;
+                        width: 60px;
+                        height: 60px;
+                        background: var(--primary-orange);
+                        border-radius: 50%;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        color: var(--white);
+                        font-size: 1.8rem;
+                        box-shadow: 0 10px 30px rgba(89, 18, 2, 0.3);
+                    }
+
+                    .service-content {
+                        padding: 3rem 2rem 2rem;
+                    }
+
+                    .service-content h3 {
+                        font-size: 1.5rem;
+                        margin-bottom: 1rem;
+                        color: var(--dark-navy);
+                    }
+
+                    .service-content p {
+                        color: var(--text-gray);
+                        margin-bottom: 1.5rem;
+                        line-height: 1.7;
+                    }
+
+                    .service-info {
+                        position: relative;
+                        z-index: 2;
+                    }
+
+                    .service-name {
+                        font-weight: 700;
+                        font-size: 1.5rem;
+                        color: var(--dark-navy);
+                    }
+
+                    .learn-more {
+                        color: var(--dark-navy);
+                        font-weight: 600;
+                        text-decoration: none;
+                        display: inline-flex;
+                        align-items: center;
+                        gap: 0.5rem;
+                        transition: all 0.3s;
+                    }
+
+                    .learn-more:hover {
+                        color: var(--primary-orange);
+                        gap: 1rem;
+                    }
+
+                    .learn-more::after {
+                        content: '→';
+                        font-size: 1.2rem;
+                    }
+
+                    /* Blog Section */
+                    .blog-section {
+                        padding: 4rem 2rem;
+                        background: var(--light-gray);
+                    }
+
+                    .blog-grid {
+                        display: grid;
+                        grid-template-columns: repeat(3, 1fr);
+                        gap: 2rem;
+                        max-width: 1400px;
+                        margin: 2rem auto 0;
+                    }
+
+                    .blog-card {
+                        background: var(--white);
+                        border-radius: 8px;
+                        overflow: hidden;
+                        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+                        transition: all 0.3s;
+                    }
+
+                    .blog-card:hover {
+                        transform: translateY(-10px);
+                        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+                    }
+
+                    .blog-card-link {
+                        text-decoration: none;
+                        color: inherit;
+                        display: block;
+                    }
+
+                    .blog-image {
+                        position: relative;
+                        height: 250px;
+                        overflow: hidden;
+                    }
+
+                    .blog-image img {
+                        width: 100%;
+                        height: 100%;
+                        object-fit: cover;
+                        transition: transform 0.3s;
+                    }
+
+                    .blog-card:hover .blog-image img {
+                        transform: scale(1.1);
+                    }
+
+                    .blog-image-placeholder {
+                        width: 100%;
+                        height: 100%;
+                        background: linear-gradient(135deg, var(--primary-orange), var(--dark-orange));
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        font-size: 4rem;
+                    }
+
+                    .blog-date {
+                        position: absolute;
+                        top: 1rem;
+                        right: 1rem;
+                        background: var(--white);
+                        padding: 0.5rem 1rem;
+                        border-radius: 5px;
+                        text-align: center;
+                        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+                    }
+
+                    .date-day {
+                        display: block;
+                        font-size: 1.5rem;
+                        font-weight: 700;
+                        color: var(--primary-orange);
+                        line-height: 1;
+                    }
+
+                    .date-month {
+                        display: block;
+                        font-size: 0.9rem;
+                        text-transform: uppercase;
+                        color: var(--text-dark);
+                        font-weight: 600;
+                    }
+
+                    .blog-content {
+                        padding: 1.5rem;
+                    }
+
+                    .blog-meta {
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                        margin-bottom: 1rem;
+                        font-size: 0.85rem;
+                    }
+
+                    .blog-category {
+                        color: var(--primary-orange);
+                        font-weight: 600;
+                        text-transform: uppercase;
+                        font-size: 0.75rem;
+                        letter-spacing: 0.05em;
+                    }
+
+                    .blog-author {
+                        color: #666;
+                        font-size: 0.85rem;
+                    }
+
+                    .blog-title {
+                        font-size: 1.3rem;
+                        font-weight: 700;
+                        margin-bottom: 0.8rem;
+                        color: var(--text-dark);
+                        line-height: 1.4;
+                        display: -webkit-box;
+                        -webkit-line-clamp: 2;
+                        -webkit-box-orient: vertical;
+                        overflow: hidden;
+                    }
+
+                    .blog-excerpt {
+                        color: #666;
+                        line-height: 1.6;
+                        margin-bottom: 1rem;
+                        display: -webkit-box;
+                        -webkit-line-clamp: 3;
+                        -webkit-box-orient: vertical;
+                        overflow: hidden;
+                    }
+
+                    .blog-footer {
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                        padding-top: 1rem;
+                        border-top: 1px solid var(--light-gray);
+                    }
+
+                    .read-more {
+                        color: var(--primary-orange);
+                        font-weight: 600;
+                        font-size: 0.9rem;
+                    }
+
+                    .blog-card:hover .read-more {
+                        text-decoration: underline;
+                    }
+
+                    /* Responsive */
+                    @media (max-width: 1024px) {
+                        .hero-content {
+                            grid-template-columns: 1fr;
+                            gap: 3rem;
+                        }
+
+                        .hero-slide h1 {
+                            font-size: 2.5rem;
+                        }
+
+                        .section-title {
+                            font-size: 2rem;
+                        }
+
+                        .stats-boxes {
+                            position: static;
+                            transform: none;
+                            flex-direction: row;
+                            margin-top: 1.5rem;
+                        }
+
+                        .stat-box {
+                            min-width: auto;
+                            flex: 1;
+                        }
+
+                        .carousel-content {
+                            grid-template-columns: 1fr;
+                            gap: 3rem;
+                        }
+
+                        .services-grid {
+                            grid-template-columns: 1fr;
+                        }
+
+                        .blog-grid {
+                            grid-template-columns: repeat(2, 1fr);
+                        }
+                    }
+
+                    @media (max-width: 768px) {
+                        .hero-slider {
+                            padding: 2rem 1rem;
+                        }
+
+                        .hero-slide h1 {
+                            font-size: 2rem;
+                        }
+
+                        .tagline {
+                            font-size: 0.85rem;
+                        }
+
+                        .hero-subtitle {
+                            font-size: 1rem;
+                        }
+
+                        .hero-services {
+                            grid-template-columns: 1fr;
+                        }
+
+                        .hero-search {
+                            flex-direction: column;
+                        }
+
+                        .stats-boxes {
+                            flex-direction: column;
+                        }
+
+                        .stat-box h3 {
+                            font-size: 2rem;
+                        }
+
+                        .section-title {
+                            font-size: 1.75rem;
+                        }
+
+                        .services-grid {
+                            grid-template-columns: 1fr;
+                        }
+
+                        .blog-grid {
+                            grid-template-columns: 1fr;
+                        }
+
+                        .blog-image {
+                            height: 200px;
+                        }
+                    }
+                </style>
+            </head>
+
+            <div id="wrap" class="oe_structure oe_empty">
+                <!-- Hero Section (Static) -->
+                <section class="hero-slider">
+                    <div class="hero-content">
+                        <div class="hero-text">
+                            <p class="tagline">THIỀN VIỆN PHÁP SƠN</p>
+                            <h1>THƯ VIỆN PHÁP ĐĂNG</h1>
+                            <p class="hero-subtitle">
+                                Khám phá kho tàng tri thức với hơn <t t-esc="total_books"/> đầu sách, tài liệu số chất lượng cao và dịch vụ thư viện hiện đại.
+                            </p>
+                            <div class="hero-services">
+                                <div class="hero-service-item">Trao đổi nhóm</div>
+                                <div class="hero-service-item">Khu vực học tập - nghiên cứu cá nhân</div>
+                                <div class="hero-service-item">Sách &amp; Tài liệu số</div>
+                                <div class="hero-service-item">Tra cứu &amp; khai thác tài nguyên</div>
+                            </div>
+                            <form class="hero-search" action="/kho-tai-nguyen" method="get">
+                                <input type="text" name="search" placeholder="Tìm sách, tài liệu số..."/>
+                                <button type="submit">TÌM KIẾM</button>
+                            </form>
+                        </div>
+                        <div class="hero-visual">
+                            <div class="hero-image-card">
+                                <div class="hero-image">
+                                    <img src="/entro_library_website/static/src/img/hero-image-card.jpg" alt="Thư viện"/>
+                                </div>
+                                <div class="stats-boxes">
+                                    <div class="stat-box">
+                                        <h3 t-esc="total_books"/>
+                                        <p>Đầu Sách</p>
+                                    </div>
+                                    <div class="stat-box">
+                                        <h3 t-esc="total_members"/>
+                                        <p>Hội Viên</p>
+                                    </div>
+                                    <div class="stat-box">
+                                        <h3 t-esc="total_borrowings"/>
+                                        <p>Lượt Mượn/Năm</p>
+                                    </div>
+                                    <div class="stat-box">
+                                        <h3 t-esc="total_media"/>
+                                        <p>Tài Liệu Số</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Carousel Section - About Style -->
+                <t t-if="hero_slides and len(hero_slides) > 0">
+                    <section class="carousel-section carousel slide" id="banner-slide">
+                        <div class="carousel-wrapper">
+                            <!-- Indicators -->
+                            <t t-if="len(hero_slides) > 1">
+                                <ol class="carousel-indicators">
+                                    <t t-foreach="hero_slides" t-as="indicator_slide">
+                                        <li t-att-data-slide-to="indicator_slide_index"
+                                            t-att-class="'active' if indicator_slide_index == 0 else ''"/>
+                                    </t>
+                                </ol>
+                            </t>
+
+                            <!-- Wrapper for slides -->
+                            <div class="carousel-inner">
+                                <t t-foreach="hero_slides" t-as="slide">
+                                    <div t-att-class="'carousel-item active' if slide_index == 0 else 'carousel-item'">
+                                        <div class="carousel-content">
+                                            <div class="carousel-visual">
+                                                <div class="carousel-image-main">
+                                                    <t t-if="slide.image">
+                                                        <img t-att-src="image_data_uri(slide.image)" t-att-alt="slide.name"/>
+                                                    </t>
+                                                    <t t-else="">
+                                                        🏛️
+                                                    </t>
+                                                </div>
+                                            </div>
+                                            <div class="carousel-text">
+                                                <p class="section-label">Giới thiệu</p>
+                                                <h2>
+                                                    <t t-if="slide.title">
+                                                        <t t-esc="slide.title"/>
+                                                    </t>
+                                                    <t t-else="">
+                                                        Trí Đức song tu - <span class="highlight">gìn giữ Chánh Pháp</span>
+                                                    </t>
+                                                </h2>
+                                                <p>
+                                                    <t t-if="slide.subtitle">
+                                                        <t t-esc="slide.subtitle"/>
+                                                    </t>
+                                                    <t t-else="">
+                                                        <strong>Thư viện Pháp Đăng</strong> nằm trong khuôn viên của <strong>Thiền Viện Pháp Sơn</strong> có không gian tu học và nghiên cứu nhỏ gọn, được hình thành trong lòng Thiền viện Pháp Sơn, với tâm nguyện làm nơi nương tựa cho việc học tập, tra cứu và nuôi dưỡng đời sống nội tâm của Chư Ni.<br/><br/>
+
+Thư viện được thiết kế theo mô hình mở, hài hòa giữa sự giản dị của thiền môn và những nét đặc trưng của văn hóa Phật giáo. Không gian thư viện bao gồm các khu vực trao đổi nhóm, khu vực học tập – nghiên cứu cá nhân, khu vực đa phương tiện, cùng các kệ trưng bày sách được phân theo từng mảng nội dung như: Phật học, Tổng hợp, Ngoại ngữ và Kho lưu…
+                                                    </t>
+                                                </p>
+                                                <!-- <div class="carousel-actions">
+                                                    <a t-att-href="slide.button_url if slide.button_url else '/thu-vien'" class="btn-primary">
+                                                        <t t-if="slide.button_text">
+                                                            <t t-esc="slide.button_text"/>
+                                                        </t>
+                                                        <t t-else="">
+                                                            Tìm hiểu thêm
+                                                        </t>
+                                                    </a>
+                                                    <button class="play-button">▶</button>
+                                                </div> -->
+                                            </div>
+                                        </div>
+                                    </div>
+                                </t>
+                            </div>
+                        </div>
+                    </section>
+                </t>
+
+                <!-- In Focus Section -->
+                <section class="in-focus">
+                    <div class="section-header">
+                        <div>
+                            <h2 class="section-title">Nổi bật</h2>
+                        </div>
+                        <a href="/thu-vien" class="btn-outline">XEM TẤT CẢ</a>
+                    </div>
+                    <div class="popular-items-carousel-wrapper">
+                        <div class="popular-items-carousel">
+                            <!-- Popular Books - First Set -->
+                            <t t-foreach="popular_books" t-as="book">
+                                <div class="carousel-item-wrapper">
+                                    <t t-call="entro_library_website.library_book_card"/>
+                                </div>
+                            </t>
+                            <!-- Popular Media - First Set -->
+                            <t t-foreach="popular_media" t-as="media">
+                                <div class="carousel-item-wrapper">
+                                    <t t-call="entro_library_website.library_media_card"/>
+                                </div>
+                            </t>
+                            <!-- Duplicate for infinite loop -->
+                            <!-- Popular Books - Second Set -->
+                            <t t-foreach="popular_books" t-as="book">
+                                <div class="carousel-item-wrapper">
+                                    <t t-call="entro_library_website.library_book_card"/>
+                                </div>
+                            </t>
+                            <!-- Popular Media - Second Set -->
+                            <t t-foreach="popular_media" t-as="media">
+                                <div class="carousel-item-wrapper">
+                                    <t t-call="entro_library_website.library_media_card"/>
+                                </div>
+                            </t>
+                        </div>
+                    </div>
+                </section>
+
+
+                <!-- Services Section -->
+                <section class="services">
+                    <div class="services-header">
+                        <p class="section-label">Dịch vụ của Thư viện</p>
+                        <h3>Dịch vụ phù hợp với <span class="highlight">chí nguyện cầu học, tinh thần cầu pháp</span></h3>
+                    </div>
+                    <div class="services-grid">
+                        <div class="service-card">
+                            <div class="service-image">
+                                <img src="/entro_library_website/static/src/img/book_service.png" alt="Tài nguyên sách"/>
+                            </div>
+                            <div class="service-content">
+                                <h3>Tài nguyên sách</h3>
+                                <p>Khám phá kho tàng sách phong phú với hàng nghìn đầu sách từ nhiều lĩnh vực khác nhau, phục vụ mọi nhu cầu học tập và nghiên cứu.</p>
+                                <a href="/thu-vien" class="learn-more">Tìm hiểu thêm</a>
+                            </div>
+                        </div>
+                        <div class="service-card">
+                            <div class="service-image">
+                                <img src="/entro_library_website/static/src/img/media_service.png" alt="Tài nguyên số"/>
+                            </div>
+                            <div class="service-content">
+                                <h3>Tài nguyên số</h3>
+                                <p>Truy cập tài liệu số, video, audio và các nguồn học liệu trực tuyến chất lượng cao, hỗ trợ học tập hiện đại và hiệu quả.</p>
+                                <a href="/media" class="learn-more">Tìm hiểu thêm</a>
+                            </div>
+                        </div>
+                        <div class="service-card">
+                            <div class="service-image">
+                                <img src="/entro_library_website/static/src/img/borrowing.png" alt="Dịch vụ mượn sách"/>
+                            </div>
+                            <div class="service-content">
+                                <h3>Dịch vụ mượn sách</h3>
+                                <p>Hệ thống mượn trả sách tiện lợi, nhanh chóng với quy trình đơn giản, giúp bạn dễ dàng tiếp cận nguồn tri thức mọi lúc mọi nơi.</p>
+                                <a href="/gio-muon" class="learn-more">Tìm hiểu thêm</a>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Blog/News Section -->
+                <t t-if="blog_posts and len(blog_posts) > 0">
+                    <section class="blog-section">
+                        <div class="section-header">
+                            <h2 class="section-title">TIN TỨC &amp; BÀI VIẾT</h2>
+                            <a href="/blog" class="btn-outline">XEM TẤT CẢ</a>
+                        </div>
+                        <div class="blog-grid">
+                            <t t-foreach="blog_posts" t-as="post">
+                                <article class="blog-card">
+                                    <a t-attf-href="/blog/#{post.blog_id.id}/post/#{post.id}" class="blog-card-link">
+                                        <div class="blog-image">
+                                            <t t-if="post.cover_properties">
+                                                <img t-attf-src="/web/image/blog.post/#{post.id}/cover_image"
+                                                     t-att-alt="post.name"/>
+                                            </t>
+                                            <t t-else="">
+                                                <div class="blog-image-placeholder">
+                                                    <span>📰</span>
+                                                </div>
+                                            </t>
+                                            <t t-if="post.published_date">
+                                                <div class="blog-date">
+                                                    <span class="date-day" t-esc="post.published_date.strftime('%d')"/>
+                                                    <span class="date-month" t-esc="post.published_date.strftime('%b')"/>
+                                                </div>
+                                            </t>
+                                        </div>
+                                        <div class="blog-content">
+                                            <div class="blog-meta">
+                                                <span class="blog-category" t-esc="post.blog_id.name"/>
+                                                <t t-if="post.author_id">
+                                                    <span class="blog-author" t-esc="post.author_id.name"/>
+                                                </t>
+                                            </div>
+                                            <h3 class="blog-title" t-esc="post.name"/>
+                                            <p class="blog-excerpt" t-esc="post.subtitle or ''"/>
+                                            <div class="blog-footer">
+                                                <span class="read-more">Đọc tiếp →</span>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </article>
+                            </t>
+                        </div>
+                    </section>
+                </t>
+            </div>
+        </t>
+    </template>
+</odoo>

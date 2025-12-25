@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import base64
-from odoo import http, _, exceptions
+from odoo import http, _, exceptions, fields
 from odoo.http import request
 from odoo.addons.website.controllers.main import QueryURL
 from werkzeug.exceptions import NotFound
@@ -17,6 +17,68 @@ class Website(Home):
         return super()._login_redirect(uid, redirect=redirect)
 
 class LibraryWebsite(http.Controller):
+
+    @http.route(['/'], type='http', auth='public', website=True, sitemap=True)
+    def library_home(self, **kwargs):
+        """Trang chủ thư viện"""
+
+        # Get hero slides
+        hero_slides = request.env['library.website.slider'].search([
+            ('active', '=', True),
+            ('is_published', '=', True)
+        ], order='sequence, id')
+
+        # Get popular books (most borrowed)
+        # Use SQL to get books with borrow count
+        request.env.cr.execute("""
+            SELECT b.id, COUNT(bl.id) as borrow_count
+            FROM library_book b
+            LEFT JOIN library_borrowing_line bl ON bl.book_id = b.id
+            WHERE b.website_published = true AND b.active = true
+            GROUP BY b.id
+            HAVING COUNT(bl.id) > 0
+            ORDER BY borrow_count DESC
+            LIMIT 10
+        """)
+        popular_books_data = request.env.cr.fetchall()
+        popular_book_ids = [row[0] for row in popular_books_data]
+        popular_books = request.env['library.book'].browse(popular_book_ids)
+
+        # Get popular media (most viewed)
+        popular_media = request.env['library.media'].search([
+            ('website_published', '=', True),
+            ('active', '=', True),
+        ], limit=10, order='view_count desc')
+
+        # Get recent blog posts
+        blog_posts = request.env['blog.post'].search([
+            ('website_published', '=', True)
+        ], limit=3, order='published_date desc')
+
+        # Get statistics
+        total_books = request.env['library.book'].search_count([('active', '=', True)])
+        total_media = request.env['library.media'].search_count([('active', '=', True)])
+        total_members = request.env['res.partner'].search_count([('borrower_type_id', '!=', False)])
+
+        # Get total borrowing count for the current year
+        current_year_start = fields.Date.today().replace(month=1, day=1)
+        total_borrowings = request.env['library.borrowing'].search_count([
+            ('borrow_date', '>=', current_year_start)
+        ])
+
+        values = {
+            'hero_slides': hero_slides,
+            'popular_books': popular_books,
+            'popular_media': popular_media,
+            'blog_posts': blog_posts,
+            'total_books': total_books,
+            'total_media': total_media,
+            'total_members': total_members,
+            'total_borrowings': total_borrowings,
+            'page_name': 'library_home',
+        }
+
+        return request.render("entro_library_website.library_home", values)
 
     @http.route([
         '/thu-vien',
@@ -111,7 +173,7 @@ class LibraryWebsite(http.Controller):
 
         # Lấy website categories
         website_categories = request.env['library.website.category'].search(
-            [('active', '=', True)], order='sequence, name')
+            [('active', '=', True), ('category_type', 'in', ['book', 'both'])], order='sequence, name')
 
         # Keep query parameters
         keep = QueryURL(
@@ -307,7 +369,7 @@ class LibraryWebsite(http.Controller):
 
         # Get website categories
         website_categories = request.env['library.website.category'].search(
-            [('active', '=', True)],
+            [('active', '=', True), ('category_type', 'in', ['media', 'both'])],
             order='sequence, name'
         )
 
@@ -526,7 +588,7 @@ class LibraryWebsite(http.Controller):
 
         # Get website categories
         website_categories = request.env['library.website.category'].search(
-            [('active', '=', True)],
+            [('active', '=', True), ('category_type', 'in', ['media', 'both'])],
             order='sequence, name'
         )
 
@@ -630,7 +692,7 @@ class LibraryWebsite(http.Controller):
 
         # Get website categories
         website_categories = request.env['library.website.category'].search(
-            [('active', '=', True)],
+            [('active', '=', True), ('category_type', 'in', ['media', 'both'])],
             order='sequence, name'
         )
 
@@ -704,3 +766,197 @@ class LibraryWebsite(http.Controller):
             title='Phương tiện - Phật tử',
             **kwargs
         )
+
+    # ====================================
+    # UNIFIED CATALOG (BOOKS + MEDIA)
+    # ====================================
+
+    @http.route([
+        '/kho-tai-nguyen',
+        '/kho-tai-nguyen/page/<int:page>',
+        '/kho-tai-nguyen/danh-muc/<model("library.website.category"):category>',
+        '/kho-tai-nguyen/danh-muc/<model("library.website.category"):category>/page/<int:page>',
+    ], type='http', auth='public', website=True, sitemap=True)
+    def unified_catalog(self, page=1, category=None, search='', item_type=None, sortby=None, **kwargs):
+        """Unified page showing both books and media"""
+
+        # Build domain for books
+        book_domain = [('website_published', '=', True)]
+        media_domain = [('website_published', '=', True), ('active', '=', True)]
+
+        # Filter by borrower type access control
+        if not request.env.user._is_public():
+            partner = request.env.user.partner_id
+            if partner.borrower_type_id:
+                book_domain += [
+                    '|',
+                    ('allowed_borrower_type_ids', '=', False),
+                    ('allowed_borrower_type_ids', 'in', partner.borrower_type_id.id)
+                ]
+                media_domain += [
+                    '|',
+                    ('allowed_borrower_type_ids', '=', False),
+                    ('allowed_borrower_type_ids', 'in', partner.borrower_type_id.id)
+                ]
+
+        # Filter by access level for media
+        if request.env.user._is_public():
+            media_domain += [('access_level', '=', 'public')]
+        else:
+            media_domain += [('access_level', 'in', ['public', 'members'])]
+
+        # Search
+        if search:
+            book_domain += [
+                '|', '|', '|',
+                ('name', 'ilike', search),
+                ('author_names', 'ilike', search),
+                ('keywords', 'ilike', search),
+                ('parallel_title', 'ilike', search),
+            ]
+            media_domain += [
+                '|', '|', '|',
+                ('name', 'ilike', search),
+                ('author', 'ilike', search),
+                ('keywords', 'ilike', search),
+                ('description', 'ilike', search),
+            ]
+
+        # Filter by category
+        if category:
+            book_domain += [('website_category_id', '=', category.id)]
+            media_domain += [('website_category_id', '=', category.id)]
+
+        # Filter by item type (book or media)
+        if item_type == 'book':
+            # Only show books
+            media_items = request.env['library.media'].browse([])
+            media_count = 0
+        elif item_type == 'media':
+            # Only show media
+            books = request.env['library.book'].browse([])
+            books_count = 0
+        else:
+            # Show both - we'll handle this below
+            pass
+
+        # Sorting
+        sort_options = {
+            'date_desc': ('registration_date desc, name', 'create_date desc, name'),
+            'date_asc': ('registration_date asc, name', 'create_date asc, name'),
+            'name_asc': ('name asc', 'name asc'),
+            'name_desc': ('name desc', 'name desc'),
+        }
+        if not sortby or sortby not in sort_options:
+            sortby = 'date_desc'
+
+        book_order, media_order = sort_options[sortby]
+
+        Book = request.env['library.book']
+        Media = request.env['library.media']
+
+        # Get counts
+        if item_type != 'media':
+            books_count = Book.search_count(book_domain)
+        else:
+            books_count = 0
+
+        if item_type != 'book':
+            media_count = Media.search_count(media_domain)
+        else:
+            media_count = 0
+
+        total_count = books_count + media_count
+
+        # Pagination
+        ppg = 24  # items per page
+
+        # Construct base URL
+        if category:
+            url = f'/kho-tai-nguyen/danh-muc/{category.id}'
+        else:
+            url = '/kho-tai-nguyen'
+
+        url_args = {'search': search, 'sortby': sortby}
+        if item_type:
+            url_args['item_type'] = item_type
+
+        pager = request.website.pager(
+            url=url,
+            url_args=url_args,
+            total=total_count,
+            page=page,
+            step=ppg,
+        )
+
+        # Fetch mixed results
+        all_items = []
+
+        if item_type != 'media' and books_count > 0:
+            books = Book.search(
+                book_domain,
+                limit=ppg if item_type == 'book' else books_count,
+                offset=pager['offset'] if item_type == 'book' else 0,
+                order=book_order
+            )
+            for book in books:
+                all_items.append({
+                    'type': 'book',
+                    'item': book,
+                    'date': book.registration_date or fields.Date.today(),
+                })
+
+        if item_type != 'book' and media_count > 0:
+            media_items = Media.search(
+                media_domain,
+                limit=ppg if item_type == 'media' else media_count,
+                offset=pager['offset'] if item_type == 'media' else 0,
+                order=media_order
+            )
+            for media in media_items:
+                all_items.append({
+                    'type': 'media',
+                    'item': media,
+                    'date': media.create_date.date() if media.create_date else fields.Date.today(),
+                })
+
+        # Sort mixed items
+        if not item_type:
+            if sortby in ['date_desc', 'name_desc']:
+                all_items.sort(key=lambda x: x['date'] if sortby == 'date_desc' else x['item'].name, reverse=True)
+            else:
+                all_items.sort(key=lambda x: x['date'] if sortby == 'date_asc' else x['item'].name)
+
+            # Apply pagination to mixed results
+            all_items = all_items[pager['offset']:pager['offset'] + ppg]
+
+        # Get website categories (both book and media)
+        website_categories = request.env['library.website.category'].search(
+            [('active', '=', True)], order='sequence, name')
+
+        # Keep query parameters
+        keep = QueryURL(
+            url,
+            category=category and category.id,
+            search=search,
+            item_type=item_type,
+            sortby=sortby
+        )
+
+        values = {
+            'all_items': all_items,
+            'total_count': total_count,
+            'books_count': books_count,
+            'media_count': media_count,
+            'pager': pager,
+            'search': search,
+            'category': category,
+            'item_type': item_type,
+            'website_categories': website_categories,
+            'page_name': 'unified_catalog',
+            'keep': keep,
+            'sortby': sortby,
+            'sort_options': {k: v[0] for k, v in sort_options.items()},
+        }
+
+        return request.render("entro_library_website.unified_catalog", values)

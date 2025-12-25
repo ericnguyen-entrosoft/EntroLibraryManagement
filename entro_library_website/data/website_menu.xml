@@ -13,14 +13,39 @@
 
     <record id="menu_kho_tai_nguyen" model="website.menu">
         <field name="name">Kho tài nguyên</field>
-        <field name="url">/thu-vien</field>
+        <field name="url">/kho-tai-nguyen</field>
         <field name="sequence">50</field>
         <field name="mega_menu_content"><![CDATA[
             <section class="s_mega_menu_library_resources py-3">
                 <div class="container">
                     <div class="row">
+                        <!-- Column 0: All Resources -->
+                        <div class="col-lg-4 mb-3">
+                            <h5 class="mb-3 pb-2 border-bottom">
+                                <a href="/kho-tai-nguyen" class="text-decoration-none text-dark">Tất cả tài nguyên</a>
+                            </h5>
+                            <nav class="nav flex-column">
+                                <a href="/kho-tai-nguyen" class="nav-link py-2">
+                                    <i class="fa fa-th me-2"></i>Tất cả (Sách & Phương tiện)
+                                </a>
+                                <a href="/kho-tai-nguyen?item_type=book" class="nav-link py-2">
+                                    <i class="fa fa-book me-2"></i>Chỉ xem Sách
+                                </a>
+                                <a href="/kho-tai-nguyen?item_type=media" class="nav-link py-2">
+                                    <i class="fa fa-video-camera me-2"></i>Chỉ xem Phương tiện
+                                </a>
+                                <hr class="my-2"/>
+                                <a href="/my/borrowings" class="nav-link py-2 small">
+                                    <i class="fa fa-file-text-o me-2"></i>Phiếu Mượn Của Tôi
+                                </a>
+                                <a href="/my/borrowing-cart" class="nav-link py-2 small">
+                                    <i class="fa fa-shopping-cart me-2"></i>Giỏ Mượn Sách
+                                </a>
+                            </nav>
+                        </div>
+
                         <!-- Column 1: Sách -->
-                        <div class="col-lg-6 mb-3">
+                        <div class="col-lg-4 mb-3">
                             <h5 class="mb-3 pb-2 border-bottom">
                                 <a href="/thu-vien" class="text-decoration-none text-dark">Sách</a>
                             </h5>
@@ -34,23 +59,16 @@
                                 <a href="/thu-vien/ngoai-ngu" class="nav-link py-2">
                                     <i class="fa fa-angle-right me-2"></i>Khu ngoại ngữ
                                 </a>
-                                <hr class="my-2"/>
-                                <a href="/my/borrowings" class="nav-link py-2 small">
-                                    <i class="fa fa-file-text-o me-2"></i>Phiếu Mượn Của Tôi
-                                </a>
-                                <a href="/my/borrowing-cart" class="nav-link py-2 small">
-                                    <i class="fa fa-shopping-cart me-2"></i>Giỏ Mượn Sách
-                                </a>
                             </nav>
                         </div>
 
                         <!-- Column 2: Tài liệu số -->
-                        <div class="col-lg-6 mb-3">
+                        <div class="col-lg-4 mb-3">
                             <h5 class="mb-3 pb-2 border-bottom">
                                 <a href="/media" class="text-decoration-none text-dark">Tài liệu số</a>
                             </h5>
                             <div class="row">
-                                <div class="col-md-6">
+                                <div class="col-md-12">
                                     <nav class="nav flex-column">
                                         <a href="/media/chu-ni" class="nav-link py-2">
                                            Chư Ni
