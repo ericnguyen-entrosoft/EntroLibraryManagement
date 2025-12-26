@@ -82,15 +82,6 @@ publicWidget.registry.LibraryMedia = publicWidget.Widget.extend({
 
                     // Add a helper message for users
                     const pdfUrl = $object.attr('data') || $iframe.attr('src');
-                    if (pdfUrl && !$container.find('.mobile-pdf-hint').length) {
-                        $container.append(`
-                            <div class="mobile-pdf-hint" style="position: absolute; top: 10px; right: 10px; z-index: 100;">
-                                <a href="${pdfUrl}" target="_blank" class="btn btn-sm btn-primary">
-                                    <i class="fa fa-external-link"></i> Open in New Tab
-                                </a>
-                            </div>
-                        `);
-                    }
                 }
             }
 
