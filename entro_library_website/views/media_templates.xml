@@ -546,18 +546,22 @@
     <template id="media_pdf_viewer" name="PDF Viewer">
         <div class="pdf_viewer_wrapper">
             <t t-if="media.storage_type == 'file' and media.file">
-                <div class="ratio" style="padding-bottom: 100%;">
+                <div class="pdf-container">
                     <iframe t-attf-src="/web/content/library.media/#{media.id}/file"
                         type="application/pdf"
-                        class="border rounded" />
+                        class="border rounded"
+                        scrolling="yes"
+                        allowfullscreen="true" />
                 </div>
             </t>
 
             <t t-elif="media.storage_type == 'url' and media.file_url">
-                <div class="ratio" style="padding-bottom: 100%;">
+                <div class="pdf-container">
                     <iframe t-att-src="media.file_url"
                         type="application/pdf"
-                        class="border rounded" />
+                        class="border rounded"
+                        scrolling="yes"
+                        allowfullscreen="true" />
                 </div>
             </t>
         </div>
