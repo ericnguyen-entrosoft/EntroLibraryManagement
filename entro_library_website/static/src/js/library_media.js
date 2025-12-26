@@ -21,6 +21,9 @@ publicWidget.registry.LibraryMedia = publicWidget.Widget.extend({
             this._initLightGallery();
         }
 
+        // Initialize PDF viewer handling for mobile
+        this._initPDFViewer();
+
         return this._super.apply(this, arguments);
     },
 
@@ -42,6 +45,62 @@ publicWidget.registry.LibraryMedia = publicWidget.Widget.extend({
                 console.warn('lightGallery initialization failed:', e);
             }
         }
+    },
+
+    /**
+     * Initialize PDF viewer with mobile support
+     */
+    _initPDFViewer: function () {
+        const $pdfContainers = this.$('.pdf-container');
+        if ($pdfContainers.length === 0) {
+            return;
+        }
+
+        // Detect mobile devices
+        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+
+        $pdfContainers.each((index, container) => {
+            const $container = $(container);
+            const $object = $container.find('.pdf-object');
+            const $iframe = $container.find('.pdf-iframe');
+
+            if (isMobile) {
+                // For mobile devices, especially iOS which has poor PDF iframe support
+                // Add touch event handling to improve scrolling
+                $iframe.css({
+                    'overflow': 'auto',
+                    '-webkit-overflow-scrolling': 'touch',
+                    'height': '100%'
+                });
+
+                // For iOS, try to use object tag with proper fallback
+                if (isIOS) {
+                    // iOS Safari doesn't handle PDFs in iframes well
+                    // The object tag works better, but still limited
+                    $iframe.css('display', 'none');
+
+                    // Add a helper message for users
+                    const pdfUrl = $object.attr('data') || $iframe.attr('src');
+                    if (pdfUrl && !$container.find('.mobile-pdf-hint').length) {
+                        $container.append(`
+                            <div class="mobile-pdf-hint" style="position: absolute; top: 10px; right: 10px; z-index: 100;">
+                                <a href="${pdfUrl}" target="_blank" class="btn btn-sm btn-primary">
+                                    <i class="fa fa-external-link"></i> Open in New Tab
+                                </a>
+                            </div>
+                        `);
+                    }
+                }
+            }
+
+            // Handle object load errors
+            $object.on('error', function() {
+                // If object fails to load, show iframe
+                $object.hide();
+                $iframe.show();
+            });
+        });
     },
 });
 

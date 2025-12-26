@@ -547,21 +547,43 @@
         <div class="pdf_viewer_wrapper">
             <t t-if="media.storage_type == 'file' and media.file">
                 <div class="pdf-container">
-                    <iframe t-attf-src="/web/content/library.media/#{media.id}/file"
+                    <object t-attf-data="/web/content/library.media/#{media.id}/file#view=FitH"
                         type="application/pdf"
-                        class="border rounded"
-                        scrolling="yes"
-                        allowfullscreen="true" />
+                        class="pdf-object">
+                        <iframe t-attf-src="/web/content/library.media/#{media.id}/file#view=FitH"
+                            type="application/pdf"
+                            class="pdf-iframe">
+                        </iframe>
+                        <div class="pdf-fallback">
+                            <p>Your browser does not support PDF viewing.</p>
+                            <a t-attf-href="/web/content/library.media/#{media.id}/file"
+                               class="btn btn-primary"
+                               download="">
+                                <i class="fa fa-download"></i> Download PDF
+                            </a>
+                        </div>
+                    </object>
                 </div>
             </t>
 
             <t t-elif="media.storage_type == 'url' and media.file_url">
                 <div class="pdf-container">
-                    <iframe t-att-src="media.file_url"
+                    <object t-attf-data="#{media.file_url}#view=FitH"
                         type="application/pdf"
-                        class="border rounded"
-                        scrolling="yes"
-                        allowfullscreen="true" />
+                        class="pdf-object">
+                        <iframe t-attf-src="#{media.file_url}#view=FitH"
+                            type="application/pdf"
+                            class="pdf-iframe">
+                        </iframe>
+                        <div class="pdf-fallback">
+                            <p>Your browser does not support PDF viewing.</p>
+                            <a t-att-href="media.file_url"
+                               class="btn btn-primary"
+                               target="_blank">
+                                <i class="fa fa-external-link"></i> Open PDF in New Tab
+                            </a>
+                        </div>
+                    </object>
                 </div>
             </t>
         </div>
