@@ -44,7 +44,7 @@
                     /* Hero Slider Section */
                     .hero-slider {
                         position: relative;
-                        background: var(--light-gray);
+                        background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('/entro_library_website/static/src/img/hero-image-card.png') center center / cover no-repeat;
                         padding: 4rem 2rem;
                         overflow: hidden;
                         min-height: 600px;
@@ -105,10 +105,10 @@
                         max-width: 1400px;
                         margin: 0 auto;
                         display: grid;
-                        grid-template-columns: 1fr 1fr;
+                        grid-template-columns: 1fr;
                         gap: 4rem;
                         align-items: center;
-                        color: var(--text-dark);
+                        color: var(--white);
                     }
 
                     .hero-text {
@@ -116,7 +116,7 @@
                     }
 
                     .tagline {
-                        color: var(--text-gray);
+                        color: var(--white);
                         font-size: 1rem;
                         margin-bottom: 1rem;
                         font-weight: 500;
@@ -129,7 +129,7 @@
                         font-weight: 700;
                         line-height: 1.2;
                         margin-bottom: 1.5rem;
-                        color: var(--dark-navy);
+                        color: var(--white);
                     }
 
                     .hero-slide h1 .highlight {
@@ -138,9 +138,10 @@
 
                     .hero-subtitle {
                         font-size: 1.1rem;
-                        color: var(--text-gray);
+                        color: var(--white);
                         margin-bottom: 2rem;
                         line-height: 1.8;
+                        max-width: 50%;
                     }
 
                     .hero-btn {
@@ -184,6 +185,7 @@
                         gap: 0.75rem;
                         font-size: 0.95rem;
                         font-weight: 500;
+                        color: var(--white);
                     }
 
                     .hero-service-item::before {
@@ -200,83 +202,91 @@
                         flex-shrink: 0;
                     }
 
-                    .hero-visual {
-                        position: relative;
-                    }
-
-                    .hero-image-card {
-                        background: var(--white);
-                        padding: 1.5rem;
-                        border-radius: 20px;
-                        box-shadow: 0 20px 60px rgba(0,0,0,0.1);
-                        position: relative;
-                    }
-
-                    .hero-image {
-                        width: 100%;
-                        height: 500px;
-                        border-radius: 15px;
-                        position: relative;
-                        overflow: hidden;
-                    }
-
-                    .hero-image img {
-                        width: 100%;
-                        height: 100%;
-                        object-fit: cover;
-                        border-radius: 15px;
-                    }
 
                     .stats-boxes {
                         position: absolute;
-                        right: -20px;
-                        top: 50%;
-                        transform: translateY(-50%);
-                        display: flex;
-                        flex-direction: column;
-                        gap: 0.75rem;
-                        max-height: 100%;
+                        right: 0;
+                        bottom: -30px;
+                        background: var(--white);
+                        border-radius: 16px 0 0 16px;
+                        padding: 1.75rem 2rem;
+                        box-shadow: 0 15px 50px rgba(0, 0, 0, 0.15);
+                        z-index: 100;
+                        width: 35%;
+                    }
+
+                    .stats-intro {
+                        margin-bottom: 1.5rem;
+                        padding-bottom: 1rem;
+                    }
+
+                    .stats-intro h3 {
+                        font-size: 1.2rem;
+                        font-weight: 800;
+                        color: var(--primary-orange);
+                        line-height: 1.2;
+                        margin: 0 0 0.5rem 0;
+                    }
+
+                    .stats-intro h4 {
+                        font-size: 0.85rem;
+                        font-weight: 600;
+                        color: var(--text-gray);
+                        line-height: 1.4;
+                        margin: 0;
+                    }
+
+                    .stats-grid {
+                        display: grid;
+                        grid-template-columns: repeat(3, 1fr);
+                        gap: 2rem;
                     }
 
                     .stat-box {
-                        background: var(--primary-orange);
-                        color: var(--white);
-                        padding: 1.25rem 1.75rem;
+                        text-align: center;
+                        padding: 0.75rem 1rem;
                         border-radius: 10px;
-                        box-shadow: 0 10px 30px rgba(89, 18, 2, 0.3);
-                        min-width: 180px;
-                        animation: slideInRight 1s ease-out forwards;
-                        opacity: 0;
+                        transition: all 0.3s ease;
                     }
 
-                    .stat-box:nth-child(1) { animation-delay: 0.2s; }
-                    .stat-box:nth-child(2) { animation-delay: 0.4s; }
-                    .stat-box:nth-child(3) { animation-delay: 0.6s; }
-                    .stat-box:nth-child(4) { animation-delay: 0.8s; }
-
-                    @keyframes slideInRight {
-                        to {
-                            opacity: 1;
-                            transform: translateX(0);
-                        }
-                        from {
-                            opacity: 0;
-                            transform: translateX(30px);
-                        }
+                    .stat-box:hover {
+                        background: var(--light-gray);
+                        transform: translateY(-3px);
                     }
 
                     .stat-box h3 {
-                        font-size: 2.25rem;
-                        margin-bottom: 0.25rem;
+                        font-size: 2.5rem;
+                        margin-bottom: 0.4rem;
                         font-weight: 800;
                         line-height: 1;
+                        color: var(--primary-orange);
+                        font-family: 'Be Vietnam Pro', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+                    }
+
+                    .stat-box h3.counter {
+                        display: inline-block;
                     }
 
                     .stat-box p {
-                        font-size: 0.8rem;
-                        opacity: 0.95;
-                        font-weight: 500;
+                        font-size: 0.75rem;
+                        color: var(--text-gray);
+                        font-weight: 600;
                         line-height: 1.2;
+                        text-transform: uppercase;
+                        letter-spacing: 0.05em;
+                        margin: 0;
+                    }
+
+                    /* Counter Animation */
+                    @keyframes countUp {
+                        from {
+                            opacity: 0;
+                            transform: translateY(10px);
+                        }
+                        to {
+                            opacity: 1;
+                            transform: translateY(0);
+                        }
                     }
 
                     .hero-search {
@@ -354,11 +364,92 @@
                         filter: drop-shadow(0 0 10px rgba(0, 0, 0, 0.6));
                     }
 
+                    /* Quick Access Section */
+                    .quick-access {
+                        background: var(--white);
+                        padding: 3rem 2rem;
+                    }
+
+                    .quick-access-container {
+                        max-width: 1400px;
+                        margin: 0 auto;
+                    }
+
+                    .quick-access-grid {
+                        display: grid;
+                        grid-template-columns: repeat(4, 1fr);
+                        gap: 2rem;
+                    }
+
+                    .quick-access-card {
+                        padding: 1.5rem 2rem;
+                        text-decoration: none;
+                        transition: all 0.3s ease;
+                        display: flex;
+                        flex-direction: column;
+                        justify-content: center;
+                        align-items: center;
+                        text-align: center;
+                        min-height: 100px;
+                        border-radius: 12px;
+                        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+                    }
+
+                    .quick-access-card:nth-child(1) {
+                        background: var(--light-gray);
+                    }
+
+                    .quick-access-card:nth-child(2) {
+                        background: var(--light-navy);
+                    }
+
+                    .quick-access-card:nth-child(3) {
+                        background: var(--light-gray);
+                    }
+
+                    .quick-access-card:nth-child(4) {
+                        background: var(--light-navy);
+                    }
+
+                    .quick-access-card:hover {
+                        transform: translateY(-5px);
+                        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+                    }
+
+                    .quick-access-title {
+                        font-size: 1.1rem;
+                        font-weight: 700;
+                        margin: 0 0 0.25rem 0;
+                        line-height: 1.2;
+                    }
+
+                    .quick-access-card:nth-child(odd) .quick-access-title {
+                        color: var(--dark-navy);
+                    }
+
+                    .quick-access-card:nth-child(even) .quick-access-title {
+                        color: var(--white);
+                    }
+
+                    .quick-access-description {
+                        font-size: 0.8rem;
+                        margin: 0;
+                        line-height: 1.4;
+                    }
+
+                    .quick-access-card:nth-child(odd) .quick-access-description {
+                        color: var(--text-gray);
+                    }
+
+                    .quick-access-card:nth-child(even) .quick-access-description {
+                        color: rgba(255, 255, 255, 0.9);
+                    }
+
                     /* Carousel Section - About Style */
                     .carousel-section {
                         position: relative;
                         background: var(--white);
-                        padding: 6rem 2rem;
+                        padding: 2rem 2rem;
                         overflow: hidden;
                     }
 
@@ -1072,15 +1163,39 @@
                         }
 
                         .stats-boxes {
-                            position: static;
-                            transform: none;
-                            flex-direction: row;
-                            margin-top: 1.5rem;
+                            right: 0;
+                            bottom: 20px;
+                            padding: 1.5rem 1.75rem;
+                            border-radius: 12px 0 0 12px;
+                        }
+
+                        .stats-intro {
+                            margin-bottom: 1.25rem;
+                            padding-bottom: 0.85rem;
+                        }
+
+                        .stats-intro h3 {
+                            font-size: 1rem;
+                        }
+
+                        .stats-intro h4 {
+                            font-size: 0.75rem;
+                        }
+
+                        .stats-grid {
+                            gap: 1.5rem;
                         }
 
                         .stat-box {
-                            min-width: auto;
-                            flex: 1;
+                            padding: 0.5rem 0.75rem;
+                        }
+
+                        .stat-box h3 {
+                            font-size: 2rem;
+                        }
+
+                        .stat-box p {
+                            font-size: 0.7rem;
                         }
 
                         .carousel-content {
@@ -1095,12 +1210,34 @@
                         .blog-grid {
                             grid-template-columns: repeat(2, 1fr);
                         }
+
+                        .quick-access {
+                            padding: 2rem 1.5rem;
+                        }
+
+                        .quick-access-grid {
+                            grid-template-columns: repeat(2, 1fr);
+                            gap: 1.5rem;
+                        }
+
+                        .quick-access-card {
+                            padding: 1.25rem 1.5rem;
+                            min-height: 80px;
+                        }
+
+                        .quick-access-title {
+                            font-size: 1rem;
+                        }
+
+                        .quick-access-description {
+                            font-size: 0.75rem;
+                        }
                     }
 
                     @media (max-width: 768px) {
                         /* Hero Section Mobile - Keep side by side, scale everything down */
                         .hero-slider {
-                            padding: 1rem 0.5rem;
+                            padding: 1.5rem 0.5rem 5rem;
                             min-height: auto;
                         }
 
@@ -1128,13 +1265,15 @@
                         }
 
                         .hero-subtitle {
-                            font-size: 0.9rem;
+                            font-size: 0.85rem;
                             line-height: 1.4;
                             margin-bottom: 1rem;
+                            max-width: 100%;
                         }
 
                         .hero-services {
                             margin-bottom: 1.5rem;
+                            width: 100%;
                         }
 
                         .hero-service-items {
@@ -1142,44 +1281,50 @@
                         }
 
                         .hero-visual-mobile {
-                            display: block;
+                            display: none;
                         }
 
-                        .hero-visual-mobile .hero-image-card {
-                            padding: 0.75rem;
-                            position: relative;
-                        }
-
-                        .hero-visual-mobile .hero-image {
-                            height: 250px;
-                            border-radius: 12px;
-                            position: relative;
-                            overflow: visible;
-                        }
-
-                        .hero-visual-mobile .stats-boxes {
+                        .stats-boxes {
                             position: absolute;
-                            right: -3px;
-                            top: 41%;
-                            transform: translateY(-50%);
-                            flex-direction: column;
-                            gap: 0.35rem;
+                            right: 0;
+                            left: auto;
+                            bottom: -5px;
+                            padding: 0.25rem 0.35rem;
+                            border-radius: 4px;
+                            width: 50%;
+                            margin: 0;
                         }
 
-                        .hero-visual-mobile .stat-box {
-                            padding: 0.4rem 0.5rem;
-                            width: 70px;
-                            text-align: center;
+                        .stats-intro {
+                            margin-bottom: 0.25rem;
+                            padding-bottom: 0.2rem;
                         }
 
-                        .hero-visual-mobile .stat-box h3 {
-                            font-size: 0.95rem;
-                            margin-bottom: 0.15rem;
-                        }
-
-                        .hero-visual-mobile .stat-box p {
+                        .stats-intro h3 {
                             font-size: 0.5rem;
+                        }
+
+                        .stats-intro h4 {
+                            font-size: 0.3rem;
                             line-height: 1.1;
+                        }
+
+                        .stats-grid {
+                            gap: 0.25rem;
+                        }
+
+                        .stat-box {
+                            padding: 0.15rem 0.1rem;
+                        }
+
+                        .stat-box h3 {
+                            font-size: 0.5rem;
+                            margin-bottom: 0.1rem;
+                        }
+
+                        .stat-box p {
+                            font-size: 0.22rem;
+                            line-height: 1;
                         }
 
                         .hero-search {
@@ -1272,29 +1417,60 @@
                             padding: 3rem 1rem;
                         }
 
-                        .services-header h3 {
-                            font-size: 1.1rem;
+                        .services-header {
+                            margin-bottom: 1.5rem;
                         }
 
-                        .section-label {
-                            font-size: 0.7rem;
+                        .services-header h3 {
+                            font-size: 0.85rem;
+                            line-height: 1.3;
+                        }
+
+                        .services-header .section-label {
+                            font-size: 0.65rem;
+                            margin-bottom: 0.5rem;
+                        }
+
+                        .services {
+                            padding: 2rem 0.5rem;
                         }
 
                         .services-grid {
-                            grid-template-columns: 1fr;
-                            gap: 1.5rem;
+                            grid-template-columns: repeat(3, 1fr);
+                            gap: 0.5rem;
+                        }
+
+                        .service-card {
+                            border-radius: 8px;
                         }
 
                         .service-image {
-                            height: 150px;
+                            height: 100px;
+                        }
+
+                        .service-icon {
+                            width: 35px;
+                            height: 35px;
+                            font-size: 1rem;
+                            bottom: -17px;
+                            left: 15px;
+                        }
+
+                        .service-content {
+                            padding: 1.75rem 0.75rem 0.75rem;
                         }
 
                         .service-content h3 {
-                            font-size: 1rem;
+                            font-size: 0.75rem;
+                            margin-bottom: 0.5rem;
                         }
 
                         .service-content p {
-                            font-size: 0.8rem;
+                            display: none;
+                        }
+
+                        .learn-more {
+                            font-size: 0.65rem;
                         }
 
                         /* In Focus Section Mobile */
@@ -1378,6 +1554,32 @@
                         .blog-excerpt {
                             font-size: 0.8rem;
                         }
+
+                        .quick-access {
+                            padding: 1rem 0.5rem;
+                        }
+
+                        .quick-access-grid {
+                            grid-template-columns: repeat(4, 1fr);
+                            gap: 0.5rem;
+                        }
+
+                        .quick-access-card {
+                            padding: 0.65rem 0.5rem;
+                            min-height: 55px;
+                            border-radius: 6px;
+                        }
+
+                        .quick-access-title {
+                            font-size: 0.7rem;
+                            margin: 0 0 0.1rem 0;
+                            line-height: 1.1;
+                        }
+
+                        .quick-access-description {
+                            font-size: 0.55rem;
+                            line-height: 1.2;
+                        }
                     }
 
                     /* Extra Small Devices */
@@ -1432,7 +1634,7 @@
                             <p class="hero-subtitle">
                                 Nơi nuôi dưỡng Trí tuệ qua học tập và Đạo hạnh qua hành trì, góp phần gìn giữ và lan tỏa Chánh Pháp trong đời sống tu học.
                             </p>
-                            <div class="hero-services">
+                            <div class="hero-services" style="width:50%">
                                 <div class="hero-service-items">
                                     <div class="hero-service-item">Trao đổi nhóm</div>
                                     <div class="hero-service-item">Khu vực học tập - nghiên cứu cá nhân</div>
@@ -1442,25 +1644,7 @@
                                 <div class="hero-visual-mobile">
                                     <div class="hero-image-card">
                                         <div class="hero-image">
-                                            <img src="/entro_library_website/static/src/img/hero-image-card.jpg" alt="Thư viện"/>
-                                        </div>
-                                        <div class="stats-boxes">
-                                            <div class="stat-box">
-                                                <h3 t-esc="total_books"/>
-                                                <p>Đầu Sách</p>
-                                            </div>
-                                            <div class="stat-box">
-                                                <h3 t-esc="total_members"/>
-                                                <p>Hội Viên</p>
-                                            </div>
-                                            <div class="stat-box">
-                                                <h3 t-esc="visitor_count"/>
-                                                <p>Lượt Truy Cập</p>
-                                            </div>
-                                            <div class="stat-box">
-                                                <h3 t-esc="total_media"/>
-                                                <p>Tài Liệu Số</p>
-                                            </div>
+                                            <img src="/entro_library_website/static/src/img/hero-image-card.png" alt="Thư viện"/>
                                         </div>
                                     </div>
                                 </div>
@@ -1470,30 +1654,51 @@
                                 <button type="submit">TÌM KIẾM</button>
                             </form>
                         </div>
-                        <div class="hero-visual">
-                            <div class="hero-image-card">
-                                <div class="hero-image">
-                                    <img src="/entro_library_website/static/src/img/hero-image-card.jpg" alt="Thư viện"/>
-                                </div>
-                                <div class="stats-boxes">
-                                    <div class="stat-box">
-                                        <h3 t-esc="total_books"/>
-                                        <p>Đầu Sách</p>
-                                    </div>
-                                    <div class="stat-box">
-                                        <h3 t-esc="total_members"/>
-                                        <p>Hội Viên</p>
-                                    </div>
-                                    <div class="stat-box">
-                                        <h3 t-esc="visitor_count"/>
-                                        <p>Lượt Truy Cập</p>
-                                    </div>
-                                    <div class="stat-box">
-                                        <h3 t-esc="total_media"/>
-                                        <p>Tài Liệu Số</p>
-                                    </div>
-                                </div>
+                    </div>
+
+                    <!-- Stats Box - Independent element -->
+                    <div class="stats-boxes">
+                        <div class="stats-intro">
+                            <h3>Trí Đức song tu</h3>
+                            <h4>Nhịp cầu nhỏ để gieo duyên lành, hộ trì Tam Bảo và tiếp nối mạch sống của Phật pháp.</h4>
+                        </div>
+                        <div class="stats-grid">
+                            <div class="stat-box">
+                                <h3 t-esc="total_books"/>
+                                <p>Đầu Sách</p>
                             </div>
+                            <div class="stat-box">
+                                <h3 t-esc="total_media"/>
+                                <p>Tài Liệu Số</p>
+                            </div>
+                            <div class="stat-box">
+                                <h3 t-esc="visitor_count"/>
+                                <p>Lượt Truy Cập</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Quick Access Section -->
+                <section class="quick-access">
+                    <div class="quick-access-container">
+                        <div class="quick-access-grid">
+                            <a href="/thu-vien" class="quick-access-card">
+                                <h3 class="quick-access-title">Sách</h3>
+                                <p class="quick-access-description">Khám phá kho tàng sách phong phú</p>
+                            </a>
+                            <a href="/media/thien-vipassana/phap-thoai" class="quick-access-card">
+                                <h3 class="quick-access-title">Pháp thoại</h3>
+                                <p class="quick-access-description">Lắng nghe lời dạy từ thiện tri thức</p>
+                            </a>
+                            <a href="/media/thien-vipassana/huong-dan" class="quick-access-card">
+                                <h3 class="quick-access-title">Thực hành Thiền</h3>
+                                <p class="quick-access-description">Hướng dẫn tu tập Thiền Vipassana</p>
+                            </a>
+                            <a href="/media" class="quick-access-card">
+                                <h3 class="quick-access-title">Tài liệu số</h3>
+                                <p class="quick-access-description">Truy cập tài nguyên số đa dạng</p>
+                            </a>
                         </div>
                     </div>
                 </section>
@@ -1696,6 +1901,42 @@
                     </section>
                 </t>
             </div>
+
+            <!-- Counter Animation Script -->
+            <script type="text/javascript">
+                document.addEventListener('DOMContentLoaded', function() {
+                    function animateCounter(element, target, duration) {
+                        let start = 0;
+                        const increment = target / (duration / 16); // 60fps
+                        const timer = setInterval(function() {
+                            start += increment;
+                            if (start >= target) {
+                                element.textContent = target;
+                                clearInterval(timer);
+                            } else {
+                                element.textContent = Math.floor(start);
+                            }
+                        }, 16);
+                    }
+
+                    // Animate all stat counters
+                    const statCounters = document.querySelectorAll('.stats-boxes .stat-box h3');
+                    const observer = new IntersectionObserver(function(entries) {
+                        entries.forEach(function(entry) {
+                            if (entry.isIntersecting) {
+                                const target = parseInt(entry.target.textContent);
+                                entry.target.textContent = '0';
+                                animateCounter(entry.target, target, 1000); // 1 second animation
+                                observer.unobserve(entry.target);
+                            }
+                        });
+                    }, { threshold: 0.5 });
+
+                    statCounters.forEach(function(counter) {
+                        observer.observe(counter);
+                    });
+                });
+            </script>
         </t>
     </template>
 </odoo>
