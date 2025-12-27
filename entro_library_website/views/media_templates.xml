@@ -547,20 +547,79 @@
         <div class="pdf_viewer_wrapper">
             <t t-if="media.storage_type == 'file' and media.file">
                 <div class="pdf-container">
-                    <iframe t-attf-src="/web/static/lib/pdfjs/web/viewer.html?file=/web/content/library.media/#{media.id}/file"
-                            class="pdf-iframe">
+                    <!-- Desktop: Use PDF.js -->
+                    <iframe t-attf-src="/web/static/lib/pdfjs/web/viewer.html?file=%2Fweb%2Fcontent%2Flibrary.media%2F#{media.id}%2Ffile"
+                            class="pdf-iframe pdf-desktop">
                     </iframe>
+
+                    <!-- iOS Fallback: Direct link with download option -->
+                    <div class="pdf-ios-fallback" style="display: none;">
+                        <div class="text-center p-5">
+                            <p class="text-muted mb-4">Nhấn vào nút bên dưới để xem tài liệu</p>
+                            <div class="d-flex flex-column gap-2 align-items-center">
+                                <a t-attf-href="/web/content/library.media/#{media.id}/file"
+                                   class="btn btn-primary btn-lg"
+                                   target="_blank">
+                                    <i class="fa fa-external-link me-2"></i> Xem tài liệu
+                                </a>
+                                <a t-attf-href="/web/content/library.media/#{media.id}/file"
+                                   class="btn btn-outline-primary"
+                                   download="">
+                                    <i class="fa fa-download me-2"></i> Tải xuống
+                                </a>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </t>
 
             <t t-elif="media.storage_type == 'url' and media.file_url">
                 <div class="pdf-container">
+                    <!-- Desktop: Use PDF.js -->
                     <iframe t-attf-src="/web/static/lib/pdfjs/web/viewer.html?file=#{media.file_url}"
-                            class="pdf-iframe">
+                            class="pdf-iframe pdf-desktop">
                     </iframe>
+
+                    <!-- iOS Fallback: Direct link -->
+                    <div class="pdf-ios-fallback" style="display: none;">
+                        <div class="text-center p-5">
+                            <i class="fa fa-file-pdf-o fa-5x text-danger mb-4"></i>
+                            <h4 class="mb-3">Xem PDF</h4>
+                            <p class="text-muted mb-4">Nhấn vào nút bên dưới để xem tài liệu PDF</p>
+                            <a t-att-href="media.file_url"
+                               class="btn btn-primary btn-lg"
+                               target="_blank">
+                                <i class="fa fa-external-link me-2"></i> Mở PDF
+                            </a>
+                        </div>
+                    </div>
                 </div>
             </t>
         </div>
+
+        <!-- JavaScript to detect iOS and show appropriate viewer -->
+        <script type="text/javascript">
+            (function() {
+                // Detect iOS devices
+                function isIOSDevice() {
+                    return /iPad|iPhone|iPod/.test(navigator.userAgent) &amp;&amp; !window.MSStream;
+                }
+
+                // Run on page load
+                if (isIOSDevice()) {
+                    document.addEventListener('DOMContentLoaded', function() {
+                        var containers = document.querySelectorAll('.pdf-container');
+                        containers.forEach(function(container) {
+                            var desktopViewer = container.querySelector('.pdf-desktop');
+                            var iosFallback = container.querySelector('.pdf-ios-fallback');
+
+                            if (desktopViewer) desktopViewer.style.display = 'none';
+                            if (iosFallback) iosFallback.style.display = 'block';
+                        });
+                    });
+                }
+            })();
+        </script>
     </template>
 
 </odoo>
