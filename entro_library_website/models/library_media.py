@@ -32,6 +32,15 @@ class LibraryMedia(models.Model):
         help='Chỉ những loại độc giả này mới được xem tài liệu trên website. Để trống nếu cho phép tất cả.'
     )
 
+    # Menu Category (Hierarchical)
+    menu_category_id = fields.Many2one(
+        'library.menu.category',
+        string='Danh mục Menu',
+        help='Danh mục trong menu website (hỗ trợ cấu trúc phân cấp)',
+        tracking=True,
+        index=True
+    )
+
     @api.depends('name')
     def _compute_website_url(self):
         for media in self:

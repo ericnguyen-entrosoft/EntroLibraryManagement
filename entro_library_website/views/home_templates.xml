@@ -165,10 +165,17 @@
                     }
 
                     .hero-services {
+                        margin-bottom: 2.5rem;
+                    }
+
+                    .hero-service-items {
                         display: grid;
                         grid-template-columns: repeat(2, 1fr);
                         gap: 1rem;
-                        margin-bottom: 2.5rem;
+                    }
+
+                    .hero-visual-mobile {
+                        display: none;
                     }
 
                     .hero-service-item {
@@ -1048,12 +1055,16 @@
                     /* Responsive */
                     @media (max-width: 1024px) {
                         .hero-content {
-                            grid-template-columns: 1fr;
-                            gap: 3rem;
+                            grid-template-columns: 1fr 1fr;
+                            gap: 2rem;
                         }
 
-                        .hero-slide h1 {
-                            font-size: 2.5rem;
+                        .hero-text h1 {
+                            font-size: 2rem;
+                        }
+
+                        .hero-subtitle {
+                            font-size: 1rem;
                         }
 
                         .section-title {
@@ -1087,52 +1098,325 @@
                     }
 
                     @media (max-width: 768px) {
+                        /* Hero Section Mobile - Keep side by side, scale everything down */
                         .hero-slider {
-                            padding: 2rem 1rem;
+                            padding: 1rem 0.5rem;
+                            min-height: auto;
                         }
 
-                        .hero-slide h1 {
-                            font-size: 2rem;
+                        .hero-content {
+                            grid-template-columns: 1fr;
+                            gap: 0;
+                            padding: 0 0.5rem;
+                            max-width: 100%;
+                        }
+
+                        .hero-text {
+                            padding-right: 0;
+                            text-align: left;
+                        }
+
+                        .hero-text h1 {
+                            font-size: 1.5rem;
+                            line-height: 1.2;
+                            margin-bottom: 0.75rem;
                         }
 
                         .tagline {
-                            font-size: 0.85rem;
+                            font-size: 0.75rem;
+                            margin-bottom: 0.5rem;
                         }
 
                         .hero-subtitle {
-                            font-size: 1rem;
+                            font-size: 0.9rem;
+                            line-height: 1.4;
+                            margin-bottom: 1rem;
                         }
 
                         .hero-services {
-                            grid-template-columns: 1fr;
+                            margin-bottom: 1.5rem;
+                        }
+
+                        .hero-service-items {
+                            display: none;
+                        }
+
+                        .hero-visual-mobile {
+                            display: block;
+                        }
+
+                        .hero-visual-mobile .hero-image-card {
+                            padding: 0.75rem;
+                            position: relative;
+                        }
+
+                        .hero-visual-mobile .hero-image {
+                            height: 250px;
+                            border-radius: 12px;
+                            position: relative;
+                            overflow: visible;
+                        }
+
+                        .hero-visual-mobile .stats-boxes {
+                            position: absolute;
+                            right: -3px;
+                            top: 41%;
+                            transform: translateY(-50%);
+                            flex-direction: column;
+                            gap: 0.35rem;
+                        }
+
+                        .hero-visual-mobile .stat-box {
+                            padding: 0.4rem 0.5rem;
+                            width: 70px;
+                            text-align: center;
+                        }
+
+                        .hero-visual-mobile .stat-box h3 {
+                            font-size: 0.95rem;
+                            margin-bottom: 0.15rem;
+                        }
+
+                        .hero-visual-mobile .stat-box p {
+                            font-size: 0.5rem;
+                            line-height: 1.1;
                         }
 
                         .hero-search {
+                            max-width: 100%;
+                        }
+
+                        .hero-search input {
+                            padding: 0.5rem 0.75rem;
+                            font-size: 0.85rem;
+                        }
+
+                        .hero-search button {
+                            padding: 0.5rem 1rem;
+                            font-size: 0.85rem;
+                        }
+
+                        .hero-visual {
+                            display: none;
+                        }
+
+                        /* Carousel Section Mobile - Text above image */
+                        .carousel-section {
+                            padding: 1rem 0.5rem;
+                        }
+
+                        .carousel-wrapper {
+                            padding: 0;
+                        }
+
+                        .carousel-content {
+                            grid-template-columns: 1fr;
+                            gap: 1rem;
+                        }
+
+                        .carousel-text {
+                            padding: 0;
+                            order: 1;
+                        }
+
+                        .carousel-visual {
+                            order: 2;
+                        }
+
+                        .carousel-image-main {
+                            height: 200px;
+                        }
+
+                        .carousel-text h2 {
+                            font-size: 1.1rem;
+                            line-height: 1.3;
+                            margin-bottom: 0.5rem;
+                        }
+
+                        .carousel-text p {
+                            font-size: 0.8rem;
+                            line-height: 1.5;
+                        }
+
+                        .section-label {
+                            font-size: 0.7rem;
+                            margin-bottom: 0.25rem;
+                        }
+
+                        .carousel-indicators {
+                            position: relative;
+                            top: auto;
+                            left: auto;
+                            transform: none;
+                            margin-top: 1rem;
+                            order: 3;
+                        }
+
+                        .carousel-indicators li {
+                            width: 8px;
+                            height: 8px;
+                            margin: 0 4px;
+                        }
+
+                        .carousel-wrapper {
+                            display: flex;
                             flex-direction: column;
+                        }
+
+                        .carousel-inner {
+                            order: 1;
+                        }
+
+                        /* Services Section Mobile */
+                        .services {
+                            padding: 3rem 1rem;
+                        }
+
+                        .services-header h3 {
+                            font-size: 1.1rem;
+                        }
+
+                        .section-label {
+                            font-size: 0.7rem;
+                        }
+
+                        .services-grid {
+                            grid-template-columns: 1fr;
+                            gap: 1.5rem;
+                        }
+
+                        .service-image {
+                            height: 150px;
+                        }
+
+                        .service-content h3 {
+                            font-size: 1rem;
+                        }
+
+                        .service-content p {
+                            font-size: 0.8rem;
+                        }
+
+                        /* In Focus Section Mobile */
+                        .in-focus {
+                            padding: 2rem 0.5rem;
+                        }
+
+                        .section-header h2 {
+                            font-size: 1.1rem;
+                        }
+
+                        .popular-items-carousel-wrapper {
+                            padding-bottom: 10px;
+                            max-height: 280px;
+                        }
+
+                        .popular-items-carousel {
+                            gap: 1rem;
+                        }
+
+                        .carousel-item-wrapper {
+                            min-width: 140px;
+                            max-width: 140px;
+                        }
+
+                        .carousel-item-wrapper .card {
+                            height: 100%;
+                        }
+
+                        .carousel-item-wrapper .book_card,
+                        .carousel-item-wrapper .media_card {
+                            height: 260px !important;
+                        }
+
+                        .carousel-item-wrapper .book_cover,
+                        .carousel-item-wrapper .media_thumbnail {
+                            height: 140px !important;
+                            width: 140px !important;
+                        }
+
+                        .carousel-item-wrapper .card-body {
+                            padding: 0.4rem;
+                            min-height: auto;
+                            max-height: 80px;
+                            overflow: hidden;
+                        }
+
+                        .carousel-item-wrapper .book_title,
+                        .carousel-item-wrapper .media_title {
+                            font-size: 0.7rem;
+                            line-height: 1.1;
+                            margin-bottom: 0.25rem;
+                            -webkit-line-clamp: 2;
+                        }
+
+                        .carousel-item-wrapper .card-text {
+                            font-size: 0.6rem;
+                            line-height: 1.1;
+                            margin-bottom: 0.25rem;
+                        }
+
+                        .carousel-item-wrapper .card-footer {
+                            padding: 0.3rem 0.4rem;
+                            font-size: 0.6rem;
+                        }
+
+                        /* Blog Section Mobile */
+                        .blog-grid {
+                            grid-template-columns: 1fr;
+                            gap: 1.5rem;
+                        }
+
+                        .blog-image {
+                            height: 150px;
+                        }
+
+                        .blog-title {
+                            font-size: 1rem;
+                        }
+
+                        .blog-excerpt {
+                            font-size: 0.8rem;
+                        }
+                    }
+
+                    /* Extra Small Devices */
+                    @media (max-width: 480px) {
+                        .hero-text h1 {
+                            font-size: 1.5rem;
+                        }
+
+                        .hero-subtitle {
+                            font-size: 0.875rem;
+                        }
+
+                        .hero-image {
+                            height: 250px;
                         }
 
                         .stats-boxes {
                             flex-direction: column;
                         }
 
-                        .stat-box h3 {
-                            font-size: 2rem;
+                        .stat-box {
+                            min-width: 100%;
+                        }
+
+                        .carousel-text h2 {
+                            font-size: 1.25rem;
+                        }
+
+                        .carousel-image-main {
+                            height: 200px;
                         }
 
                         .section-title {
-                            font-size: 1.75rem;
+                            font-size: 1.5rem;
                         }
 
-                        .services-grid {
-                            grid-template-columns: 1fr;
-                        }
-
-                        .blog-grid {
-                            grid-template-columns: 1fr;
-                        }
-
-                        .blog-image {
-                            height: 200px;
+                        .carousel-item-wrapper {
+                            min-width: 180px;
+                            max-width: 180px;
                         }
                     }
                 </style>
@@ -1146,13 +1430,40 @@
                             <p class="tagline">THIỀN VIỆN PHÁP SƠN</p>
                             <h1>THƯ VIỆN PHÁP ĐĂNG</h1>
                             <p class="hero-subtitle">
-                                Khám phá kho tàng tri thức với hơn <t t-esc="total_books"/> đầu sách, tài liệu số chất lượng cao và không gian trao đổi, tu học.
+                                Nơi nuôi dưỡng Trí tuệ qua học tập và Đạo hạnh qua hành trì, góp phần gìn giữ và lan tỏa Chánh Pháp trong đời sống tu học.
                             </p>
                             <div class="hero-services">
-                                <div class="hero-service-item">Trao đổi nhóm</div>
-                                <div class="hero-service-item">Khu vực học tập - nghiên cứu cá nhân</div>
-                                <div class="hero-service-item">Sách &amp; Tài liệu số</div>
-                                <div class="hero-service-item">Tra cứu &amp; khai thác tài nguyên</div>
+                                <div class="hero-service-items">
+                                    <div class="hero-service-item">Trao đổi nhóm</div>
+                                    <div class="hero-service-item">Khu vực học tập - nghiên cứu cá nhân</div>
+                                    <div class="hero-service-item">Sách &amp; Tài liệu số</div>
+                                    <div class="hero-service-item">Tra cứu &amp; khai thác tài nguyên</div>
+                                </div>
+                                <div class="hero-visual-mobile">
+                                    <div class="hero-image-card">
+                                        <div class="hero-image">
+                                            <img src="/entro_library_website/static/src/img/hero-image-card.jpg" alt="Thư viện"/>
+                                        </div>
+                                        <div class="stats-boxes">
+                                            <div class="stat-box">
+                                                <h3 t-esc="total_books"/>
+                                                <p>Đầu Sách</p>
+                                            </div>
+                                            <div class="stat-box">
+                                                <h3 t-esc="total_members"/>
+                                                <p>Hội Viên</p>
+                                            </div>
+                                            <div class="stat-box">
+                                                <h3 t-esc="visitor_count"/>
+                                                <p>Lượt Truy Cập</p>
+                                            </div>
+                                            <div class="stat-box">
+                                                <h3 t-esc="total_media"/>
+                                                <p>Tài Liệu Số</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                             <form class="hero-search" action="/kho-tai-nguyen" method="get">
                                 <input type="text" name="search" placeholder="Tìm sách, tài liệu số..."/>
@@ -1174,8 +1485,8 @@
                                         <p>Hội Viên</p>
                                     </div>
                                     <div class="stat-box">
-                                        <h3 t-esc="total_borrowings"/>
-                                        <p>Lượt Mượn/Năm</p>
+                                        <h3 t-esc="visitor_count"/>
+                                        <p>Lượt Truy Cập</p>
                                     </div>
                                     <div class="stat-box">
                                         <h3 t-esc="total_media"/>
@@ -1231,9 +1542,10 @@
                                                         <t t-esc="slide.subtitle"/>
                                                     </t>
                                                     <t t-else="">
-                                                        <strong>Thư viện Pháp Đăng</strong> nằm trong khuôn viên của <strong>Thiền Viện Pháp Sơn</strong> có không gian tu học và nghiên cứu nhỏ gọn, được hình thành trong lòng Thiền viện Pháp Sơn, với tâm nguyện làm nơi nương tựa cho việc học tập, tra cứu và nuôi dưỡng đời sống nội tâm của Chư Ni.<br/><br/>
+                                                        <strong>Thư viện Pháp Đăng</strong> được hình thành với tâm nguyện làm nơi nuôi dưỡng Trí tuệ qua học tập và Đạo hạnh qua hành trì, góp phần gìn giữ và lan tỏa Chánh Pháp trong đời sống tu học.<br/><br/>
 
-Thư viện được thiết kế theo mô hình mở, hài hòa giữa sự giản dị của thiền môn và những nét đặc trưng của văn hóa Phật giáo. Không gian thư viện bao gồm các khu vực trao đổi nhóm, khu vực học tập – nghiên cứu cá nhân, khu vực đa phương tiện, cùng các kệ trưng bày sách được phân theo từng mảng nội dung như: Phật học, Tổng hợp, Ngoại ngữ và Kho lưu…
+                                                        Giữa không gian thanh tịnh của Thiền viện Pháp Sơn, từng trang kinh, từng đầu sách là phương tiện giúp Chư Ni soi sáng chánh kiến, bồi dưỡng nội lực và vững bước trên con đường tu tập.<br/><br/>
+                                                        Với thiết kế giản dị, thanh tịnh, thư viện từng bước phát triển thêm hình thức thư viện điện tử, chia sẻ chọn lọc một số nội dung đến thiền sinh và Phật tử hữu duyên, như một nhịp cầu nhỏ để gieo duyên lành, hộ trì Tam Bảo và tiếp nối mạch sống của Phật pháp.
                                                     </t>
                                                 </p>
                                                 <!-- <div class="carousel-actions">

@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <!-- Root Category: Thiền Vipassana -->
+        <record id="menu_cat_thien_vipassana" model="library.menu.category">
+            <field name="name">Thiền Vipassana</field>
+            <field name="url_key">thien-vipassana</field>
+            <field name="menu_type">tai_lieu_so</field>
+            <field name="sequence">10</field>
+            <field name="icon">fa-leaf</field>
+            <field name="description">Tài liệu về thiền Vipassana</field>
+        </record>
+
+        <!-- Level 1: Pháp thoại -->
+        <record id="menu_cat_phap_thoai" model="library.menu.category">
+            <field name="name">Pháp thoại</field>
+            <field name="url_key">phap-thoai</field>
+            <field name="parent_id" ref="menu_cat_thien_vipassana"/>
+            <field name="menu_type">tai_lieu_so</field>
+            <field name="sequence">10</field>
+            <field name="icon">fa-microphone</field>
+        </record>
+
+        <!-- Level 1: Hướng dẫn thực hành thiền -->
+        <record id="menu_cat_huong_dan" model="library.menu.category">
+            <field name="name">Hướng dẫn thực hành thiền</field>
+            <field name="url_key">huong-dan</field>
+            <field name="parent_id" ref="menu_cat_thien_vipassana"/>
+            <field name="menu_type">tai_lieu_so</field>
+            <field name="sequence">20</field>
+            <field name="icon">fa-compass</field>
+        </record>
+
+        <!-- Level 2: 3 ngày -->
+        <record id="menu_cat_3_ngay" model="library.menu.category">
+            <field name="name">3 ngày</field>
+            <field name="url_key">3-ngay</field>
+            <field name="parent_id" ref="menu_cat_huong_dan"/>
+            <field name="menu_type">tai_lieu_so</field>
+            <field name="sequence">10</field>
+        </record>
+
+        <!-- Level 2: 10 ngày -->
+        <record id="menu_cat_10_ngay" model="library.menu.category">
+            <field name="name">10 ngày</field>
+            <field name="url_key">10-ngay</field>
+            <field name="parent_id" ref="menu_cat_huong_dan"/>
+            <field name="menu_type">tai_lieu_so</field>
+            <field name="sequence">20</field>
+        </record>
+
+        <!-- Level 2: Căn bản -->
+        <record id="menu_cat_can_ban" model="library.menu.category">
+            <field name="name">Căn bản</field>
+            <field name="url_key">can-ban</field>
+            <field name="parent_id" ref="menu_cat_huong_dan"/>
+            <field name="menu_type">tai_lieu_so</field>
+            <field name="sequence">30</field>
+        </record>
+
+        <!-- Level 2: Metta -->
+        <record id="menu_cat_metta" model="library.menu.category">
+            <field name="name">Metta</field>
+            <field name="url_key">metta</field>
+            <field name="parent_id" ref="menu_cat_huong_dan"/>
+            <field name="menu_type">tai_lieu_so</field>
+            <field name="sequence">40</field>
+        </record>
+
+        <!-- Level 2: Thiếu nhi -->
+        <record id="menu_cat_thieu_nhi" model="library.menu.category">
+            <field name="name">Thiếu nhi</field>
+            <field name="url_key">thieu-nhi</field>
+            <field name="parent_id" ref="menu_cat_huong_dan"/>
+            <field name="menu_type">tai_lieu_so</field>
+            <field name="sequence">50</field>
+        </record>
+
+        <!-- Level 2: Thiếu niên -->
+        <record id="menu_cat_thieu_nien" model="library.menu.category">
+            <field name="name">Thiếu niên</field>
+            <field name="url_key">thieu-nien</field>
+            <field name="parent_id" ref="menu_cat_huong_dan"/>
+            <field name="menu_type">tai_lieu_so</field>
+            <field name="sequence">60</field>
+        </record>
+
+        <!-- Level 1: Tư liệu -->
+        <record id="menu_cat_tu_lieu" model="library.menu.category">
+            <field name="name">Tư liệu</field>
+            <field name="url_key">tu-lieu</field>
+            <field name="parent_id" ref="menu_cat_thien_vipassana"/>
+            <field name="menu_type">tai_lieu_so</field>
+            <field name="sequence">30</field>
+            <field name="icon">fa-archive</field>
+        </record>
+
+        <!-- Level 1: Q&A -->
+        <record id="menu_cat_qa" model="library.menu.category">
+            <field name="name">Q&amp;A</field>
+            <field name="url_key">qa</field>
+            <field name="parent_id" ref="menu_cat_thien_vipassana"/>
+            <field name="menu_type">tai_lieu_so</field>
+            <field name="sequence">40</field>
+            <field name="icon">fa-question-circle</field>
+        </record>
+
+    </data>
+</odoo>

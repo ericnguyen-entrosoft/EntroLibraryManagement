@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Google Analytics Configuration Form View -->
+    <record id="view_google_analytics_config_form" model="ir.ui.view">
+        <field name="name">google.analytics.config.form</field>
+        <field name="model">google.analytics.config</field>
+        <field name="arch" type="xml">
+            <form string="Google Analytics Configuration">
+                <header>
+                    <button name="action_test_connection" string="Test Connection" type="object"
+                            class="oe_highlight" icon="fa-plug"/>
+                    <button name="action_fetch_data" string="Fetch Data Now" type="object"
+                            class="btn-primary" icon="fa-download"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="toggle_active" type="object" class="oe_stat_button" icon="fa-archive">
+                            <field name="active" widget="boolean_button" options='{"terminology": "archive"}'/>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <label for="name" class="oe_edit_only"/>
+                        <h1>
+                            <field name="name" placeholder="e.g., GA4 Production Configuration"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group string="Google Analytics 4 Settings">
+                            <field name="property_id" placeholder="123456789"
+                                   help="Find this in Google Analytics Admin > Property Settings"/>
+                            <field name="metric_name"/>
+                            <field name="date_range"/>
+                        </group>
+                        <group string="Current Statistics">
+                            <field name="visitor_count" widget="integer"/>
+                            <field name="last_update" widget="datetime"/>
+                        </group>
+                    </group>
+                    <group string="Auto-Update Settings">
+                        <field name="auto_update"/>
+                        <field name="update_interval" invisible="not auto_update"/>
+                    </group>
+                    <notebook>
+                        <page string="Service Account Credentials" name="credentials">
+                            <group>
+                                <field name="credentials_json" widget="text"
+                                       placeholder='{"type": "service_account", "project_id": "...", ...}'
+                                       nolabel="1"/>
+                            </group>
+                            <div class="alert alert-info" role="alert">
+                                <h4>How to get Service Account Credentials:</h4>
+                                <ol>
+                                    <li>Go to <a href="https://console.cloud.google.com/" target="_blank">Google Cloud Console</a></li>
+                                    <li>Create or select a project</li>
+                                    <li>Enable the Google Analytics Data API</li>
+                                    <li>Create a Service Account (IAM &amp; Admin > Service Accounts)</li>
+                                    <li>Create and download a JSON key for the service account</li>
+                                    <li>In Google Analytics, add the service account email (found in the JSON) as a Viewer in Property Access Management</li>
+                                    <li>Copy the entire content of the JSON file and paste it above</li>
+                                </ol>
+                            </div>
+                        </page>
+                        <page string="Last Error" name="error" invisible="not last_error">
+                            <field name="last_error" widget="text" readonly="1" nolabel="1"/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Google Analytics Configuration list View -->
+    <record id="view_google_analytics_config_list" model="ir.ui.view">
+        <field name="name">google.analytics.config.list</field>
+        <field name="model">google.analytics.config</field>
+        <field name="arch" type="xml">
+            <list string="Google Analytics Configurations">
+                <field name="name"/>
+                <field name="property_id"/>
+                <field name="metric_name"/>
+                <field name="visitor_count" string="Visitor Count"/>
+                <field name="last_update"/>
+                <field name="auto_update" widget="boolean_toggle"/>
+                <field name="active" widget="boolean_toggle"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Google Analytics Configuration Action -->
+    <record id="action_google_analytics_config" model="ir.actions.act_window">
+        <field name="name">Google Analytics Configuration</field>
+        <field name="res_model">google.analytics.config</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Configure Google Analytics Integration
+            </p>
+            <p>
+                Set up your Google Analytics 4 property to automatically fetch visitor statistics
+                and display them on your library website homepage.
+            </p>
+        </field>
+    </record>
+
+    <!-- Menu Items -->
+    <menuitem id="menu_google_analytics_root"
+              name="Google Analytics"
+              parent="website.menu_website_configuration"
+              sequence="50"/>
+
+    <menuitem id="menu_google_analytics_config"
+              name="Configuration"
+              parent="menu_google_analytics_root"
+              action="action_google_analytics_config"
+              sequence="10"/>
+</odoo>

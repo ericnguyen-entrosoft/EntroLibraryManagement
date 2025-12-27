@@ -70,15 +70,47 @@
                             <div class="row">
                                 <div class="col-md-12">
                                     <nav class="nav flex-column">
-                                        <a href="/media/chu-ni" class="nav-link py-2">
-                                           Chư Ni
-                                        </a>
-                                        <a href="/media/thien-sinh" class="nav-link py-2">
-                                            Thiền sinh
-                                        </a>
-                                        <a href="/media/phat-tu" class="nav-link py-2">
-                                            Phật tử
-                                        </a>
+                                        <div class="nav-item">
+                                            <a href="/media/thien-vipassana" class="nav-link py-2 fw-bold">
+                                                Thiền Vipassana
+                                            </a>
+                                            <nav class="nav flex-column ms-3">
+                                                <a href="/media/thien-vipassana/phap-thoai" class="nav-link py-1">
+                                                    <i class="fa fa-angle-right me-2"></i>Pháp thoại
+                                                </a>
+                                                <div class="nav-item">
+                                                    <a href="/media/thien-vipassana/huong-dan" class="nav-link py-1">
+                                                        <i class="fa fa-angle-right me-2"></i>Hướng dẫn thực hành thiền
+                                                    </a>
+                                                    <nav class="nav flex-column ms-3">
+                                                        <a href="/media/thien-vipassana/huong-dan/3-ngay" class="nav-link py-1 small">
+                                                            3 ngày
+                                                        </a>
+                                                        <a href="/media/thien-vipassana/huong-dan/10-ngay" class="nav-link py-1 small">
+                                                            10 ngày
+                                                        </a>
+                                                        <a href="/media/thien-vipassana/huong-dan/can-ban" class="nav-link py-1 small">
+                                                            Căn bản
+                                                        </a>
+                                                        <a href="/media/thien-vipassana/huong-dan/metta" class="nav-link py-1 small">
+                                                            Metta
+                                                        </a>
+                                                        <a href="/media/thien-vipassana/huong-dan/thieu-nhi" class="nav-link py-1 small">
+                                                            Thiếu nhi
+                                                        </a>
+                                                        <a href="/media/thien-vipassana/huong-dan/thieu-nien" class="nav-link py-1 small">
+                                                            Thiếu niên
+                                                        </a>
+                                                    </nav>
+                                                </div>
+                                                <a href="/media/thien-vipassana/tu-lieu" class="nav-link py-1">
+                                                    <i class="fa fa-angle-right me-2"></i>Tư liệu
+                                                </a>
+                                                <a href="/media/thien-vipassana/qa" class="nav-link py-1">
+                                                    <i class="fa fa-angle-right me-2"></i>Q&A
+                                                </a>
+                                            </nav>
+                                        </div>
                                     </nav>
                                 </div>
                             </div>

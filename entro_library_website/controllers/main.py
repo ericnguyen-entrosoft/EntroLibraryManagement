@@ -60,11 +60,15 @@ class LibraryWebsite(http.Controller):
         total_media = request.env['library.media'].search_count([('active', '=', True)])
         total_members = request.env['res.partner'].search_count([('borrower_type_id', '!=', False)])
 
-        # Get total borrowing count for the current year
-        current_year_start = fields.Date.today().replace(month=1, day=1)
-        total_borrowings = request.env['library.borrowing'].search_count([
-            ('borrow_date', '>=', current_year_start)
-        ])
+        # Get visitor count from Google Analytics (cached value)
+        visitor_count = 0
+        try:
+            # Get cached value from system parameter (updated by scheduled action)
+            visitor_count = int(request.env['ir.config_parameter'].sudo().get_param(
+                'library.visitor_count', default=0
+            ))
+        except (ValueError, TypeError):
+            visitor_count = 0
 
         values = {
             'hero_slides': hero_slides,
@@ -74,7 +78,7 @@ class LibraryWebsite(http.Controller):
             'total_books': total_books,
             'total_media': total_media,
             'total_members': total_members,
-            'total_borrowings': total_borrowings,
+            'visitor_count': visitor_count,
             'page_name': 'library_home',
         }
 
@@ -280,11 +284,26 @@ class LibraryWebsite(http.Controller):
     @http.route([
         '/media',
         '/media/page/<int:page>',
+        '/media/<path:menu_path>',
+        '/media/<path:menu_path>/page/<int:page>',
         '/media/danh-muc/<model("library.website.category"):category>',
         '/media/danh-muc/<model("library.website.category"):category>/page/<int:page>',
     ], type='http', auth='public', website=True, sitemap=True)
-    def library_media_list(self, page=1, category=None, search='', media_type=None, sortby=None, **kwargs):
+    def library_media_list(self, page=1, category=None, menu_path=None, search='', media_type=None, sortby=None, **kwargs):
         """Trang danh sách phương tiện"""
+
+        # Handle menu category path
+        menu_category = None
+        if menu_path:
+            # Find menu category by matching the full URL path
+            # For example: "thien-vipassana/huong-dan/3-ngay"
+            menu_category = request.env['library.menu.category'].search([
+                ('full_url', '=', f'/media/{menu_path}')
+            ], limit=1)
+
+            if not menu_category:
+                # If exact match not found, redirect to main media page
+                return request.redirect('/media')
 
         domain = [('website_published', '=', True), ('active', '=', True)]
 
@@ -319,6 +338,14 @@ class LibraryWebsite(http.Controller):
         if category:
             domain += [('website_category_id', '=', category.id)]
 
+        # Filter by menu category (hierarchical)
+        if menu_category:
+            # Get all child categories including this one
+            all_category_ids = request.env['library.menu.category'].search([
+                ('id', 'child_of', menu_category.id)
+            ]).ids
+            domain += [('menu_category_id', 'in', all_category_ids)]
+
         # Filter by media type
         if media_type:
             domain += [('media_type', '=', media_type)]
@@ -343,7 +370,10 @@ class LibraryWebsite(http.Controller):
         ppg = 12  # media per page
 
         # Construct base URL
-        if category:
+        if menu_category:
+            # Use menu category path
+            url = menu_category.full_url
+        elif category:
             url = f'/media/danh-muc/{category.id}'
         else:
             url = '/media'
@@ -375,7 +405,7 @@ class LibraryWebsite(http.Controller):
 
         # Keep query parameters
         keep = QueryURL(
-            '/media',
+            url,
             category=category and category.id,
             search=search,
             media_type=media_type,
@@ -388,6 +418,7 @@ class LibraryWebsite(http.Controller):
             'pager': pager,
             'search': search,
             'category': category,
+            'menu_category': menu_category,
             'media_type': media_type,
             'website_categories': website_categories,
             'page_name': 'library_media',

@@ -19,6 +19,7 @@
             <!-- Add website category field in general info -->
             <xpath expr="//field[@name='category_id']" position="after">
                 <field name="website_category_id"/>
+                <field name="menu_category_id" options="{'no_create': True}"/>
             </xpath>
 
             <!-- Add website fields in access control section -->
