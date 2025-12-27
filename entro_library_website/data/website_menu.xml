@@ -26,13 +26,13 @@
                             </h5>
                             <nav class="nav flex-column">
                                 <a href="/kho-tai-nguyen" class="nav-link py-2">
-                                    <i class="fa fa-th me-2"></i>Tất cả (Sách & Phương tiện)
+                                    <i class="fa fa-th me-2"></i>Tất cả
                                 </a>
                                 <a href="/kho-tai-nguyen?item_type=book" class="nav-link py-2">
-                                    <i class="fa fa-book me-2"></i>Chỉ xem Sách
+                                    <i class="fa fa-book me-2"></i>Tài nguyên sách
                                 </a>
                                 <a href="/kho-tai-nguyen?item_type=media" class="nav-link py-2">
-                                    <i class="fa fa-video-camera me-2"></i>Chỉ xem Phương tiện
+                                    <i class="fa fa-video-camera me-2"></i>Tài nguyên số
                                 </a>
                                 <hr class="my-2"/>
                                 <a href="/my/borrowings" class="nav-link py-2 small">
@@ -47,7 +47,7 @@
                         <!-- Column 1: Sách -->
                         <div class="col-lg-4 mb-3">
                             <h5 class="mb-3 pb-2 border-bottom">
-                                <a href="/thu-vien" class="text-decoration-none text-dark">Sách</a>
+                                <a href="/thu-vien" class="text-decoration-none text-dark">Tài nguyên sách</a>
                             </h5>
                             <nav class="nav flex-column">
                                 <a href="/thu-vien/phat-hoc" class="nav-link py-2">
@@ -65,7 +65,7 @@
                         <!-- Column 2: Tài liệu số -->
                         <div class="col-lg-4 mb-3">
                             <h5 class="mb-3 pb-2 border-bottom">
-                                <a href="/media" class="text-decoration-none text-dark">Tài liệu số</a>
+                                <a href="/media" class="text-decoration-none text-dark">Tài nguyên số</a>
                             </h5>
                             <div class="row">
                                 <div class="col-md-12">

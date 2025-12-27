@@ -25,6 +25,8 @@
         <field name="arch" type="xml">
             <form string="Danh mục Menu">
                 <sheet>
+                    <field name="banner_image" widget="image" class="oe_avatar"
+                           options="{'preview_image': 'banner_image', 'size': [1920, 400]}"/>
                     <div class="oe_button_box" name="button_box">
                         <button name="action_view_media" type="object"
                                 class="oe_stat_button" icon="fa-file-video-o">

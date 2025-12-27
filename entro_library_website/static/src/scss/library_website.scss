@@ -118,8 +118,6 @@ th {
 
 // ========== Book Cards ==========
 .book_card {
-    width: 224.625px !important;
-    height: 330.930px !important;
     transition: transform 0.2s, box-shadow 0.2s;
     border: 1px solid #e0e0e0;
 
@@ -136,13 +134,11 @@ th {
         overflow: hidden;
         background-color: #f8f9fa;
         height: 224.625px !important;
-        width: 224.625px !important;
         flex-shrink: 0;
 
         img {
             transition: transform 0.3s;
             height: 224.625px !important;
-            width: 224.625px !important;
         }
     }
 

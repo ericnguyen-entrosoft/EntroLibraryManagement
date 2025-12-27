@@ -92,7 +92,7 @@ class LibraryWebsite(http.Controller):
         '/thu-vien/danh-muc/<model("library.website.category"):category>',
         '/thu-vien/danh-muc/<model("library.website.category"):category>/page/<int:page>',
     ], type='http', auth='public', website=True, sitemap=True)
-    def library_books(self, page=1, category=None, category_slug=None, search='', sortby=None, **kwargs):
+    def library_books(self, page=1, category=None, category_slug=None, search='', sortby=None, category_id=None, **kwargs):
         """Trang danh sách sách"""
 
         # Handle category slug mapping
@@ -130,9 +130,27 @@ class LibraryWebsite(http.Controller):
                 ('parallel_title', 'ilike', search),
             ]
 
-        # Lọc theo danh mục website
-        if category:
+        # Filter by category (support multiple categories via checkbox)
+        category_id_list = []
+        # Get all category_id values from request (supports multiple checkboxes)
+        category_ids_from_request = request.httprequest.args.getlist('category_id')
+
+        if category_ids_from_request:
+            category_id_list = [int(cid) for cid in category_ids_from_request if cid]
+            if category_id_list:
+                domain += [('website_category_id', 'in', category_id_list)]
+        # Fallback to single category_id parameter
+        elif category_id:
+            if isinstance(category_id, list):
+                category_id_list = [int(cid) for cid in category_id]
+            else:
+                category_id_list = [int(category_id)]
+            if category_id_list:
+                domain += [('website_category_id', 'in', category_id_list)]
+        # Lọc theo danh mục website (legacy URL support)
+        elif category:
             domain += [('website_category_id', '=', category.id)]
+            category_id_list = [category.id]
 
         # Sorting
         sort_options = {
@@ -193,6 +211,7 @@ class LibraryWebsite(http.Controller):
             'pager': pager,
             'search': search,
             'category': category,
+            'category_id_list': category_id_list,
             'website_categories': website_categories,
             'page_name': 'library_books',
             'keep': keep,
@@ -289,7 +308,7 @@ class LibraryWebsite(http.Controller):
         '/media/danh-muc/<model("library.website.category"):category>',
         '/media/danh-muc/<model("library.website.category"):category>/page/<int:page>',
     ], type='http', auth='public', website=True, sitemap=True)
-    def library_media_list(self, page=1, category=None, menu_path=None, search='', media_type=None, sortby=None, **kwargs):
+    def library_media_list(self, page=1, category=None, menu_path=None, search='', media_type=None, category_id=None, menu_category_id=None, sortby=None, **kwargs):
         """Trang danh sách phương tiện"""
 
         # Handle menu category path
@@ -334,21 +353,69 @@ class LibraryWebsite(http.Controller):
                 ('description', 'ilike', search),
             ]
 
-        # Filter by category
-        if category:
-            domain += [('website_category_id', '=', category.id)]
+        # Filter by category (support multiple categories via checkbox)
+        category_id_list = []
+        # Get all category_id values from request (supports multiple checkboxes)
+        category_ids_from_request = request.httprequest.args.getlist('category_id')
 
-        # Filter by menu category (hierarchical)
-        if menu_category:
-            # Get all child categories including this one
+        if category_ids_from_request:
+            category_id_list = [int(cid) for cid in category_ids_from_request if cid]
+            if category_id_list:
+                domain += [('website_category_id', 'in', category_id_list)]
+        elif category_id:
+            # Fallback to single category_id parameter
+            if isinstance(category_id, list):
+                category_id_list = [int(cid) for cid in category_id]
+            else:
+                category_id_list = [int(category_id)]
+            if category_id_list:
+                domain += [('website_category_id', 'in', category_id_list)]
+        elif category:
+            # Support old single category URL format
+            domain += [('website_category_id', '=', category.id)]
+            category_id_list = [category.id]
+
+        # Filter by specific menu categories (checkbox selection)
+        menu_category_id_list = []
+        menu_category_ids_from_request = request.httprequest.args.getlist('menu_category_id')
+
+        if menu_category_ids_from_request:
+            # User selected specific child menu categories
+            menu_category_id_list = [int(mcid) for mcid in menu_category_ids_from_request if mcid]
+            if menu_category_id_list:
+                domain += [('menu_category_id', 'in', menu_category_id_list)]
+        elif menu_category_id:
+            # Fallback to single menu_category_id parameter
+            if isinstance(menu_category_id, list):
+                menu_category_id_list = [int(mcid) for mcid in menu_category_id]
+            else:
+                menu_category_id_list = [int(menu_category_id)]
+            if menu_category_id_list:
+                domain += [('menu_category_id', 'in', menu_category_id_list)]
+        elif menu_category:
+            # No specific child selected - show all from this menu category and its children
             all_category_ids = request.env['library.menu.category'].search([
                 ('id', 'child_of', menu_category.id)
             ]).ids
             domain += [('menu_category_id', 'in', all_category_ids)]
 
-        # Filter by media type
-        if media_type:
-            domain += [('media_type', '=', media_type)]
+        # Filter by media type (support multiple types)
+        media_type_list = []
+        # Get all media_type values from request (supports multiple checkboxes)
+        media_types_from_request = request.httprequest.args.getlist('media_type')
+
+        if media_types_from_request:
+            media_type_list = [mt for mt in media_types_from_request if mt]
+            if media_type_list:
+                domain += [('media_type', 'in', media_type_list)]
+        elif media_type:
+            # Fallback to single media_type parameter
+            if isinstance(media_type, list):
+                media_type_list = media_type
+            else:
+                media_type_list = [media_type]
+            if media_type_list:
+                domain += [('media_type', 'in', media_type_list)]
 
         # Sorting
         sort_options = {
@@ -379,8 +446,12 @@ class LibraryWebsite(http.Controller):
             url = '/media'
 
         url_args = {'search': search, 'sortby': sortby}
-        if media_type:
-            url_args['media_type'] = media_type
+        if media_type_list:
+            url_args['media_type'] = media_type_list
+        if category_id_list:
+            url_args['category_id'] = category_id_list
+        if menu_category_id_list:
+            url_args['menu_category_id'] = menu_category_id_list
 
         pager = request.website.pager(
             url=url,
@@ -403,12 +474,22 @@ class LibraryWebsite(http.Controller):
             order='sequence, name'
         )
 
+        # Get child menu categories if we're in a menu category
+        child_menu_categories = None
+        if menu_category:
+            child_menu_categories = request.env['library.menu.category'].search([
+                ('parent_id', '=', menu_category.id),
+                ('active', '=', True)
+            ], order='sequence, name')
+
         # Keep query parameters
         keep = QueryURL(
             url,
             category=category and category.id,
             search=search,
-            media_type=media_type,
+            media_type=media_type_list,
+            category_id=category_id_list,
+            menu_category_id=menu_category_id_list,
             sortby=sortby
         )
 
@@ -419,7 +500,11 @@ class LibraryWebsite(http.Controller):
             'search': search,
             'category': category,
             'menu_category': menu_category,
+            'child_menu_categories': child_menu_categories,
             'media_type': media_type,
+            'media_type_list': media_type_list,
+            'category_id_list': category_id_list,
+            'menu_category_id_list': menu_category_id_list,
             'website_categories': website_categories,
             'page_name': 'library_media',
             'keep': keep,
@@ -808,7 +893,7 @@ class LibraryWebsite(http.Controller):
         '/kho-tai-nguyen/danh-muc/<model("library.website.category"):category>',
         '/kho-tai-nguyen/danh-muc/<model("library.website.category"):category>/page/<int:page>',
     ], type='http', auth='public', website=True, sitemap=True)
-    def unified_catalog(self, page=1, category=None, search='', item_type=None, sortby=None, **kwargs):
+    def unified_catalog(self, page=1, category=None, search='', item_type=None, sortby=None, category_id=None, **kwargs):
         """Unified page showing both books and media"""
 
         # Build domain for books
@@ -853,10 +938,30 @@ class LibraryWebsite(http.Controller):
                 ('description', 'ilike', search),
             ]
 
-        # Filter by category
-        if category:
+        # Filter by category (support multiple categories via checkbox)
+        category_id_list = []
+        # Get all category_id values from request (supports multiple checkboxes)
+        category_ids_from_request = request.httprequest.args.getlist('category_id')
+
+        if category_ids_from_request:
+            category_id_list = [int(cid) for cid in category_ids_from_request if cid]
+            if category_id_list:
+                book_domain += [('website_category_id', 'in', category_id_list)]
+                media_domain += [('website_category_id', 'in', category_id_list)]
+        elif category_id:
+            # Fallback to single category_id parameter
+            if isinstance(category_id, list):
+                category_id_list = [int(cid) for cid in category_id]
+            else:
+                category_id_list = [int(category_id)]
+            if category_id_list:
+                book_domain += [('website_category_id', 'in', category_id_list)]
+                media_domain += [('website_category_id', 'in', category_id_list)]
+        elif category:
+            # Support old single category URL format
             book_domain += [('website_category_id', '=', category.id)]
             media_domain += [('website_category_id', '=', category.id)]
+            category_id_list = [category.id]
 
         # Filter by item type (book or media)
         if item_type == 'book':
@@ -971,6 +1076,7 @@ class LibraryWebsite(http.Controller):
             category=category and category.id,
             search=search,
             item_type=item_type,
+            category_id=category_id_list,
             sortby=sortby
         )
 
@@ -982,6 +1088,7 @@ class LibraryWebsite(http.Controller):
             'pager': pager,
             'search': search,
             'category': category,
+            'category_id_list': category_id_list,
             'item_type': item_type,
             'website_categories': website_categories,
             'page_name': 'unified_catalog',

@@ -27,55 +27,278 @@
 
     <template id="library_books" name="Thư Viện - Danh Sách Sách">
         <t t-call="website.layout">
+            <t t-set="pageName" t-value="'library_books'"/>
+
+            <head>
+                <style>
+                    /* Books Hero Banner */
+                    .books_hero_banner {
+                        position: relative;
+                        background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('/entro_library_website/static/src/img/hero-image-card.png') center center / cover no-repeat;
+                        padding: 4rem 2rem;
+                        overflow: hidden;
+                        min-height: 400px;
+                        margin-bottom: 2rem;
+                    }
+
+                    .books_hero_content {
+                        position: relative;
+                        z-index: 2;
+                        max-width: 1400px;
+                        margin: 0 auto;
+                        color: #FFFFFF;
+                        text-align: center;
+                    }
+
+                    .books_hero_content .tagline {
+                        color: #FFFFFF;
+                        font-size: 1rem;
+                        margin-bottom: 1rem;
+                        font-weight: 500;
+                        text-transform: uppercase;
+                        letter-spacing: 0.1em;
+                    }
+
+                    .books_hero_content h1 {
+                        font-size: 3.5rem;
+                        font-weight: 700;
+                        line-height: 1.2;
+                        margin-bottom: 1.5rem;
+                        color: #FFFFFF;
+                    }
+
+                    .books_hero_content .subtitle {
+                        font-size: 1.1rem;
+                        color: #FFFFFF;
+                        margin-bottom: 2rem;
+                        line-height: 1.8;
+                        max-width: 800px;
+                        margin-left: auto;
+                        margin-right: auto;
+                    }
+
+                    @media (max-width: 768px) {
+                        .books_hero_banner {
+                            padding: 2rem 1rem;
+                            min-height: 300px;
+                        }
+
+                        .books_hero_content h1 {
+                            font-size: 2rem;
+                        }
+
+                        .books_hero_content .subtitle {
+                            font-size: 0.95rem;
+                        }
+                    }
+
+                    /* Sidebar Filter Cards */
+                    .media_filter_card {
+                        background: #ffffff;
+                        border-radius: 12px;
+                        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+                        overflow: hidden;
+                        transition: all 0.3s ease;
+                    }
+
+                    .media_filter_card:hover {
+                        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+                    }
+
+                    .filter_card_header {
+                        background: #8c675a;
+                        color: #ffffff;
+                        padding: 1rem 1.25rem;
+                        display: flex;
+                        align-items: center;
+                    }
+
+                    .filter_card_header h5 {
+                        font-size: 1rem;
+                        font-weight: 600;
+                        margin: 0;
+                    }
+
+                    .filter_card_body {
+                        padding: 1.25rem;
+                    }
+
+                    /* Category Checkboxes */
+                    .category_checkboxes {
+                        display: flex;
+                        flex-direction: column;
+                        gap: 0.35rem;
+                    }
+
+                    .category_checkbox_item {
+                        display: block;
+                        cursor: pointer;
+                        margin: 0;
+                        position: relative;
+                    }
+
+                    .category_checkbox_item input[type="checkbox"] {
+                        position: absolute;
+                        opacity: 0;
+                        cursor: pointer;
+                    }
+
+                    .category_checkbox_item .checkbox_content {
+                        display: flex;
+                        align-items: center;
+                        padding: 0.5rem 0.75rem;
+                        padding-left: 2.25rem;
+                        border-radius: 6px;
+                        color: #8c675a;
+                        background: transparent;
+                        transition: all 0.25s ease;
+                        position: relative;
+                    }
+
+                    /* Custom checkbox */
+                    .category_checkbox_item .checkbox_content:before {
+                        content: '';
+                        position: absolute;
+                        left: 0.5rem;
+                        width: 16px;
+                        height: 16px;
+                        border: 2px solid #8c675a;
+                        border-radius: 3px;
+                        background: #ffffff;
+                        transition: all 0.25s ease;
+                    }
+
+                    /* Checkmark */
+                    .category_checkbox_item .checkbox_content:after {
+                        content: '\f00c';
+                        font-family: 'FontAwesome';
+                        position: absolute;
+                        left: 0.65rem;
+                        top: 50%;
+                        transform: translateY(-50%);
+                        font-size: 10px;
+                        color: #ffffff;
+                        opacity: 0;
+                        transition: all 0.25s ease;
+                    }
+
+                    .category_checkbox_item:hover .checkbox_content {
+                        background: #f2e5d5;
+                    }
+
+                    .category_checkbox_item input[type="checkbox"]:checked + .checkbox_content {
+                        background: #8c675a;
+                        color: #ffffff;
+                        font-weight: 600;
+                    }
+
+                    .category_checkbox_item input[type="checkbox"]:checked + .checkbox_content:before {
+                        background: #ffffff;
+                        border-color: #ffffff;
+                    }
+
+                    .category_checkbox_item input[type="checkbox"]:checked + .checkbox_content:after {
+                        opacity: 1;
+                        color: #8c675a;
+                    }
+
+                    .category_checkbox_item .checkbox_content i {
+                        color: inherit;
+                        font-size: 0.95rem;
+                    }
+
+                    .category_checkbox_item .checkbox_content span {
+                        font-size: 0.875rem;
+                        font-weight: inherit;
+                    }
+
+                    /* Filter submit button */
+                    .filter_card_body .btn-primary {
+                        background: #8c675a;
+                        border-color: #8c675a;
+                    }
+
+                    .filter_card_body .btn-primary:hover {
+                        background: #6d5044;
+                        border-color: #6d5044;
+                    }
+                </style>
+            </head>
+
             <div id="wrap" class="js_library">
+                <!-- Hero Banner Section -->
+                <section class="books_hero_banner">
+                    <div class="books_hero_content">
+                        <p class="tagline">THƯ VIỆN PHÁP ĐĂNG</p>
+                        <h1>TÀI NGUYÊN SÁCH</h1>
+                        <p class="subtitle">Khám phá kho tàng tri thức - nơi nuôi dưỡng trí tuệ và đạo hạnh</p>
+                    </div>
+                </section>
+
                 <div class="container mt-4 library_container">
-
-                    <!-- Header -->
-                    <div class="library_header text-center mb-4">
-                        <h1 class="display-3">Thư Viện Sách</h1>
-                        <p class="lead">Khám phá kho tàng tri thức của chúng tôi</p>
-                    </div>
-
-                    <!-- Search box (centered, below header) -->
-                    <div class="search_box mb-5">
-                        <div class="row justify-content-center">
-                            <div class="col-lg-6 col-md-8">
-                                <form method="get" class="input-group input-group-lg" t-att-action="keep()">
-                                    <input type="text" name="search"
-                                           class="form-control"
-                                           placeholder="Tìm kiếm sách, tác giả..."
-                                           t-att-value="search"/>
-                                    <button class="btn btn-primary" type="submit">
-                                        <i class="fa fa-search me-2"/>
-                                    </button>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
 
                     <div class="row">
                         <!-- Sidebar -->
                         <div class="col-lg-3 mb-4">
                             <!-- Website Categories Filter -->
-                            <div class="website_categories_filter mb-4" t-if="website_categories">
-                                <h5>Danh mục</h5>
-                                <ul class="list-unstyled">
-                                    <li>
-                                        <a href="/thu-vien"
-                                           t-attf-class="#{not category and 'fw-bold text-primary'}">
-                                            Tất cả
-                                        </a>
-                                    </li>
-                                    <t t-foreach="website_categories" t-as="web_cat">
-                                        <li>
-                                            <a t-attf-href="/thu-vien/danh-muc/#{web_cat.id}"
-                                               t-attf-class="#{category and category.id == web_cat.id and 'fw-bold text-primary'}">
-                                                <t t-esc="web_cat.name"/>
-                                            </a>
-                                        </li>
-                                    </t>
-                                </ul>
+                            <div class="media_filter_card mb-4" t-if="website_categories">
+                                <div class="filter_card_header">
+                                    <i class="fa fa-folder-open me-2"/>
+                                    <h5 class="mb-0">Danh mục</h5>
+                                </div>
+                                <div class="filter_card_body">
+                                    <form method="get" id="categoryFilterForm" t-att-action="keep()">
+                                        <!-- Preserve search and other params -->
+                                        <input type="hidden" name="search" t-att-value="search or ''"/>
+                                        <input type="hidden" name="sortby" t-att-value="sortby or ''"/>
+
+                                        <div class="category_checkboxes">
+                                            <t t-foreach="website_categories" t-as="web_cat">
+                                                <label class="category_checkbox_item">
+                                                    <input type="checkbox" name="category_id" t-att-value="web_cat.id"
+                                                        t-att-checked="'checked' if (category_id_list and web_cat.id in category_id_list) else None"
+                                                        class="category-checkbox"/>
+                                                    <span class="checkbox_content">
+                                                        <span t-esc="web_cat.name"/>
+                                                    </span>
+                                                </label>
+                                            </t>
+                                        </div>
+                                    </form>
+                                </div>
                             </div>
+
+                            <script>
+                                document.addEventListener('DOMContentLoaded', function() {
+                                    var form = document.getElementById('categoryFilterForm');
+                                    if (form) {
+                                        var checkboxes = form.querySelectorAll('.category-checkbox');
+                                        var submitTimer = null;
+
+                                        // Restore scroll position after page reload
+                                        if (sessionStorage.getItem('filterScrollPos')) {
+                                            window.scrollTo(0, parseInt(sessionStorage.getItem('filterScrollPos')));
+                                            sessionStorage.removeItem('filterScrollPos');
+                                        }
+
+                                        checkboxes.forEach(function(checkbox) {
+                                            checkbox.addEventListener('change', function(e) {
+                                                // Clear any pending submit
+                                                if (submitTimer) {
+                                                    clearTimeout(submitTimer);
+                                                }
+
+                                                // Wait 300ms before submitting to allow multiple quick clicks
+                                                submitTimer = setTimeout(function() {
+                                                    // Save current scroll position
+                                                    sessionStorage.setItem('filterScrollPos', window.pageYOffset);
+                                                    form.submit();
+                                                }, 300);
+                                            });
+                                        });
+                                    }
+                                });
+                            </script>
 
                         </div>
 
@@ -133,16 +356,15 @@
     <!-- ========== BOOK CARD COMPONENT ========== -->
 
     <template id="library_book_card" name="Thẻ Sách">
-        <div class="card book_card shadow-sm">
+        <div class="card book_card shadow-sm h-100">
             <a t-attf-href="/thu-vien/sach/#{book.id}" class="text-decoration-none text-dark d-flex flex-column h-100">
-                <div class="card-img-top book_cover position-relative overflow-hidden">
+                <div class="card-img-top book_cover position-relative overflow-hidden" style="height: 200px;">
                     <img t-if="book.image_512"
                          t-att-src="'/web/image/library.book/%s/image_512' % book.id"
                          t-att-alt="book.name"
-                         class="img-fluid w-100"
-                         style="height: 224.625px; width: 224.625px; object-fit: cover;"/>
-                    <div t-else="" class="bg-light d-flex align-items-center justify-content-center"
-                         style="height: 300px;">
+                         class="w-100 h-100"
+                         style="object-fit: cover;"/>
+                    <div t-else="" class="d-flex align-items-center justify-content-center h-100">
                         <i class="fa fa-book fa-5x text-muted"/>
                     </div>
 
@@ -494,80 +716,342 @@
 
     <template id="unified_catalog" name="Kho Tài Nguyên - Sách &amp; Phương Tiện">
         <t t-call="website.layout">
+            <t t-set="pageName" t-value="'unified_catalog'"/>
+
+            <head>
+                <style>
+                    /* Catalog Hero Banner */
+                    .catalog_hero_banner {
+                        position: relative;
+                        background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('/entro_library_website/static/src/img/hero-image-card.png') center center / cover no-repeat;
+                        padding: 4rem 2rem;
+                        overflow: hidden;
+                        min-height: 400px;
+                        margin-bottom: 2rem;
+                    }
+
+                    .catalog_hero_content {
+                        position: relative;
+                        z-index: 2;
+                        max-width: 1400px;
+                        margin: 0 auto;
+                        color: #FFFFFF;
+                        text-align: center;
+                    }
+
+                    .catalog_hero_content .tagline {
+                        color: #FFFFFF;
+                        font-size: 1rem;
+                        margin-bottom: 1rem;
+                        font-weight: 500;
+                        text-transform: uppercase;
+                        letter-spacing: 0.1em;
+                    }
+
+                    .catalog_hero_content h1 {
+                        font-size: 3.5rem;
+                        font-weight: 700;
+                        line-height: 1.2;
+                        margin-bottom: 1.5rem;
+                        color: #FFFFFF;
+                    }
+
+                    .catalog_hero_content .subtitle {
+                        font-size: 1.1rem;
+                        color: #FFFFFF;
+                        margin-bottom: 2rem;
+                        line-height: 1.8;
+                        max-width: 800px;
+                        margin-left: auto;
+                        margin-right: auto;
+                    }
+
+                    @media (max-width: 768px) {
+                        .catalog_hero_banner {
+                            padding: 2rem 1rem;
+                            min-height: 300px;
+                        }
+
+                        .catalog_hero_content h1 {
+                            font-size: 2rem;
+                        }
+
+                        .catalog_hero_content .subtitle {
+                            font-size: 0.95rem;
+                        }
+                    }
+
+                    /* Sidebar Filter Cards */
+                    .media_filter_card {
+                        background: #ffffff;
+                        border-radius: 12px;
+                        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+                        overflow: hidden;
+                        transition: all 0.3s ease;
+                    }
+
+                    .media_filter_card:hover {
+                        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+                    }
+
+                    .filter_card_header {
+                        background: #8c675a;
+                        color: #ffffff;
+                        padding: 1rem 1.25rem;
+                        display: flex;
+                        align-items: center;
+                    }
+
+                    .filter_card_header h5 {
+                        font-size: 1rem;
+                        font-weight: 600;
+                        margin: 0;
+                    }
+
+                    .filter_card_body {
+                        padding: 1.25rem;
+                    }
+
+                    /* Category Checkboxes */
+                    .category_checkboxes {
+                        display: flex;
+                        flex-direction: column;
+                        gap: 0.35rem;
+                    }
+
+                    .category_checkbox_item {
+                        display: block;
+                        cursor: pointer;
+                        margin: 0;
+                        position: relative;
+                    }
+
+                    .category_checkbox_item input[type="checkbox"] {
+                        position: absolute;
+                        opacity: 0;
+                        cursor: pointer;
+                    }
+
+                    .category_checkbox_item .checkbox_content {
+                        display: flex;
+                        align-items: center;
+                        padding: 0.5rem 0.75rem;
+                        padding-left: 2.25rem;
+                        border-radius: 6px;
+                        color: #8c675a;
+                        background: transparent;
+                        transition: all 0.25s ease;
+                        position: relative;
+                    }
+
+                    /* Custom checkbox */
+                    .category_checkbox_item .checkbox_content:before {
+                        content: '';
+                        position: absolute;
+                        left: 0.5rem;
+                        width: 16px;
+                        height: 16px;
+                        border: 2px solid #8c675a;
+                        border-radius: 3px;
+                        background: #ffffff;
+                        transition: all 0.25s ease;
+                    }
+
+                    /* Checkmark */
+                    .category_checkbox_item .checkbox_content:after {
+                        content: '\f00c';
+                        font-family: 'FontAwesome';
+                        position: absolute;
+                        left: 0.65rem;
+                        top: 50%;
+                        transform: translateY(-50%);
+                        font-size: 10px;
+                        color: #ffffff;
+                        opacity: 0;
+                        transition: all 0.25s ease;
+                    }
+
+                    .category_checkbox_item:hover .checkbox_content {
+                        background: #f2e5d5;
+                    }
+
+                    .category_checkbox_item input[type="checkbox"]:checked + .checkbox_content {
+                        background: #8c675a;
+                        color: #ffffff;
+                        font-weight: 600;
+                    }
+
+                    .category_checkbox_item input[type="checkbox"]:checked + .checkbox_content:before {
+                        background: #ffffff;
+                        border-color: #ffffff;
+                    }
+
+                    .category_checkbox_item input[type="checkbox"]:checked + .checkbox_content:after {
+                        opacity: 1;
+                        color: #8c675a;
+                    }
+
+                    .category_checkbox_item .checkbox_content i {
+                        color: inherit;
+                        font-size: 0.95rem;
+                    }
+
+                    .category_checkbox_item .checkbox_content span {
+                        font-size: 0.875rem;
+                        font-weight: inherit;
+                    }
+
+                    /* Link style for item type filter */
+                    .category_checkbox_item a.checkbox_content {
+                        text-decoration: none;
+                    }
+
+                    .category_checkbox_item a.checkbox_content.active {
+                        background: #8c675a;
+                        color: #ffffff;
+                        font-weight: 600;
+                    }
+
+                    /* Ensure book and media cards have same height in unified catalog */
+                    .catalog_grid .card {
+                        height: 100%;
+                        display: flex;
+                        flex-direction: column;
+                    }
+
+                    .catalog_grid .card-body {
+                        flex: 1;
+                        display: flex;
+                        flex-direction: column;
+                    }
+
+                    .catalog_grid .card-body .mt-auto {
+                        margin-top: auto !important;
+                    }
+
+                    /* Ensure book card image container has consistent height */
+                    .catalog_grid .book_card .card-img-top {
+                        height: 200px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        overflow: hidden;
+                    }
+
+                    .catalog_grid .book_card .card-img-top img {
+                        height: 100%;
+                        width: 100%;
+                        object-fit: cover;
+                    }
+
+                    /* Media card already has height: 200px for thumbnail */
+                    .catalog_grid .media_card .media_thumbnail {
+                        height: 200px;
+                    }
+                </style>
+            </head>
+
             <div id="wrap" class="js_unified_catalog">
+                <!-- Hero Banner Section -->
+                <section class="catalog_hero_banner">
+                    <div class="catalog_hero_content">
+                        <p class="tagline">THƯ VIỆN PHÁP ĐĂNG</p>
+                        <h1>KHO TÀI NGUYÊN</h1>
+                        <p class="subtitle">Khám phá kho tàng sách và phương tiện số - nơi hội tụ tri thức và đạo pháp</p>
+                    </div>
+                </section>
+
                 <div class="container mt-4 unified_catalog_container">
-
-                    <!-- Header -->
-                    <div class="catalog_header text-center mb-4">
-                        <h1 class="display-3">Kho Tài Nguyên</h1>
-                        <p class="lead">Khám phá sách và phương tiện của chúng tôi</p>
-                    </div>
-
-                    <!-- Search box (centered, below header) -->
-                    <div class="search_box mb-5">
-                        <div class="row justify-content-center">
-                            <div class="col-lg-6 col-md-8">
-                                <form method="get" class="input-group input-group-lg" t-att-action="keep()">
-                                    <input type="text" name="search"
-                                           class="form-control"
-                                           placeholder="Tìm kiếm sách, phương tiện..."
-                                           t-att-value="search"/>
-                                    <button class="btn btn-primary" type="submit">
-                                        <i class="fa fa-search me-2"/>
-                                    </button>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
 
                     <div class="row">
                         <!-- Sidebar -->
                         <div class="col-lg-3 mb-4">
                             <!-- Item Type Filter -->
-                            <div class="item_type_filter mb-4">
-                                <h5>Loại tài nguyên</h5>
-                                <ul class="list-unstyled">
-                                    <li>
-                                        <a t-attf-href="#{keep(item_type=False)}"
-                                           t-attf-class="#{not item_type and 'fw-bold text-primary'}">
-                                            <i class="fa fa-th me-2"/> Tất cả (<t t-esc="total_count"/>)
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a t-attf-href="#{keep(item_type='book')}"
-                                           t-attf-class="#{item_type == 'book' and 'fw-bold text-primary'}">
-                                            <i class="fa fa-book me-2"/> Sách (<t t-esc="books_count"/>)
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a t-attf-href="#{keep(item_type='media')}"
-                                           t-attf-class="#{item_type == 'media' and 'fw-bold text-primary'}">
-                                            <i class="fa fa-video-camera me-2"/> Phương tiện (<t t-esc="media_count"/>)
-                                        </a>
-                                    </li>
-                                </ul>
+                            <div class="media_filter_card mb-4">
+                                <div class="filter_card_header">
+                                    <i class="fa fa-filter me-2"/>
+                                    <h5 class="mb-0">Loại tài nguyên</h5>
+                                </div>
+                                <div class="filter_card_body">
+                                    <div class="category_checkboxes">
+                                        <label class="category_checkbox_item">
+                                            <a t-attf-href="#{keep(item_type='book')}"
+                                               t-attf-class="checkbox_content #{item_type == 'book' and 'active'}">
+                                                <i class="fa fa-book me-2"/>
+                                                <span>Sách (<t t-esc="books_count"/>)</span>
+                                            </a>
+                                        </label>
+                                        <label class="category_checkbox_item">
+                                            <a t-attf-href="#{keep(item_type='media')}"
+                                               t-attf-class="checkbox_content #{item_type == 'media' and 'active'}">
+                                                <i class="fa fa-video-camera me-2"/>
+                                                <span>Phương tiện (<t t-esc="media_count"/>)</span>
+                                            </a>
+                                        </label>
+                                    </div>
+                                </div>
                             </div>
 
                             <!-- Website Categories Filter -->
-                            <div class="website_categories_filter mb-4" t-if="website_categories">
-                                <h5>Danh mục</h5>
-                                <ul class="list-unstyled">
-                                    <li>
-                                        <a href="/kho-tai-nguyen"
-                                           t-attf-class="#{not category and 'fw-bold text-primary'}">
-                                            Tất cả
-                                        </a>
-                                    </li>
-                                    <t t-foreach="website_categories" t-as="web_cat">
-                                        <li>
-                                            <a t-attf-href="/kho-tai-nguyen/danh-muc/#{web_cat.id}"
-                                               t-attf-class="#{category and category.id == web_cat.id and 'fw-bold text-primary'}">
-                                                <t t-esc="web_cat.name"/>
-                                            </a>
-                                        </li>
-                                    </t>
-                                </ul>
+                            <div class="media_filter_card mb-4" t-if="website_categories">
+                                <div class="filter_card_header">
+                                    <i class="fa fa-folder-open me-2"/>
+                                    <h5 class="mb-0">Danh mục</h5>
+                                </div>
+                                <div class="filter_card_body">
+                                    <form method="get" id="categoryFilterForm" t-att-action="keep()">
+                                        <!-- Preserve search and other params -->
+                                        <input type="hidden" name="search" t-att-value="search or ''"/>
+                                        <input type="hidden" name="sortby" t-att-value="sortby or ''"/>
+                                        <input type="hidden" name="item_type" t-att-value="item_type or ''"/>
+
+                                        <div class="category_checkboxes">
+                                            <t t-foreach="website_categories" t-as="web_cat">
+                                                <label class="category_checkbox_item">
+                                                    <input type="checkbox" name="category_id" t-att-value="web_cat.id"
+                                                        t-att-checked="'checked' if (category_id_list and web_cat.id in category_id_list) else None"
+                                                        class="category-checkbox"/>
+                                                    <span class="checkbox_content">
+                                                        <span t-esc="web_cat.name"/>
+                                                    </span>
+                                                </label>
+                                            </t>
+                                        </div>
+                                    </form>
+                                </div>
                             </div>
+
+                            <script>
+                                document.addEventListener('DOMContentLoaded', function() {
+                                    var form = document.getElementById('categoryFilterForm');
+                                    if (form) {
+                                        var checkboxes = form.querySelectorAll('.category-checkbox');
+                                        var submitTimer = null;
+
+                                        // Restore scroll position after page reload
+                                        if (sessionStorage.getItem('catalogFilterScrollPos')) {
+                                            window.scrollTo(0, parseInt(sessionStorage.getItem('catalogFilterScrollPos')));
+                                            sessionStorage.removeItem('catalogFilterScrollPos');
+                                        }
+
+                                        checkboxes.forEach(function(checkbox) {
+                                            checkbox.addEventListener('change', function(e) {
+                                                // Clear any pending submit
+                                                if (submitTimer) {
+                                                    clearTimeout(submitTimer);
+                                                }
+
+                                                // Wait 300ms before submitting to allow multiple quick clicks
+                                                submitTimer = setTimeout(function() {
+                                                    // Save current scroll position
+                                                    sessionStorage.setItem('catalogFilterScrollPos', window.pageYOffset);
+                                                    form.submit();
+                                                }, 300);
+                                            });
+                                        });
+                                    }
+                                });
+                            </script>
 
                         </div>
 

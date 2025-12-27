@@ -5,93 +5,664 @@
 
     <template id="library_media_list" name="Phương Tiện - Danh Sách">
         <t t-call="website.layout">
+            <t t-set="pageName" t-value="'library_media'"/>
+
+            <head>
+                <style>
+                    /* Hero Banner Section */
+                    .media_hero_banner {
+                        position: relative;
+                        /* Background is set inline per menu category */
+                        padding: 4rem 2rem;
+                        overflow: hidden;
+                        min-height: 400px;
+                        margin-bottom: 2rem;
+                    }
+
+                    .media_hero_content {
+                        position: relative;
+                        z-index: 2;
+                        max-width: 1400px;
+                        margin: 0 auto;
+                        color: #FFFFFF;
+                        text-align: center;
+                    }
+
+                    .media_hero_content .tagline {
+                        color: #FFFFFF;
+                        font-size: 1rem;
+                        margin-bottom: 1rem;
+                        font-weight: 500;
+                        text-transform: uppercase;
+                        letter-spacing: 0.1em;
+                    }
+
+                    .media_hero_content h1 {
+                        font-size: 3.5rem;
+                        font-weight: 700;
+                        line-height: 1.2;
+                        margin-bottom: 1.5rem;
+                        color: #FFFFFF;
+                    }
+
+                    .media_hero_content .subtitle {
+                        font-size: 1.1rem;
+                        color: #FFFFFF;
+                        margin-bottom: 2rem;
+                        line-height: 1.8;
+                        max-width: 800px;
+                        margin-left: auto;
+                        margin-right: auto;
+                    }
+
+                    @media (max-width: 768px) {
+                        .media_hero_banner {
+                            padding: 2rem 1rem;
+                            min-height: 300px;
+                        }
+
+                        .media_hero_content h1 {
+                            font-size: 2rem;
+                        }
+
+                        .media_hero_content .subtitle {
+                            font-size: 0.95rem;
+                        }
+                    }
+
+                    /* Sidebar Filter Cards */
+                    .media_filter_card {
+                        background: #ffffff;
+                        border-radius: 12px;
+                        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+                        overflow: hidden;
+                        transition: all 0.3s ease;
+                    }
+
+                    .media_filter_card:hover {
+                        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+                    }
+
+                    .filter_card_header {
+                        background: #8c675a;
+                        color: #ffffff;
+                        padding: 1rem 1.25rem;
+                        display: flex;
+                        align-items: center;
+                    }
+
+                    .filter_card_header h5 {
+                        font-size: 1rem;
+                        font-weight: 600;
+                        margin: 0;
+                    }
+
+                    .filter_card_body {
+                        padding: 1.25rem;
+                    }
+
+                    /* Media Type Checkboxes */
+                    .media_type_checkboxes {
+                        display: flex;
+                        flex-direction: column;
+                        gap: 0.35rem;
+                    }
+
+                    .media_type_checkbox_item {
+                        display: block;
+                        cursor: pointer;
+                        margin: 0;
+                        position: relative;
+                    }
+
+                    .media_type_checkbox_item input[type="checkbox"] {
+                        position: absolute;
+                        opacity: 0;
+                        cursor: pointer;
+                    }
+
+                    .media_type_checkbox_item .checkbox_content {
+                        display: flex;
+                        align-items: center;
+                        padding: 0.5rem 0.75rem;
+                        padding-left: 2.25rem;
+                        border-radius: 6px;
+                        color: #8c675a;
+                        background: transparent;
+                        transition: all 0.25s ease;
+                        position: relative;
+                    }
+
+                    /* Custom checkbox */
+                    .media_type_checkbox_item .checkbox_content:before {
+                        content: '';
+                        position: absolute;
+                        left: 0.5rem;
+                        width: 16px;
+                        height: 16px;
+                        border: 2px solid #8c675a;
+                        border-radius: 3px;
+                        background: #ffffff;
+                        transition: all 0.25s ease;
+                    }
+
+                    /* Checkmark */
+                    .media_type_checkbox_item .checkbox_content:after {
+                        content: '\f00c';
+                        font-family: 'FontAwesome';
+                        position: absolute;
+                        left: 0.65rem;
+                        top: 50%;
+                        transform: translateY(-50%);
+                        font-size: 10px;
+                        color: #ffffff;
+                        opacity: 0;
+                        transition: all 0.25s ease;
+                    }
+
+                    .media_type_checkbox_item:hover .checkbox_content {
+                        background: #f2e5d5;
+                    }
+
+                    .media_type_checkbox_item input[type="checkbox"]:checked + .checkbox_content {
+                        background: #8c675a;
+                        color: #ffffff;
+                        font-weight: 600;
+                    }
+
+                    .media_type_checkbox_item input[type="checkbox"]:checked + .checkbox_content:before {
+                        background: #ffffff;
+                        border-color: #ffffff;
+                    }
+
+                    .media_type_checkbox_item input[type="checkbox"]:checked + .checkbox_content:after {
+                        opacity: 1;
+                        color: #8c675a;
+                    }
+
+                    .media_type_checkbox_item .checkbox_content i {
+                        color: inherit;
+                        font-size: 0.95rem;
+                    }
+
+                    .media_type_checkbox_item .checkbox_content span {
+                        font-size: 0.875rem;
+                        font-weight: inherit;
+                    }
+
+                    /* Category Checkboxes */
+                    .category_checkboxes {
+                        display: flex;
+                        flex-direction: column;
+                        gap: 0.35rem;
+                    }
+
+                    .category_checkbox_item {
+                        display: block;
+                        cursor: pointer;
+                        margin: 0;
+                        position: relative;
+                    }
+
+                    .category_checkbox_item input[type="checkbox"] {
+                        position: absolute;
+                        opacity: 0;
+                        cursor: pointer;
+                    }
+
+                    .category_checkbox_item .checkbox_content {
+                        display: flex;
+                        align-items: center;
+                        padding: 0.5rem 0.75rem;
+                        padding-left: 2.25rem;
+                        border-radius: 6px;
+                        color: #8c675a;
+                        background: transparent;
+                        transition: all 0.25s ease;
+                        position: relative;
+                    }
+
+                    /* Custom checkbox */
+                    .category_checkbox_item .checkbox_content:before {
+                        content: '';
+                        position: absolute;
+                        left: 0.5rem;
+                        width: 16px;
+                        height: 16px;
+                        border: 2px solid #8c675a;
+                        border-radius: 3px;
+                        background: #ffffff;
+                        transition: all 0.25s ease;
+                    }
+
+                    /* Checkmark */
+                    .category_checkbox_item .checkbox_content:after {
+                        content: '\f00c';
+                        font-family: 'FontAwesome';
+                        position: absolute;
+                        left: 0.65rem;
+                        top: 50%;
+                        transform: translateY(-50%);
+                        font-size: 10px;
+                        color: #ffffff;
+                        opacity: 0;
+                        transition: all 0.25s ease;
+                    }
+
+                    .category_checkbox_item:hover .checkbox_content {
+                        background: #f2e5d5;
+                    }
+
+                    .category_checkbox_item input[type="checkbox"]:checked + .checkbox_content {
+                        background: #8c675a;
+                        color: #ffffff;
+                        font-weight: 600;
+                    }
+
+                    .category_checkbox_item input[type="checkbox"]:checked + .checkbox_content:before {
+                        background: #ffffff;
+                        border-color: #ffffff;
+                    }
+
+                    .category_checkbox_item input[type="checkbox"]:checked + .checkbox_content:after {
+                        opacity: 1;
+                        color: #8c675a;
+                    }
+
+                    .category_checkbox_item .checkbox_content i {
+                        color: inherit;
+                        font-size: 0.95rem;
+                    }
+
+                    .category_checkbox_item .checkbox_content span {
+                        font-size: 0.875rem;
+                        font-weight: inherit;
+                    }
+
+                    /* Search Box */
+                    .media_sidebar_search .input-group {
+                        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+                        border-radius: 8px;
+                        overflow: hidden;
+                    }
+
+                    .media_sidebar_search .form-control {
+                        border: 1px solid #f2e5d5;
+                        padding: 0.75rem 1rem;
+                    }
+
+                    .media_sidebar_search .form-control:focus {
+                        border-color: #8c675a;
+                        box-shadow: 0 0 0 0.2rem rgba(140, 103, 90, 0.15);
+                    }
+
+                    .media_sidebar_search .btn-primary {
+                        background: #8c675a;
+                        border-color: #8c675a;
+                        padding: 0.75rem 1.5rem;
+                    }
+
+                    .media_sidebar_search .btn-primary:hover {
+                        background: #8c675a;
+                        border-color: #8c675a;
+                        opacity: 0.9;
+                    }
+
+                    /* Responsive */
+                    @media (max-width: 991px) {
+                        .media_type_checkboxes,
+                        .category_checkboxes {
+                            gap: 0.25rem;
+                        }
+
+                        .media_type_checkbox_item .checkbox_content,
+                        .category_checkbox_item .checkbox_content {
+                            padding: 0.45rem 0.65rem;
+                            padding-left: 2rem;
+                        }
+
+                        .media_type_checkbox_item .checkbox_content span,
+                        .category_checkbox_item .checkbox_content span {
+                            font-size: 0.8rem;
+                        }
+                    }
+
+                    @media (max-width: 576px) {
+                        .media_type_checkbox_item .checkbox_content,
+                        .category_checkbox_item .checkbox_content {
+                            padding: 0.4rem 0.5rem;
+                            padding-left: 1.85rem;
+                        }
+
+                        .media_type_checkbox_item .checkbox_content:before,
+                        .category_checkbox_item .checkbox_content:before {
+                            left: 0.4rem;
+                            width: 14px;
+                            height: 14px;
+                        }
+
+                        .media_type_checkbox_item .checkbox_content:after,
+                        .category_checkbox_item .checkbox_content:after {
+                            left: 0.5rem;
+                            font-size: 9px;
+                        }
+
+                        .media_type_checkbox_item .checkbox_content i,
+                        .category_checkbox_item .checkbox_content i {
+                            font-size: 0.85rem;
+                        }
+
+                        .media_type_checkbox_item .checkbox_content span,
+                        .category_checkbox_item .checkbox_content span {
+                            font-size: 0.75rem;
+                        }
+                    }
+                </style>
+            </head>
+
             <div id="wrap" class="js_library_media">
+                <!-- Hero Banner Section -->
+                <section class="media_hero_banner" t-attf-style="background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5))#{', url(/web/image/library.menu.category/' + str(menu_category.id) + '/banner_image) center center / cover no-repeat' if menu_category and menu_category.banner_image else ', url(/entro_library_website/static/src/img/hero-image-card.png) center center / cover no-repeat'};">
+                    <div class="media_hero_content">
+                        <p class="tagline">THƯ VIỆN PHÁP ĐĂNG</p>
+                        <t t-if="menu_category">
+                            <h1 t-esc="menu_category.name"/>
+                            <p class="subtitle" t-if="menu_category.description" t-esc="menu_category.description"/>
+                        </t>
+                        <t t-else="">
+                            <h1>TÀI NGUYÊN SỐ</h1>
+                            <p class="subtitle">Khám phá kho tàng phương tiện - video, âm thanh, hình ảnh và tài liệu</p>
+                        </t>
+                    </div>
+                </section>
+
                 <div class="container mt-4 library_media_container">
 
-                    <!-- Header -->
-                    <div class="library_media_header text-center mb-4">
-                        <h1 class="display-3">Thư Viện Phương Tiện</h1>
-                        <p class="lead">Khám phá video, tài liệu, hình ảnh và âm thanh</p>
-                    </div>
-
-                    <!-- Search box (centered, below header) -->
-                    <div class="search_box mb-5">
-                        <div class="row justify-content-center">
-                            <div class="col-lg-6 col-md-8">
-                                <form method="get" class="input-group input-group-lg"
-                                    t-att-action="keep()">
-                                    <input type="text" name="search"
-                                        class="form-control"
-                                        placeholder="Tìm kiếm..."
-                                        t-att-value="search" />
-                                    <button class="btn btn-primary" type="submit">
-                                        <i class="fa fa-search me-2" />
-                                    </button>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
+                    <!-- Breadcrumb for menu_category -->
+                    <nav aria-label="breadcrumb" t-if="menu_category">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item">
+                                <a href="/media">Tài liệu số</a>
+                            </li>
+                            <t t-if="menu_category.parent_id">
+                                <li class="breadcrumb-item">
+                                    <a t-att-href="menu_category.parent_id.full_url" t-esc="menu_category.parent_id.name"/>
+                                </li>
+                            </t>
+                            <li class="breadcrumb-item active" aria-current="page" t-esc="menu_category.name"/>
+                        </ol>
+                    </nav>
 
                     <div class="row">
                         <!-- Sidebar -->
                         <div class="col-lg-3 mb-4">
+                            <!-- Search Box -->
+                            <div class="media_sidebar_search mb-4">
+                                <form method="get" t-att-action="keep()">
+                                    <div class="input-group">
+                                        <input type="text" name="search"
+                                            class="form-control"
+                                            placeholder="Tìm kiếm..."
+                                            t-att-value="search" />
+                                        <button class="btn btn-primary" type="submit">
+                                            <i class="fa fa-search" />
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+
                             <!-- Media Type Filter -->
-                            <div class="media_type_filter mb-4">
-                                <h5>Loại</h5>
-                                <ul class="list-unstyled">
-                                    <li>
-                                        <a href="/media"
-                                            t-attf-class="#{not media_type and 'fw-bold text-primary'}">
-                                            <i class="fa fa-th me-2" /> Tất cả </a>
-                                    </li>
-                                    <li>
-                                        <a t-attf-href="#{keep(media_type='video')}"
-                                            t-attf-class="#{media_type == 'video' and 'fw-bold text-primary'}">
-                                            <i class="fa fa-video-camera me-2" /> Video </a>
-                                    </li>
-                                    <li>
-                                        <a t-attf-href="#{keep(media_type='audio')}"
-                                            t-attf-class="#{media_type == 'audio' and 'fw-bold text-primary'}">
-                                            <i class="fa fa-music me-2" /> Âm thanh </a>
-                                    </li>
-                                    <li>
-                                        <a t-attf-href="#{keep(media_type='image')}"
-                                            t-attf-class="#{media_type == 'image' and 'fw-bold text-primary'}">
-                                            <i class="fa fa-image me-2" /> Hình ảnh </a>
-                                    </li>
-                                    <li>
-                                        <a t-attf-href="#{keep(media_type='document')}"
-                                            t-attf-class="#{media_type == 'document' and 'fw-bold text-primary'}">
-                                            <i class="fa fa-file-pdf-o me-2" /> Tài liệu </a>
-                                    </li>
-                                </ul>
+                            <div class="media_filter_card mb-4">
+                                <div class="filter_card_header">
+                                    <i class="fa fa-filter me-2"/>
+                                    <h5 class="mb-0">Loại</h5>
+                                </div>
+                                <div class="filter_card_body">
+                                    <form method="get" id="mediaTypeFilterForm" t-att-action="keep()">
+                                        <!-- Preserve search and other params -->
+                                        <input type="hidden" name="search" t-att-value="search or ''"/>
+                                        <input type="hidden" name="sortby" t-att-value="sortby or ''"/>
+
+                                        <div class="media_type_checkboxes">
+                                            <label class="media_type_checkbox_item">
+                                                <input type="checkbox" name="media_type" value="video"
+                                                    t-att-checked="'checked' if 'video' in (media_type_list or []) else None"
+                                                    class="media-type-checkbox"/>
+                                                <span class="checkbox_content">
+                                                    <i class="fa fa-video-camera fa-lg me-2"/>
+                                                    <span>Video</span>
+                                                </span>
+                                            </label>
+
+                                            <label class="media_type_checkbox_item">
+                                                <input type="checkbox" name="media_type" value="audio"
+                                                    t-att-checked="'checked' if 'audio' in (media_type_list or []) else None"
+                                                    class="media-type-checkbox"/>
+                                                <span class="checkbox_content">
+                                                    <i class="fa fa-music fa-lg me-2"/>
+                                                    <span>Âm thanh</span>
+                                                </span>
+                                            </label>
+
+                                            <label class="media_type_checkbox_item">
+                                                <input type="checkbox" name="media_type" value="image"
+                                                    t-att-checked="'checked' if 'image' in (media_type_list or []) else None"
+                                                    class="media-type-checkbox"/>
+                                                <span class="checkbox_content">
+                                                    <i class="fa fa-image fa-lg me-2"/>
+                                                    <span>Hình ảnh</span>
+                                                </span>
+                                            </label>
+
+                                            <label class="media_type_checkbox_item">
+                                                <input type="checkbox" name="media_type" value="document"
+                                                    t-att-checked="'checked' if 'document' in (media_type_list or []) else None"
+                                                    class="media-type-checkbox"/>
+                                                <span class="checkbox_content">
+                                                    <i class="fa fa-file-pdf-o fa-lg me-2"/>
+                                                    <span>Tài liệu</span>
+                                                </span>
+                                            </label>
+                                        </div>
+                                    </form>
+                                </div>
                             </div>
 
                             <!-- Website Categories Filter -->
-                            <div class="website_categories_filter mb-4" t-if="website_categories">
-                                <h5>Danh mục</h5>
-                                <ul class="list-unstyled">
-                                    <li>
-                                        <a href="/media"
-                                            t-attf-class="#{not category and 'fw-bold text-primary'}">
-                                            Tất cả
-                                        </a>
-                                    </li>
-                                    <t t-foreach="website_categories" t-as="web_cat">
-                                        <li>
-                                            <a t-attf-href="/media/danh-muc/#{web_cat.id}"
-                                                t-attf-class="#{category and category.id == web_cat.id and 'fw-bold text-primary'}">
-                                                <t t-esc="web_cat.name" />
-                                            </a>
-                                        </li>
-                                    </t>
-                                </ul>
+                            <div class="media_filter_card mb-4" t-if="website_categories">
+                                <div class="filter_card_header">
+                                    <i class="fa fa-folder-open me-2"/>
+                                    <h5 class="mb-0">Danh mục</h5>
+                                </div>
+                                <div class="filter_card_body">
+                                    <form method="get" id="categoryFilterForm" t-att-action="keep()">
+                                        <!-- Preserve search and other params -->
+                                        <input type="hidden" name="search" t-att-value="search or ''"/>
+                                        <input type="hidden" name="sortby" t-att-value="sortby or ''"/>
+                                        <!-- Preserve media_type selections -->
+                                        <t t-foreach="media_type_list or []" t-as="mt">
+                                            <input type="hidden" name="media_type" t-att-value="mt"/>
+                                        </t>
+
+                                        <div class="category_checkboxes">
+                                            <t t-foreach="website_categories" t-as="web_cat">
+                                                <label class="category_checkbox_item">
+                                                    <input type="checkbox" name="category_id" t-att-value="web_cat.id"
+                                                        t-att-checked="'checked' if (category_id_list and web_cat.id in category_id_list) else None"
+                                                        class="category-checkbox"/>
+                                                    <span class="checkbox_content">
+                                                        <span t-esc="web_cat.name"/>
+                                                    </span>
+                                                </label>
+                                            </t>
+                                        </div>
+                                    </form>
+                                </div>
                             </div>
+
+                            <script>
+                                document.addEventListener('DOMContentLoaded', function() {
+                                    // Restore scroll position after page reload
+                                    if (sessionStorage.getItem('mediaFilterScrollPos')) {
+                                        window.scrollTo(0, parseInt(sessionStorage.getItem('mediaFilterScrollPos')));
+                                        sessionStorage.removeItem('mediaFilterScrollPos');
+                                    }
+
+                                    // Menu Category Shortcut Filter
+                                    var menuCategoryShortcutForm = document.getElementById('menuCategoryShortcutForm');
+                                    if (menuCategoryShortcutForm) {
+                                        var menuCategoryCheckboxes = menuCategoryShortcutForm.querySelectorAll('.menu-category-checkbox');
+                                        var menuCategoryTimer = null;
+
+                                        menuCategoryCheckboxes.forEach(function(checkbox) {
+                                            checkbox.addEventListener('change', function(e) {
+                                                if (menuCategoryTimer) {
+                                                    clearTimeout(menuCategoryTimer);
+                                                }
+                                                menuCategoryTimer = setTimeout(function() {
+                                                    sessionStorage.setItem('mediaFilterScrollPos', window.pageYOffset);
+                                                    menuCategoryShortcutForm.submit();
+                                                }, 300);
+                                            });
+                                        });
+                                    }
+
+                                    // Media Type Filter
+                                    var mediaTypeForm = document.getElementById('mediaTypeFilterForm');
+                                    if (mediaTypeForm) {
+                                        var mediaTypeCheckboxes = mediaTypeForm.querySelectorAll('.media-type-checkbox');
+                                        var mediaTypeTimer = null;
+
+                                        mediaTypeCheckboxes.forEach(function(checkbox) {
+                                            checkbox.addEventListener('change', function(e) {
+                                                if (mediaTypeTimer) {
+                                                    clearTimeout(mediaTypeTimer);
+                                                }
+                                                mediaTypeTimer = setTimeout(function() {
+                                                    sessionStorage.setItem('mediaFilterScrollPos', window.pageYOffset);
+                                                    mediaTypeForm.submit();
+                                                }, 300);
+                                            });
+                                        });
+                                    }
+
+                                    // Category Filter
+                                    var categoryForm = document.getElementById('categoryFilterForm');
+                                    if (categoryForm) {
+                                        var categoryCheckboxes = categoryForm.querySelectorAll('.category-checkbox');
+                                        var categoryTimer = null;
+
+                                        categoryCheckboxes.forEach(function(checkbox) {
+                                            checkbox.addEventListener('change', function(e) {
+                                                if (categoryTimer) {
+                                                    clearTimeout(categoryTimer);
+                                                }
+                                                categoryTimer = setTimeout(function() {
+                                                    sessionStorage.setItem('mediaFilterScrollPos', window.pageYOffset);
+                                                    categoryForm.submit();
+                                                }, 300);
+                                            });
+                                        });
+                                    }
+                                });
+                            </script>
 
                         </div>
 
                         <!-- Main content -->
                         <div class="col-lg-9">
+
+                            <!-- Child Menu Categories Shortcuts -->
+                            <div class="menu_category_shortcuts mb-3" t-if="child_menu_categories">
+                                <style>
+                                    .menu_category_shortcuts {
+                                        background: transparent;
+                                    }
+
+                                    .menu_category_shortcuts form {
+                                        display: flex;
+                                        gap: 0.5rem;
+                                        flex-wrap: wrap;
+                                    }
+
+                                    .menu_shortcut_btn {
+                                        display: flex;
+                                        align-items: center;
+                                        justify-content: center;
+                                        padding: 0.375rem 0.625rem;
+                                        border: none;
+                                        background: #f8f9fa;
+                                        color: #2c3e50;
+                                        border-radius: 6px;
+                                        font-size: 0.75rem;
+                                        font-weight: 600;
+                                        text-decoration: none;
+                                        transition: all 0.3s ease;
+                                        cursor: pointer;
+                                        text-align: center;
+                                        min-height: 30px;
+                                        flex: 1;
+                                        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+                                    }
+
+                                    .menu_shortcut_btn:hover {
+                                        transform: translateY(-3px);
+                                        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+                                    }
+
+                                    /* Alternating colors */
+                                    .menu_shortcut_btn:nth-child(odd) {
+                                        background: #f2e5d5;
+                                        color: #2c3e50;
+                                    }
+
+                                    .menu_shortcut_btn:nth-child(even) {
+                                        background: #f2e5d5;
+                                        color: #2c3e50;
+                                    }
+
+                                    .menu_shortcut_btn.active:nth-child(odd) {
+                                        background: #8c675a;
+                                        color: white;
+                                    }
+
+                                    .menu_shortcut_btn.active:nth-child(even) {
+                                        background: #8c675a;
+                                        color: white;
+                                    }
+
+                                    @media (max-width: 768px) {
+                                        .menu_shortcut_btn {
+                                            padding: 0.3rem 0.5rem;
+                                            min-height: 28px;
+                                            font-size: 0.7rem;
+                                        }
+                                    }
+                                </style>
+
+                                <form method="get" id="menuCategoryShortcutForm" t-att-action="keep()">
+                                    <!-- Preserve search and other params -->
+                                    <input type="hidden" name="search" t-att-value="search or ''"/>
+                                    <input type="hidden" name="sortby" t-att-value="sortby or ''"/>
+                                    <!-- Preserve media_type selections -->
+                                    <t t-foreach="media_type_list or []" t-as="mt">
+                                        <input type="hidden" name="media_type" t-att-value="mt"/>
+                                    </t>
+                                    <!-- Preserve category_id selections -->
+                                    <t t-foreach="category_id_list or []" t-as="cid">
+                                        <input type="hidden" name="category_id" t-att-value="cid"/>
+                                    </t>
+
+                                    <t t-foreach="child_menu_categories" t-as="child_cat">
+                                        <label t-attf-class="menu_shortcut_btn #{(menu_category_id_list and child_cat.id in menu_category_id_list) and 'active' or ''}">
+                                            <input type="checkbox" name="menu_category_id" t-att-value="child_cat.id"
+                                                t-att-checked="'checked' if (menu_category_id_list and child_cat.id in menu_category_id_list) else None"
+                                                class="menu-category-checkbox" style="display: none;"/>
+                                            <span t-esc="child_cat.name"/>
+                                        </label>
+                                    </t>
+                                </form>
+                            </div>
 
                             <!-- Info bar -->
                             <div
@@ -168,7 +739,7 @@
                     <t t-if="media.thumbnail">
                         <img t-att-src="'/web/image/library.media/%s/thumbnail' % media.id"
                             t-att-alt="media.name"
-                            class="img-fluid w-100 h-100"
+                            class="w-100 h-100"
                             style="object-fit: cover;" />
                     </t>
                     <t t-else="">
@@ -190,19 +761,6 @@
                         </div>
                     </t>
 
-                    <!-- Media Type Badge -->
-                    <span class="badge position-absolute top-0 start-0 m-2"
-                        t-attf-class="bg-#{media.media_type == 'video' and 'primary' or media.media_type == 'audio' and 'danger' or media.media_type == 'image' and 'info' or 'success'}">
-                        <t t-if="media.media_type == 'video'">
-                            <i class="fa fa-video-camera me-1" /> Video </t>
-                        <t t-elif="media.media_type == 'audio'">
-                            <i class="fa fa-music me-1" /> Âm thanh </t>
-                        <t t-elif="media.media_type == 'image'">
-                            <i class="fa fa-image me-1" /> Hình ảnh </t>
-                        <t t-else="">
-                            <i class="fa fa-file-pdf-o me-1" /> Tài liệu </t>
-                    </span>
-
                     <!-- Duration Badge (for video/audio) -->
                     <t t-if="media.duration_display and media.media_type in ['video', 'audio']">
                         <span class="badge bg-dark position-absolute bottom-0 end-0 m-2 opacity-75">
@@ -221,36 +779,38 @@
                     </t>
                 </div>
 
-                <div class="card-body d-flex flex-column">
+                <div class="card-body">
                     <h5 class="card-title media_title text-truncate mb-2" t-att-title="media.name"
                         t-esc="media.name" />
 
                     <p class="card-text text-muted small mb-2 text-truncate" t-if="media.author">
-                        <i class="fa fa-user" />
+                        <i class="fa fa-user me-1" />
                         <t t-esc="media.author" />
                     </p>
 
-                    <p class="card-text text-muted small mb-2 text-truncate"
-                        t-if="media.category_id">
-                        <i class="fa fa-tag" />
-                        <t t-esc="media.category_id.name" />
+                    <!-- Media Type -->
+                    <p class="card-text small text-muted mb-2">
+                        <i class="fa fa-tag me-1"/>
+                        <t t-if="media.media_type == 'video'">Video</t>
+                        <t t-elif="media.media_type == 'audio'">Âm thanh</t>
+                        <t t-elif="media.media_type == 'image'">Hình ảnh</t>
+                        <t t-else="">Tài liệu</t>
                     </p>
 
-                    <!-- Stats -->
-                    <div class="mt-auto">
-                        <div
-                            class="d-flex justify-content-between align-items-center text-muted small">
-                            <span>
-                                <i class="fa fa-eye" />
-                                <t t-esc="media.view_count" />
-                            </span>
-                            <span t-if="media.is_downloadable">
-                                <i class="fa fa-download" />
-                                <t t-esc="media.download_count" />
-                            </span>
-                            <span t-if="media.storage_type == 'file' and media.file_size">
-                                <i class="fa fa-hdd-o" /> <t t-esc="'%.1f' % media.file_size" /> MB </span>
-                        </div>
+                    <!-- Publication Date or Create Date -->
+                    <p class="card-text small mb-0">
+                        <i class="fa fa-calendar me-1"/>
+                        <t t-esc="media.publication_date or (media.create_date and media.create_date.strftime('%Y')) or 'N/A'" />
+                    </p>
+                </div>
+
+                <div class="card-footer bg-transparent border-top">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <small class="text-muted">
+                            <i class="fa fa-eye"/>
+                            <t t-esc="media.view_count" />
+                        </small>
+                        <span class="btn btn-sm btn-primary">Xem chi tiết</span>
                     </div>
                 </div>
             </a>

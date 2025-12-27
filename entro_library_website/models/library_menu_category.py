@@ -47,6 +47,11 @@ class LibraryMenuCategory(models.Model):
     sequence = fields.Integer(string='Thứ tự', default=10)
     icon = fields.Char(string='Icon CSS', help='Font Awesome icon class (vd: fa-book)')
     description = fields.Text(string='Mô tả')
+    banner_image = fields.Binary(
+        string='Ảnh banner',
+        help='Ảnh nền cho banner trang danh mục (khuyến nghị: 1920x400px)',
+        attachment=True
+    )
 
     # Status
     active = fields.Boolean(string='Hoạt động', default=True)
