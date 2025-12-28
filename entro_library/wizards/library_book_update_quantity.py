@@ -217,6 +217,7 @@ class LibraryBookUpdateQuantity(models.TransientModel):
             quant = self.env['library.book.quant'].create({
                 'book_id': self.book_id.id,
                 'registration_number': line.registration_number if line.registration_number else False,
+                'code_registration_number': line.code_registration_number if line.code_registration_number else False,
                 'location_id': line.location_id.id if line.location_id else False,
                 'state': 'available',
                 'quant_type_id': quant_type_id.id if quant_type_id else False,
