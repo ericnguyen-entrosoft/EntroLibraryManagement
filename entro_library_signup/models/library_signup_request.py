@@ -123,7 +123,7 @@ class LibrarySignupRequest(models.Model):
         user = self.env['res.users'].sudo().create(user_vals)
 
         # Generate signup token for password setup
-        user.sudo().signup_prepare()
+        user.partner_id.sudo().signup_prepare()
 
         # Update request
         self.write({
