@@ -302,27 +302,14 @@ class LibraryWebsite(http.Controller):
 
     @http.route([
         '/media',
-        '/media/page/<int:page>',
         '/media/<path:menu_path>',
+        '/media/page/<int:page>',
         '/media/<path:menu_path>/page/<int:page>',
         '/media/danh-muc/<model("library.website.category"):category>',
         '/media/danh-muc/<model("library.website.category"):category>/page/<int:page>',
     ], type='http', auth='public', website=True, sitemap=True)
-    def library_media_list(self, page=1, category=None, menu_path=None, search='', media_type=None, category_id=None, menu_category_id=None, sortby=None, **kwargs):
+    def library_media_list(self, page=1, category=None, menu_path=None, search='', media_type=None, category_id=None, sortby=None, **kwargs):
         """Trang danh sách phương tiện"""
-
-        # Handle menu category path
-        menu_category = None
-        if menu_path:
-            # Find menu category by matching the full URL path
-            # For example: "thien-vipassana/huong-dan/3-ngay"
-            menu_category = request.env['library.menu.category'].search([
-                ('full_url', '=', f'/media/{menu_path}')
-            ], limit=1)
-
-            if not menu_category:
-                # If exact match not found, redirect to main media page
-                return request.redirect('/media')
 
         domain = [('website_published', '=', True), ('active', '=', True)]
 
@@ -375,30 +362,6 @@ class LibraryWebsite(http.Controller):
             domain += [('website_category_id', '=', category.id)]
             category_id_list = [category.id]
 
-        # Filter by specific menu categories (checkbox selection)
-        menu_category_id_list = []
-        menu_category_ids_from_request = request.httprequest.args.getlist('menu_category_id')
-
-        if menu_category_ids_from_request:
-            # User selected specific child menu categories
-            menu_category_id_list = [int(mcid) for mcid in menu_category_ids_from_request if mcid]
-            if menu_category_id_list:
-                domain += [('menu_category_id', 'in', menu_category_id_list)]
-        elif menu_category_id:
-            # Fallback to single menu_category_id parameter
-            if isinstance(menu_category_id, list):
-                menu_category_id_list = [int(mcid) for mcid in menu_category_id]
-            else:
-                menu_category_id_list = [int(menu_category_id)]
-            if menu_category_id_list:
-                domain += [('menu_category_id', 'in', menu_category_id_list)]
-        elif menu_category:
-            # No specific child selected - show all from this menu category and its children
-            all_category_ids = request.env['library.menu.category'].search([
-                ('id', 'child_of', menu_category.id)
-            ]).ids
-            domain += [('menu_category_id', 'in', all_category_ids)]
-
         # Filter by media type (support multiple types)
         media_type_list = []
         # Get all media_type values from request (supports multiple checkboxes)
@@ -416,6 +379,23 @@ class LibraryWebsite(http.Controller):
                 media_type_list = [media_type]
             if media_type_list:
                 domain += [('media_type', 'in', media_type_list)]
+
+        # Filter by Vipassana categories (only for /media/thien-vipassana)
+        vipassana_category_id_list = []
+        vipassana_category_ids_from_request = request.httprequest.args.getlist('vipassana_category_id')
+
+        # Check if we're on the thien-vipassana page
+        is_vipassana_page = menu_path == 'thien-vipassana' if menu_path else False
+
+        if is_vipassana_page:
+            # Filter to show only media with vipassana categories
+            domain += [('vipassana_category_ids', '!=', False)]
+
+            # Apply specific category filter if selected
+            if vipassana_category_ids_from_request:
+                vipassana_category_id_list = [int(vcid) for vcid in vipassana_category_ids_from_request if vcid]
+                if vipassana_category_id_list:
+                    domain += [('vipassana_category_ids', 'in', vipassana_category_id_list)]
 
         # Sorting
         sort_options = {
@@ -437,9 +417,9 @@ class LibraryWebsite(http.Controller):
         ppg = 12  # media per page
 
         # Construct base URL
-        if menu_category:
-            # Use menu category path
-            url = menu_category.full_url
+        if menu_path:
+            # Preserve menu path URL (e.g., /media/thien-vipassana)
+            url = f'/media/{menu_path}'
         elif category:
             url = f'/media/danh-muc/{category.id}'
         else:
@@ -450,8 +430,8 @@ class LibraryWebsite(http.Controller):
             url_args['media_type'] = media_type_list
         if category_id_list:
             url_args['category_id'] = category_id_list
-        if menu_category_id_list:
-            url_args['menu_category_id'] = menu_category_id_list
+        if vipassana_category_id_list:
+            url_args['vipassana_category_id'] = vipassana_category_id_list
 
         pager = request.website.pager(
             url=url,
@@ -474,11 +454,10 @@ class LibraryWebsite(http.Controller):
             order='sequence, name'
         )
 
-        # Get child menu categories if we're in a menu category
-        child_menu_categories = None
-        if menu_category:
-            child_menu_categories = request.env['library.menu.category'].search([
-                ('parent_id', '=', menu_category.id),
+        # Get Vipassana categories if on Vipassana page
+        vipassana_categories = None
+        if is_vipassana_page:
+            vipassana_categories = request.env['media.vipassana.category'].search([
                 ('active', '=', True)
             ], order='sequence, name')
 
@@ -489,7 +468,7 @@ class LibraryWebsite(http.Controller):
             search=search,
             media_type=media_type_list,
             category_id=category_id_list,
-            menu_category_id=menu_category_id_list,
+            vipassana_category_id=vipassana_category_id_list,
             sortby=sortby
         )
 
@@ -499,12 +478,12 @@ class LibraryWebsite(http.Controller):
             'pager': pager,
             'search': search,
             'category': category,
-            'menu_category': menu_category,
-            'child_menu_categories': child_menu_categories,
             'media_type': media_type,
             'media_type_list': media_type_list,
             'category_id_list': category_id_list,
-            'menu_category_id_list': menu_category_id_list,
+            'vipassana_category_id_list': vipassana_category_id_list,
+            'vipassana_categories': vipassana_categories,
+            'is_vipassana_page': is_vipassana_page,
             'website_categories': website_categories,
             'page_name': 'library_media',
             'keep': keep,

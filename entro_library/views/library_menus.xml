@@ -165,11 +165,11 @@
 
 
     <!-- Character Mapping Menu -->
-    <menuitem id="menu_character_mapping"
-              name="Ánh xạ ký tự"
-              parent="menu_library_config"
-              action="action_character_mapping"
-              sequence="70"/>
+    <menuitem id="menu_media_vipassana_category"
+            name="Danh mục Thiền Vipassana"
+            parent="menu_library_config"
+            action="action_media_vipassana_category"
+            sequence="15"/>
 
     <!-- Quant Type Menu -->
     <menuitem id="menu_library_quant_type"

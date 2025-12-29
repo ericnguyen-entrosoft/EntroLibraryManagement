@@ -55,6 +55,14 @@ class LibraryMedia(models.Model):
         'playlist_id',
         string='Danh sách phát'
     )
+    vipassana_category_ids = fields.Many2many(
+        'media.vipassana.category',
+        'library_media_vipassana_category_rel',
+        'media_id',
+        'category_id',
+        string='Danh mục Vipassana',
+        help='Các danh mục Thiền Vipassana mà phương tiện này thuộc về'
+    )
 
     # Metadata
     description = fields.Html(string='Mô tả')

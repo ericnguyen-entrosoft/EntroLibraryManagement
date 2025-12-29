@@ -69,6 +69,9 @@
                                 </group>
                                 <group string="Thông tin phân loại">
                                     <field name="category_id" />
+                                    <field name="vipassana_category_ids" widget="many2many_tags"
+                                        options="{'color_field': 'color'}"
+                                        placeholder="Chọn danh mục Vipassana..."/>
                                     <field name="keywords"
                                         placeholder="Nhập từ khóa, cách nhau bởi dấu phẩy" />
                                 </group>

@@ -66,6 +66,7 @@
         'views/library_media_views.xml',
         'views/library_media_category_views.xml',
         'views/library_media_playlist_views.xml',
+        'views/media_vipassana_category_views.xml',
         'views/res_config_settings_views.xml',
         'views/library_dashboard_views.xml',
 

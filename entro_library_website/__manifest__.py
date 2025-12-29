@@ -36,14 +36,12 @@
 
         # Data
         'data/library_website_category_data.xml',
-        'data/library_menu_category_data.xml',
         'data/website_menu.xml',
         'data/google_analytics_cron.xml',
 
         # Views
         'views/library_website_category_views.xml',
         'views/library_website_slider_views.xml',
-        'views/library_menu_category_views.xml',
         'views/library_book_views.xml',
         'views/library_media_views.xml',
         'views/google_analytics_config_views.xml',

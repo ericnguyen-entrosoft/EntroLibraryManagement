@@ -20,6 +20,7 @@ from . import library_reservation
 from . import library_media
 from . import library_media_category
 from . import library_media_playlist
+from . import media_vipassana_category
 from . import res_partner
 from . import res_config_settings
 from . import library_dashboard

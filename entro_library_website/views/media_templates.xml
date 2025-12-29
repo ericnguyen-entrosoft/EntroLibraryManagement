@@ -362,37 +362,15 @@
 
             <div id="wrap" class="js_library_media">
                 <!-- Hero Banner Section -->
-                <section class="media_hero_banner" t-attf-style="background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5))#{', url(/web/image/library.menu.category/' + str(menu_category.id) + '/banner_image) center center / cover no-repeat' if menu_category and menu_category.banner_image else ', url(/entro_library_website/static/src/img/hero-image-card.png) center center / cover no-repeat'};">
+                <section class="media_hero_banner" t-attf-style="background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url(/entro_library_website/static/src/img/hero-image-card.png) center center / cover no-repeat;">
                     <div class="media_hero_content">
                         <p class="tagline">THƯ VIỆN PHÁP ĐĂNG</p>
-                        <t t-if="menu_category">
-                            <h1 t-esc="menu_category.name"/>
-                            <p class="subtitle" t-if="menu_category.description" t-esc="menu_category.description"/>
-                        </t>
-                        <t t-else="">
-                            <h1>TÀI NGUYÊN SỐ</h1>
-                            <p class="subtitle">Khám phá kho tàng phương tiện - video, âm thanh, hình ảnh và tài liệu</p>
-                        </t>
+                        <h1>TÀI NGUYÊN SỐ</h1>
+                        <p class="subtitle">Khám phá kho tàng phương tiện - video, âm thanh, hình ảnh và tài liệu</p>
                     </div>
                 </section>
 
                 <div class="container mt-4 library_media_container">
-
-                    <!-- Breadcrumb for menu_category -->
-                    <nav aria-label="breadcrumb" t-if="menu_category">
-                        <ol class="breadcrumb">
-                            <li class="breadcrumb-item">
-                                <a href="/media">Tài liệu số</a>
-                            </li>
-                            <t t-if="menu_category.parent_id">
-                                <li class="breadcrumb-item">
-                                    <a t-att-href="menu_category.parent_id.full_url" t-esc="menu_category.parent_id.name"/>
-                                </li>
-                            </t>
-                            <li class="breadcrumb-item active" aria-current="page" t-esc="menu_category.name"/>
-                        </ol>
-                    </nav>
-
                     <div class="row">
                         <!-- Sidebar -->
                         <div class="col-lg-3 mb-4">
@@ -468,8 +446,44 @@
                                 </div>
                             </div>
 
+                            <!-- Vipassana Categories Filter (Only on Thien-Vipassana page) -->
+                            <div class="media_filter_card mb-4" t-if="is_vipassana_page and vipassana_categories">
+                                <div class="filter_card_header">
+                                    <i class="fa fa-tags me-2"/>
+                                    <h5 class="mb-0">Danh mục</h5>
+                                </div>
+                                <div class="filter_card_body">
+                                    <form method="get" id="vipassanaCategoryFilterForm" t-att-action="keep()">
+                                        <!-- Preserve search and other params -->
+                                        <input type="hidden" name="search" t-att-value="search or ''"/>
+                                        <input type="hidden" name="sortby" t-att-value="sortby or ''"/>
+                                        <!-- Preserve media_type selections -->
+                                        <t t-foreach="media_type_list or []" t-as="mt">
+                                            <input type="hidden" name="media_type" t-att-value="mt"/>
+                                        </t>
+                                        <!-- Preserve category_id selections -->
+                                        <t t-foreach="category_id_list or []" t-as="cat_id">
+                                            <input type="hidden" name="category_id" t-att-value="cat_id"/>
+                                        </t>
+
+                                        <div class="category_checkboxes">
+                                            <t t-foreach="vipassana_categories" t-as="vip_cat">
+                                                <label class="category_checkbox_item">
+                                                    <input type="checkbox" name="vipassana_category_id" t-att-value="vip_cat.id"
+                                                        t-att-checked="'checked' if (vipassana_category_id_list and vip_cat.id in vipassana_category_id_list) else None"
+                                                        class="vipassana-category-checkbox"/>
+                                                    <span class="checkbox_content">
+                                                        <span t-esc="vip_cat.name"/>
+                                                    </span>
+                                                </label>
+                                            </t>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+
                             <!-- Website Categories Filter -->
-                            <div class="media_filter_card mb-4" t-if="website_categories">
+                            <div class="media_filter_card mb-4" t-if="website_categories and not is_vipassana_page">
                                 <div class="filter_card_header">
                                     <i class="fa fa-folder-open me-2"/>
                                     <h5 class="mb-0">Danh mục</h5>
@@ -564,6 +578,25 @@
                                             });
                                         });
                                     }
+
+                                    // Vipassana Category Filter
+                                    var vipassanaCategoryForm = document.getElementById('vipassanaCategoryFilterForm');
+                                    if (vipassanaCategoryForm) {
+                                        var vipassanaCategoryCheckboxes = vipassanaCategoryForm.querySelectorAll('.vipassana-category-checkbox');
+                                        var vipassanaCategoryTimer = null;
+
+                                        vipassanaCategoryCheckboxes.forEach(function(checkbox) {
+                                            checkbox.addEventListener('change', function(e) {
+                                                if (vipassanaCategoryTimer) {
+                                                    clearTimeout(vipassanaCategoryTimer);
+                                                }
+                                                vipassanaCategoryTimer = setTimeout(function() {
+                                                    sessionStorage.setItem('mediaFilterScrollPos', window.pageYOffset);
+                                                    vipassanaCategoryForm.submit();
+                                                }, 300);
+                                            });
+                                        });
+                                    }
                                 });
                             </script>
 
@@ -571,98 +604,6 @@
 
                         <!-- Main content -->
                         <div class="col-lg-9">
-
-                            <!-- Child Menu Categories Shortcuts -->
-                            <div class="menu_category_shortcuts mb-3" t-if="child_menu_categories">
-                                <style>
-                                    .menu_category_shortcuts {
-                                        background: transparent;
-                                    }
-
-                                    .menu_category_shortcuts form {
-                                        display: flex;
-                                        gap: 0.5rem;
-                                        flex-wrap: wrap;
-                                    }
-
-                                    .menu_shortcut_btn {
-                                        display: flex;
-                                        align-items: center;
-                                        justify-content: center;
-                                        padding: 0.375rem 0.625rem;
-                                        border: none;
-                                        background: #f8f9fa;
-                                        color: #2c3e50;
-                                        border-radius: 6px;
-                                        font-size: 0.75rem;
-                                        font-weight: 600;
-                                        text-decoration: none;
-                                        transition: all 0.3s ease;
-                                        cursor: pointer;
-                                        text-align: center;
-                                        min-height: 30px;
-                                        flex: 1;
-                                        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
-                                    }
-
-                                    .menu_shortcut_btn:hover {
-                                        transform: translateY(-3px);
-                                        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-                                    }
-
-                                    /* Alternating colors */
-                                    .menu_shortcut_btn:nth-child(odd) {
-                                        background: #f2e5d5;
-                                        color: #2c3e50;
-                                    }
-
-                                    .menu_shortcut_btn:nth-child(even) {
-                                        background: #f2e5d5;
-                                        color: #2c3e50;
-                                    }
-
-                                    .menu_shortcut_btn.active:nth-child(odd) {
-                                        background: #8c675a;
-                                        color: white;
-                                    }
-
-                                    .menu_shortcut_btn.active:nth-child(even) {
-                                        background: #8c675a;
-                                        color: white;
-                                    }
-
-                                    @media (max-width: 768px) {
-                                        .menu_shortcut_btn {
-                                            padding: 0.3rem 0.5rem;
-                                            min-height: 28px;
-                                            font-size: 0.7rem;
-                                        }
-                                    }
-                                </style>
-
-                                <form method="get" id="menuCategoryShortcutForm" t-att-action="keep()">
-                                    <!-- Preserve search and other params -->
-                                    <input type="hidden" name="search" t-att-value="search or ''"/>
-                                    <input type="hidden" name="sortby" t-att-value="sortby or ''"/>
-                                    <!-- Preserve media_type selections -->
-                                    <t t-foreach="media_type_list or []" t-as="mt">
-                                        <input type="hidden" name="media_type" t-att-value="mt"/>
-                                    </t>
-                                    <!-- Preserve category_id selections -->
-                                    <t t-foreach="category_id_list or []" t-as="cid">
-                                        <input type="hidden" name="category_id" t-att-value="cid"/>
-                                    </t>
-
-                                    <t t-foreach="child_menu_categories" t-as="child_cat">
-                                        <label t-attf-class="menu_shortcut_btn #{(menu_category_id_list and child_cat.id in menu_category_id_list) and 'active' or ''}">
-                                            <input type="checkbox" name="menu_category_id" t-att-value="child_cat.id"
-                                                t-att-checked="'checked' if (menu_category_id_list and child_cat.id in menu_category_id_list) else None"
-                                                class="menu-category-checkbox" style="display: none;"/>
-                                            <span t-esc="child_cat.name"/>
-                                        </label>
-                                    </t>
-                                </form>
-                            </div>
 
                             <!-- Info bar -->
                             <div
