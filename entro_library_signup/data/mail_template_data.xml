@@ -35,8 +35,8 @@
                         <strong>Email đăng nhập:</strong> <t t-out="object.email or ''">user@example.com</t><br/><br/>
                         Để hoàn tất kích hoạt tài khoản, vui lòng nhấn vào nút bên dưới để thiết lập mật khẩu của bạn:
                         <div style="margin: 16px 0px 16px 0px; text-align: center;">
-                            <t t-if="object.user_id and object.user_id.signup_token">
-                                <a t-att-href="'%s/web/signup?token=%s&amp;db=%s' % (object.get_base_url(), object.user_id.signup_token, object.env.cr.dbname)"
+                            <t t-if="object.user_id">
+                                <a t-att-href="'%s/web/signup?token=%s&amp;db=%s' % (object.get_base_url(), object.user_id.partner_id.sudo()._generate_signup_token(), object.env.cr.dbname)"
                                     style="background-color: #4CAF50; padding: 12px 30px; text-decoration: none; color: #fff; border-radius: 5px; font-size: 13px; display: inline-block;">
                                     Thiết lập mật khẩu
                                 </a>
