@@ -31,6 +31,20 @@
         </t>
     </template>
 
+    <!-- Library Notice Banner -->
+    <template id="library_notice_banner" name="Library Notice Banner" inherit_id="website.layout">
+        <xpath expr="//header" position="after">
+            <div class="library_notice_banner bg-info text-white py-2 text-center" style="background-color: var(--light-gray) !important;color:black !important">
+                <div class="container">
+                    <p class="mb-0">
+                        Thư viện đang trong quá trình hoàn thiện. Mọi ý kiến đóng góp mọi người hoan hỷ gửi về địa chỉ email
+                        <a href="mailto:thuvienphapdang@gmail.com" class="text-white text-decoration-underline">thuvienphapdang@gmail.com</a>
+                    </p>
+                </div>
+            </div>
+        </xpath>
+    </template>
+
     <!-- Add to header_default -->
     <template id="template_header_default" inherit_id="website.template_header_default">
         <xpath expr="//t[@t-call='website.placeholder_header_search_box']" position="before">
