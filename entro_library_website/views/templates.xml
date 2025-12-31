@@ -680,7 +680,7 @@
                                 <div class="p-3 bg-light rounded">
                                     <p class="mb-0">
                                         <i class="fa fa-external-link text-primary me-2"/>
-                                        <a t-attf-href="/thu-vien/media/#{book.media_id.id}"
+                                        <a t-attf-href="/media/#{book.media_id.id}"
                                            target="_blank"
                                            class="text-primary fw-bold">
                                             <t t-esc="book.media_id.name"/>
