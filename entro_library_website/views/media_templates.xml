@@ -719,7 +719,7 @@
                             </div>
 
                             <!-- Media Player/Viewer -->
-                            <div class="media_player_container mb-4">
+                            <div class="media_player_container mb-4" style="background: white;">
                                 <!-- VIDEO PLAYER -->
                                 <t t-if="media.media_type == 'video'">
                                     <t t-call="entro_library_website.media_video_player" />
@@ -738,10 +738,22 @@
                                 <!-- PDF VIEWER -->
                                 <t t-elif="media.media_type == 'document'">
                                     <t t-if="media.storage_type == 'url'">
-                                        <div class="alert alert-info text-center p-4">
-                                            <i class="fa fa-external-link fa-3x mb-3 d-block"/>
+                                        <div class="text-center">
+                                            <!-- Document Thumbnail -->
+                                            <div class="mb-4">
+                                                <img t-if="media.thumbnail"
+                                                     t-att-src="image_data_uri(media.thumbnail)"
+                                                     t-att-alt="media.name"
+                                                     class="img-fluid rounded shadow"
+                                                     style="max-height: 400px; object-fit: contain;"/>
+                                                <div t-else="" class="bg-light rounded p-5">
+                                                    <i class="fa fa-file-pdf-o fa-5x text-muted"/>
+                                                </div>
+                                            </div>
+                                            <!-- Open Document Button -->
                                             <a t-att-href="media.file_url"
                                                target="_blank"
+                                               style="padding: 10px 10px;font-size: 13pt;margin-bottom: 10px;"
                                                class="btn btn-primary btn-lg">
                                                 <i class="fa fa-external-link me-2"/>
                                                 Xem tài liệu
