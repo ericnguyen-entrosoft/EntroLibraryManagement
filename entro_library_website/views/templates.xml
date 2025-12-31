@@ -675,40 +675,17 @@
                         <div class="col-12">
                             <div class="block-content-product-detail">
                                 <h2 class="block-content-product-detail-title h4 mb-4">
-                                    <i class="fa fa-video-camera me-2"/>Phương tiện liên quan
+                                    Tài liệu số
                                 </h2>
-                                <div class="card shadow-sm">
-                                    <div class="card-body">
-                                        <div class="row align-items-center">
-                                            <div class="col-md-8">
-                                                <h5 class="card-title mb-2">
-                                                    <i class="fa fa-play-circle text-primary me-2"/>
-                                                    <t t-esc="book.media_id.name"/>
-                                                </h5>
-                                                <p class="card-text text-muted mb-2">
-                                                    <span class="badge bg-info me-2">
-                                                        <t t-if="book.media_id.media_type == 'video'">Video</t>
-                                                        <t t-elif="book.media_id.media_type == 'audio'">Âm thanh</t>
-                                                        <t t-elif="book.media_id.media_type == 'image'">Hình ảnh</t>
-                                                        <t t-else="">Tài liệu</t>
-                                                    </span>
-                                                    <t t-if="book.media_id.duration_display">
-                                                        <i class="fa fa-clock-o me-1"/>
-                                                        <t t-esc="book.media_id.duration_display"/>
-                                                    </t>
-                                                </p>
-                                                <p class="card-text small" t-if="book.media_id.description">
-                                                    <t t-esc="book.media_id.description"/>
-                                                </p>
-                                            </div>
-                                            <div class="col-md-4 text-end">
-                                                <a t-attf-href="/thu-vien/media/#{book.media_id.id}"
-                                                   class="btn btn-primary btn-lg">
-                                                    <i class="fa fa-external-link me-2"/>Xem phương tiện
-                                                </a>
-                                            </div>
-                                        </div>
-                                    </div>
+                                <div class="p-3 bg-light rounded">
+                                    <p class="mb-0">
+                                        <i class="fa fa-external-link text-primary me-2"/>
+                                        <a t-attf-href="/thu-vien/media/#{book.media_id.id}"
+                                           target="_blank"
+                                           class="text-primary fw-bold">
+                                            <t t-esc="book.media_id.name"/>
+                                        </a>
+                                    </p>
                                 </div>
                             </div>
                         </div>
