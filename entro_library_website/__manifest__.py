@@ -48,6 +48,7 @@
         'views/home_templates.xml',
         'views/templates.xml',
         'views/media_templates.xml',
+        'views/media_menu_templates.xml',
         'views/portal_templates.xml',
         'views/navbar_templates.xml',
     ],

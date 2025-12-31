@@ -35,6 +35,7 @@
                             <field name="sequence"/>
                         </group>
                         <group>
+                            <field name="category_type" />
                             <field name="color" widget="color_picker"/>
                             <field name="active" widget="boolean_toggle"/>
                         </group>

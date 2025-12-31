@@ -389,101 +389,8 @@
                                 </form>
                             </div>
 
-                            <!-- Media Type Filter -->
-                            <div class="media_filter_card mb-4">
-                                <div class="filter_card_header">
-                                    <i class="fa fa-filter me-2"/>
-                                    <h5 class="mb-0">Loại</h5>
-                                </div>
-                                <div class="filter_card_body">
-                                    <form method="get" id="mediaTypeFilterForm" t-att-action="keep()">
-                                        <!-- Preserve search and other params -->
-                                        <input type="hidden" name="search" t-att-value="search or ''"/>
-                                        <input type="hidden" name="sortby" t-att-value="sortby or ''"/>
-
-                                        <div class="media_type_checkboxes">
-                                            <label class="media_type_checkbox_item">
-                                                <input type="checkbox" name="media_type" value="video"
-                                                    t-att-checked="'checked' if 'video' in (media_type_list or []) else None"
-                                                    class="media-type-checkbox"/>
-                                                <span class="checkbox_content">
-                                                    <i class="fa fa-video-camera fa-lg me-2"/>
-                                                    <span>Video</span>
-                                                </span>
-                                            </label>
-
-                                            <label class="media_type_checkbox_item">
-                                                <input type="checkbox" name="media_type" value="audio"
-                                                    t-att-checked="'checked' if 'audio' in (media_type_list or []) else None"
-                                                    class="media-type-checkbox"/>
-                                                <span class="checkbox_content">
-                                                    <i class="fa fa-music fa-lg me-2"/>
-                                                    <span>Âm thanh</span>
-                                                </span>
-                                            </label>
-
-                                            <label class="media_type_checkbox_item">
-                                                <input type="checkbox" name="media_type" value="image"
-                                                    t-att-checked="'checked' if 'image' in (media_type_list or []) else None"
-                                                    class="media-type-checkbox"/>
-                                                <span class="checkbox_content">
-                                                    <i class="fa fa-image fa-lg me-2"/>
-                                                    <span>Hình ảnh</span>
-                                                </span>
-                                            </label>
-
-                                            <label class="media_type_checkbox_item">
-                                                <input type="checkbox" name="media_type" value="document"
-                                                    t-att-checked="'checked' if 'document' in (media_type_list or []) else None"
-                                                    class="media-type-checkbox"/>
-                                                <span class="checkbox_content">
-                                                    <i class="fa fa-file-pdf-o fa-lg me-2"/>
-                                                    <span>Tài liệu</span>
-                                                </span>
-                                            </label>
-                                        </div>
-                                    </form>
-                                </div>
-                            </div>
-
-                            <!-- Vipassana Categories Filter (Only on Thien-Vipassana page) -->
-                            <div class="media_filter_card mb-4" t-if="is_vipassana_page and vipassana_categories">
-                                <div class="filter_card_header">
-                                    <i class="fa fa-tags me-2"/>
-                                    <h5 class="mb-0">Danh mục</h5>
-                                </div>
-                                <div class="filter_card_body">
-                                    <form method="get" id="vipassanaCategoryFilterForm" t-att-action="keep()">
-                                        <!-- Preserve search and other params -->
-                                        <input type="hidden" name="search" t-att-value="search or ''"/>
-                                        <input type="hidden" name="sortby" t-att-value="sortby or ''"/>
-                                        <!-- Preserve media_type selections -->
-                                        <t t-foreach="media_type_list or []" t-as="mt">
-                                            <input type="hidden" name="media_type" t-att-value="mt"/>
-                                        </t>
-                                        <!-- Preserve category_id selections -->
-                                        <t t-foreach="category_id_list or []" t-as="cat_id">
-                                            <input type="hidden" name="category_id" t-att-value="cat_id"/>
-                                        </t>
-
-                                        <div class="category_checkboxes">
-                                            <t t-foreach="vipassana_categories" t-as="vip_cat">
-                                                <label class="category_checkbox_item">
-                                                    <input type="checkbox" name="vipassana_category_id" t-att-value="vip_cat.id"
-                                                        t-att-checked="'checked' if (vipassana_category_id_list and vip_cat.id in vipassana_category_id_list) else None"
-                                                        class="vipassana-category-checkbox"/>
-                                                    <span class="checkbox_content">
-                                                        <span t-esc="vip_cat.name"/>
-                                                    </span>
-                                                </label>
-                                            </t>
-                                        </div>
-                                    </form>
-                                </div>
-                            </div>
-
                             <!-- Website Categories Filter -->
-                            <div class="media_filter_card mb-4" t-if="website_categories and not is_vipassana_page">
+                            <div class="media_filter_card mb-4" t-if="website_categories">
                                 <div class="filter_card_header">
                                     <i class="fa fa-folder-open me-2"/>
                                     <h5 class="mb-0">Danh mục</h5>
@@ -502,7 +409,7 @@
                                             <t t-foreach="website_categories" t-as="web_cat">
                                                 <label class="category_checkbox_item">
                                                     <input type="checkbox" name="category_id" t-att-value="web_cat.id"
-                                                        t-att-checked="'checked' if (category_id_list and web_cat.id in category_id_list) else None"
+                                                        t-att-checked="'checked' if (website_category_id_list and web_cat.id in website_category_id_list) else None"
                                                         class="category-checkbox"/>
                                                     <span class="checkbox_content">
                                                         <span t-esc="web_cat.name"/>

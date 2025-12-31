@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Dynamic Media Menu for Mega Menu (Navbar) -->
+    <template id="media_mega_menu_content" name="Media Mega Menu Content">
+        <t t-set="main_categories" t-value="request.env['library.media.category'].sudo().search([('active', '=', True), ('parent_id', '=', False), ('is_website_menu', '=', True)], order='sequence, name')"/>
+        <nav class="nav flex-column">
+            <t t-foreach="main_categories" t-as="cat">
+                <!-- Main Category -->
+                <a t-attf-href="/thu-vien/media?category_id=#{cat.id}" class="nav-link py-2 fw-bold">
+                    <i t-attf-class="fa #{cat.icon or 'fa-folder'} me-2"/>
+                    <t t-esc="cat.name"/>
+                </a>
+
+                <!-- Sub Categories (indented) -->
+                <t t-if="cat.child_ids">
+                    <t t-set="visible_children" t-value="cat.child_ids.filtered(lambda c: c.is_website_menu and c.active)"/>
+                    <t t-foreach="visible_children" t-as="sub_cat">
+                        <a t-attf-href="/thu-vien/media?category_id=#{sub_cat.id}" class="nav-link py-1 ps-4 text-muted">
+                            <i class="fa fa-angle-right me-2"/>
+                            <t t-esc="sub_cat.name"/>
+                        </a>
+                    </t>
+                </t>
+            </t>
+
+            <!-- Filter by Media Type -->
+            <div class="border-top mt-2 pt-2">
+                <small class="text-muted ps-2">Lọc theo loại:</small>
+                <a href="/thu-vien/media?media_type=video" class="nav-link py-1 ps-3">
+                    <i class="fa fa-video-camera me-2"/>Video
+                </a>
+                <a href="/thu-vien/media?media_type=audio" class="nav-link py-1 ps-3">
+                    <i class="fa fa-music me-2"/>Audio
+                </a>
+                <a href="/thu-vien/media?media_type=document" class="nav-link py-1 ps-3">
+                    <i class="fa fa-file-pdf-o me-2"/>Tài liệu
+                </a>
+                <a href="/thu-vien/media?media_type=image" class="nav-link py-1 ps-3">
+                    <i class="fa fa-image me-2"/>Hình ảnh
+                </a>
+            </div>
+        </nav>
+    </template>
+</odoo>

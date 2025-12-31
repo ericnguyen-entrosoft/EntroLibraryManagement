@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <!-- ========================================== -->
+        <!-- MAIN CATEGORIES -->
+        <!-- ========================================== -->
+
+        <!-- 1. Thiền Vipassana (dạy bởi S.N.Goenka) -->
+        <record id="media_category_thien_vipassana" model="library.media.category">
+            <field name="name">Thiền Vipassana (dạy bởi S.N.Goenka)</field>
+            <field name="slug">thien-vipassana</field>
+            <field name="sequence">10</field>
+            <field name="icon">fa-om</field>
+            <field name="is_website_menu" eval="True"/>
+            <field name="access_level">public</field>
+            <field name="description">Các tài liệu về Thiền Vipassana theo truyền thống của Sayagyi U Ba Khin được dạy bởi S.N. Goenka</field>
+        </record>
+
+        <!-- Subcategories of Thiền Vipassana -->
+        <record id="media_category_phap_thoai" model="library.media.category">
+            <field name="name">Pháp thoại của S.N.Goenka</field>
+            <field name="slug">phap-thoai</field>
+            <field name="parent_id" ref="media_category_thien_vipassana"/>
+            <field name="sequence">1</field>
+            <field name="icon">fa-microphone</field>
+            <field name="is_website_menu" eval="True"/>
+            <field name="access_level">public</field>
+        </record>
+
+        <record id="media_category_huong_dan" model="library.media.category">
+            <field name="name">Hướng dẫn thực hành thiền</field>
+            <field name="slug">huong-dan</field>
+            <field name="parent_id" ref="media_category_thien_vipassana"/>
+            <field name="sequence">2</field>
+            <field name="icon">fa-compass</field>
+            <field name="is_website_menu" eval="True"/>
+            <field name="access_level">public</field>
+        </record>
+
+        <record id="media_category_qa" model="library.media.category">
+            <field name="name">Q&amp;A</field>
+            <field name="slug">qa</field>
+            <field name="parent_id" ref="media_category_thien_vipassana"/>
+            <field name="sequence">3</field>
+            <field name="icon">fa-question-circle</field>
+            <field name="is_website_menu" eval="True"/>
+            <field name="access_level">public</field>
+        </record>
+
+        <record id="media_category_tai_lieu_vipassana" model="library.media.category">
+            <field name="name">Tài liệu</field>
+            <field name="slug">tai-lieu</field>
+            <field name="parent_id" ref="media_category_thien_vipassana"/>
+            <field name="sequence">4</field>
+            <field name="icon">fa-file-text</field>
+            <field name="is_website_menu" eval="True"/>
+            <field name="access_level">public</field>
+        </record>
+
+        <!-- 2. Nội bộ TVPS -->
+        <record id="media_category_noi_bo" model="library.media.category">
+            <field name="name">Nội bộ TVPS</field>
+            <field name="slug">noi-bo-tvps</field>
+            <field name="sequence">20</field>
+            <field name="icon">fa-lock</field>
+            <field name="is_website_menu" eval="True"/>
+            <field name="access_level">members</field>
+            <field name="description">Tài liệu dành riêng cho thành viên và cộng tác viên của TVPS</field>
+        </record>
+
+        <!-- 3. Khu Phật học -->
+        <record id="media_category_phat_hoc" model="library.media.category">
+            <field name="name">Khu Phật học</field>
+            <field name="slug">phat-hoc</field>
+            <field name="sequence">30</field>
+            <field name="icon">fa-book</field>
+            <field name="is_website_menu" eval="True"/>
+            <field name="access_level">public</field>
+            <field name="description">Các tài liệu về Phật pháp, triết lý và giáo lý Phật giáo</field>
+        </record>
+
+        <!-- 4. Khu tổng hợp -->
+        <record id="media_category_tong_hop" model="library.media.category">
+            <field name="name">Khu tổng hợp</field>
+            <field name="slug">tong-hop</field>
+            <field name="sequence">40</field>
+            <field name="icon">fa-th-large</field>
+            <field name="is_website_menu" eval="True"/>
+            <field name="access_level">public</field>
+            <field name="description">Các tài liệu đa dạng về nhiều chủ đề khác nhau</field>
+        </record>
+
+        <!-- 5. Khu ngoại ngữ -->
+        <record id="media_category_ngoai_ngu" model="library.media.category">
+            <field name="name">Khu ngoại ngữ</field>
+            <field name="slug">ngoai-ngu</field>
+            <field name="sequence">50</field>
+            <field name="icon">fa-globe</field>
+            <field name="is_website_menu" eval="True"/>
+            <field name="access_level">public</field>
+            <field name="description">Tài liệu bằng tiếng nước ngoài (English, Pali, Sanskrit, etc.)</field>
+        </record>
+
+        <!-- 6. Nhạc Phật giáo -->
+        <record id="media_category_nhac_phat_giao" model="library.media.category">
+            <field name="name">Nhạc Phật giáo</field>
+            <field name="slug">nhac-phat-giao</field>
+            <field name="sequence">60</field>
+            <field name="icon">fa-music</field>
+            <field name="is_website_menu" eval="True"/>
+            <field name="access_level">public</field>
+            <field name="description">Nhạc thiền, nhạc Phật giáo và các bản nhạc tâm linh</field>
+        </record>
+
+        <!-- 7. Tài liệu khác -->
+        <record id="media_category_khac" model="library.media.category">
+            <field name="name">Tài liệu khác</field>
+            <field name="slug">khac</field>
+            <field name="sequence">70</field>
+            <field name="icon">fa-folder-open</field>
+            <field name="is_website_menu" eval="True"/>
+            <field name="access_level">public</field>
+            <field name="description">Các tài liệu và phương tiện khác</field>
+        </record>
+
+    </data>
+</odoo>

@@ -28,6 +28,8 @@
         # Data
         'data/library_data.xml',
         'data/library_borrower_type_data.xml',
+        'data/library_book_category_data.xml',
+        'data/library_media_category_data.xml',
         'data/library_paper_format.xml',
 
         # Security
@@ -57,6 +59,7 @@
         'views/library_author_views.xml',
         'views/library_publisher_views.xml',
         'views/library_category_views.xml',
+        'views/library_book_category_views.xml',
         'views/library_series_views.xml',
         'views/library_location_views.xml',
         'views/library_quant_type_views.xml',
@@ -66,7 +69,6 @@
         'views/library_media_views.xml',
         'views/library_media_category_views.xml',
         'views/library_media_playlist_views.xml',
-        'views/media_vipassana_category_views.xml',
         'views/res_config_settings_views.xml',
         'views/library_dashboard_views.xml',
 

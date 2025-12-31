@@ -256,7 +256,7 @@
                                             <t t-foreach="website_categories" t-as="web_cat">
                                                 <label class="category_checkbox_item">
                                                     <input type="checkbox" name="category_id" t-att-value="web_cat.id"
-                                                        t-att-checked="'checked' if (category_id_list and web_cat.id in category_id_list) else None"
+                                                        t-att-checked="'checked' if (website_category_id_list and web_cat.id in website_category_id_list) else None"
                                                         class="category-checkbox"/>
                                                     <span class="checkbox_content">
                                                         <span t-esc="web_cat.name"/>
@@ -670,24 +670,45 @@
                         </div>
                     </div>
 
-                    <!-- Media Section (full width if any) -->
-                    <div class="row mt-4" t-if="book.media_ids">
+                    <!-- Media Section (full width if media_id exists) -->
+                    <div class="row mt-4" t-if="book.media_id">
                         <div class="col-12">
                             <div class="block-content-product-detail">
                                 <h2 class="block-content-product-detail-title h4 mb-4">
-                                    Liên quan (<t t-esc="len(book.media_ids)"/>)
+                                    <i class="fa fa-video-camera me-2"/>Phương tiện liên quan
                                 </h2>
-                                <div class="row">
-                                    <t t-foreach="book.media_ids" t-as="media">
-                                        <div class="col-md-3 col-sm-6 mb-3">
-                                            <div class="card h-100">
-                                                <div class="card-body">
-                                                    <h6 class="card-title" t-esc="media.name"/>
-                                                    <p class="small text-muted mb-0" t-esc="media.media_type"/>
-                                                </div>
+                                <div class="card shadow-sm">
+                                    <div class="card-body">
+                                        <div class="row align-items-center">
+                                            <div class="col-md-8">
+                                                <h5 class="card-title mb-2">
+                                                    <i class="fa fa-play-circle text-primary me-2"/>
+                                                    <t t-esc="book.media_id.name"/>
+                                                </h5>
+                                                <p class="card-text text-muted mb-2">
+                                                    <span class="badge bg-info me-2">
+                                                        <t t-if="book.media_id.media_type == 'video'">Video</t>
+                                                        <t t-elif="book.media_id.media_type == 'audio'">Âm thanh</t>
+                                                        <t t-elif="book.media_id.media_type == 'image'">Hình ảnh</t>
+                                                        <t t-else="">Tài liệu</t>
+                                                    </span>
+                                                    <t t-if="book.media_id.duration_display">
+                                                        <i class="fa fa-clock-o me-1"/>
+                                                        <t t-esc="book.media_id.duration_display"/>
+                                                    </t>
+                                                </p>
+                                                <p class="card-text small" t-if="book.media_id.description">
+                                                    <t t-esc="book.media_id.description"/>
+                                                </p>
+                                            </div>
+                                            <div class="col-md-4 text-end">
+                                                <a t-attf-href="/thu-vien/media/#{book.media_id.id}"
+                                                   class="btn btn-primary btn-lg">
+                                                    <i class="fa fa-external-link me-2"/>Xem phương tiện
+                                                </a>
                                             </div>
                                         </div>
-                                    </t>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -1009,7 +1030,7 @@
                                             <t t-foreach="website_categories" t-as="web_cat">
                                                 <label class="category_checkbox_item">
                                                     <input type="checkbox" name="category_id" t-att-value="web_cat.id"
-                                                        t-att-checked="'checked' if (category_id_list and web_cat.id in category_id_list) else None"
+                                                        t-att-checked="'checked' if (website_category_id_list and web_cat.id in website_category_id_list) else None"
                                                         class="category-checkbox"/>
                                                     <span class="checkbox_content">
                                                         <span t-esc="web_cat.name"/>

@@ -61,6 +61,7 @@
                         <group string="Loại độc giả">
                             <field name="borrower_type_id"/>
                             <field name="organization"/>
+                            <field name="vipassana_attended"/>
                         </group>
                     </group>
 

@@ -75,19 +75,14 @@ class LibraryBook(models.Model):
     )
     category_id = fields.Many2one(
         'library.category', string='Nhóm', required=False)
+    book_category_id = fields.Many2one(
+        'library.book.category', string='Nhóm tài nguyên sách')
 
     # Media relationship
-    media_ids = fields.Many2many(
+    media_id = fields.Many2one(
         'library.media',
-        'library_media_book_rel',
-        'book_id',
-        'media_id',
-        string='Phương tiện'
-    )
-    media_count = fields.Integer(
-        string='Số phương tiện',
-        compute='_compute_media_count',
-        store=True
+        string='Phương tiện',
+        help='Liên kết đến phương tiện (video, audio) liên quan'
     )
 
     # Quants (Physical copies)
@@ -323,11 +318,6 @@ class LibraryBook(models.Model):
             else:
                 book.author_names = ''
 
-    @api.depends('media_ids')
-    def _compute_media_count(self):
-        for book in self:
-            book.media_count = len(book.media_ids)
-
     def _compute_website_url(self):
         """Compute the website URL for this book"""
         for book in self:
@@ -336,17 +326,6 @@ class LibraryBook(models.Model):
             else:
                 book.website_url = False
 
-    def action_view_media(self):
-        """View media related to this book"""
-        self.ensure_one()
-        return {
-            'name': f'Phương tiện - {self.name}',
-            'type': 'ir.actions.act_window',
-            'res_model': 'library.media',
-            'view_mode': 'kanban,list,form',
-            'domain': [('id', 'in', self.media_ids.ids)],
-            'context': {'default_book_ids': [(4, self.id)]}
-        }
 
     def action_update_quantity(self):
         """Open wizard to create multiple book quants"""

@@ -18,7 +18,7 @@
 
             <!-- Add website category field in general info -->
             <xpath expr="//field[@name='category_id']" position="after">
-                <field name="website_category_id"/>
+                <field name="website_category_id" domain="[('category_type', 'in', ('both', 'media'))]"/>
             </xpath>
 
             <!-- Add website fields in access control section -->

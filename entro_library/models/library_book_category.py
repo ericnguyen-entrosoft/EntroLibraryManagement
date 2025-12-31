@@ -2,23 +2,23 @@
 from odoo import models, fields, api
 
 
-class LibraryMediaCategory(models.Model):
-    _name = 'library.media.category'
-    _description = 'Nhóm tài nguyên số'
+class LibraryBookCategory(models.Model):
+    _name = 'library.book.category'
+    _description = 'Nhóm tài nguyên sách'
     _parent_name = 'parent_id'
     _parent_store = True
     _order = 'sequence, name'
 
     name = fields.Char(string='Tên danh mục', required=True, translate=True, index=True)
-    slug = fields.Char(string='Slug', help='URL-friendly name (e.g., thien-vipassana)', index=True)
+    slug = fields.Char(string='Slug', help='URL-friendly name (e.g., phat-hoc)', index=True)
     parent_id = fields.Many2one(
-        'library.media.category',
+        'library.book.category',
         string='Danh mục cha',
         ondelete='cascade',
         index=True
     )
     parent_path = fields.Char(index=True, unaccent=False)
-    child_ids = fields.One2many('library.media.category', 'parent_id', string='Danh mục con')
+    child_ids = fields.One2many('library.book.category', 'parent_id', string='Danh mục con')
 
     sequence = fields.Integer(string='Thứ tự', default=10)
     color = fields.Integer(string='Màu', default=0)
@@ -36,7 +36,7 @@ class LibraryMediaCategory(models.Model):
 
     icon = fields.Char(
         string='Icon',
-        help='FontAwesome icon class (ví dụ: fa-video-camera, fa-book)',
+        help='FontAwesome icon class (ví dụ: fa-book, fa-graduation-cap)',
         default='fa-folder'
     )
 
@@ -46,11 +46,11 @@ class LibraryMediaCategory(models.Model):
         ('members', 'Thành viên'),
         ('restricted', 'Hạn chế')
     ], string='Mức độ truy cập', default='public', required=True,
-       help='Kiểm soát ai có thể xem media trong danh mục này')
+       help='Kiểm soát ai có thể xem sách trong danh mục này')
 
-    # Media relationship
-    media_ids = fields.One2many('library.media', 'category_id', string='Phương tiện')
-    media_count = fields.Integer(string='Số phương tiện', compute='_compute_media_count', store=True)
+    # Book relationship
+    book_ids = fields.One2many('library.book', 'book_category_id', string='Sách')
+    book_count = fields.Integer(string='Số sách', compute='_compute_book_count', store=True)
 
     # Description
     description = fields.Text(string='Mô tả')
@@ -87,18 +87,18 @@ class LibraryMediaCategory(models.Model):
             else:
                 category.complete_name = category.name
 
-    @api.depends('media_ids')
-    def _compute_media_count(self):
+    @api.depends('book_ids')
+    def _compute_book_count(self):
         for category in self:
-            category.media_count = len(category.media_ids)
+            category.book_count = len(category.book_ids)
 
     @api.constrains('parent_id')
     def _check_parent_id(self):
         if not self._check_recursion():
             raise models.ValidationError('Lỗi! Bạn không thể tạo danh mục đệ quy.')
 
-    def action_view_media(self):
-        """View media in this category (including child categories)"""
+    def action_view_books(self):
+        """View books in this category (including child categories)"""
         self.ensure_one()
 
         # Get all child categories recursively
@@ -110,15 +110,15 @@ class LibraryMediaCategory(models.Model):
                 all_category_ids += child.child_ids.ids
 
         return {
-            'name': f'Phương tiện - {self.name}',
+            'name': f'Sách - {self.name}',
             'type': 'ir.actions.act_window',
-            'res_model': 'library.media',
-            'view_mode': 'kanban,list,form',
-            'domain': [('category_id', 'in', all_category_ids)],
-            'context': {'default_category_id': self.id}
+            'res_model': 'library.book',
+            'view_mode': 'kanban,tree,form',
+            'domain': [('book_category_id', 'in', all_category_ids)],
+            'context': {'default_book_category_id': self.id}
         }
 
     def get_website_url(self):
         """Get URL for this category on website"""
         self.ensure_one()
-        return f'/thu-vien/media?category_id={self.id}'
+        return f'/thu-vien/{self.slug}' if self.slug else f'/thu-vien?book_category_id={self.id}'

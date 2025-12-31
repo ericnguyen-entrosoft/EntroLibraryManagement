@@ -38,7 +38,7 @@ class LibrarySignup(AuthSignupHome):
 
         try:
             # Validate required fields
-            required_fields = ['full_name', 'email', 'phone', 'borrower_type_id']
+            required_fields = ['full_name', 'email', 'phone', 'borrower_type_id', 'vipassana_attended']
             for field in required_fields:
                 if not post.get(field):
                     raise UserError(_('Vui lòng điền đầy đủ thông tin bắt buộc.'))
@@ -77,6 +77,7 @@ class LibrarySignup(AuthSignupHome):
                 'student_id': post.get('student_id') or False,
                 'borrower_type_id': int(post.get('borrower_type_id')),
                 'organization': post.get('organization') or False,
+                'vipassana_attended': True if post.get('vipassana_attended') == 'yes' else False,
                 'notes': post.get('notes') or False,
                 'state': 'pending',
             }

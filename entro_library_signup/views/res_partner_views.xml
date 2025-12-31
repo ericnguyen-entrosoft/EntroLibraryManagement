@@ -12,6 +12,7 @@
                     <group>
                         <field name="id_card_number"/>
                         <field name="student_id"/>
+                        <field name="vipassana_attended"/>
                     </group>
                     <group>
                         <field name="date_of_birth"/>

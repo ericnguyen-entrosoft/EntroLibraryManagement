@@ -19,70 +19,81 @@
             <section class="s_mega_menu_library_resources py-3">
                 <div class="container">
                     <div class="row">
-                        <!-- Column 0: All Resources -->
-                        <div class="col-lg-4 mb-3">
-                            <h5 class="mb-3 pb-2 border-bottom">
-                                <a href="/kho-tai-nguyen" class="text-decoration-none text-dark">Tất cả tài nguyên</a>
-                            </h5>
-                            <nav class="nav flex-column">
-                                <a href="/kho-tai-nguyen" class="nav-link py-2">
-                                    <i class="fa fa-th me-2"></i>Tất cả
-                                </a>
-                                <a href="/kho-tai-nguyen?item_type=book" class="nav-link py-2">
-                                    <i class="fa fa-book me-2"></i>Tài nguyên sách
-                                </a>
-                                <a href="/kho-tai-nguyen?item_type=media" class="nav-link py-2">
-                                    <i class="fa fa-video-camera me-2"></i>Tài nguyên số
-                                </a>
-                            </nav>
-                        </div>
-
                         <!-- Column 1: Sách -->
                         <div class="col-lg-4 mb-3">
                             <h5 class="mb-3 pb-2 border-bottom">
                                 <a href="/thu-vien" class="text-decoration-none text-dark">Tài nguyên sách</a>
                             </h5>
                             <nav class="nav flex-column">
-                                <a href="/thu-vien/phat-hoc" class="nav-link py-2">
-                                    <i class="fa fa-angle-right me-2"></i>Khu Phật học
+                                <a href="/thu-vien/phat-hoc" class="nav-link py-2 fw-bold">
+                                    Khu Phật học
                                 </a>
-                                <a href="/thu-vien/tong-hop" class="nav-link py-2">
-                                    <i class="fa fa-angle-right me-2"></i>Khu tổng hợp
+                                <a href="/thu-vien/tong-hop" class="nav-link py-2 fw-bold">
+                                    Khu tổng hợp
                                 </a>
-                                <a href="/thu-vien/ngoai-ngu" class="nav-link py-2">
-                                    <i class="fa fa-angle-right me-2"></i>Khu ngoại ngữ
+                                <a href="/thu-vien/ngoai-ngu" class="nav-link py-2 fw-bold">
+                                    Khu ngoại ngữ
                                 </a>
                             </nav>
                         </div>
 
-                        <!-- Column 2: Tài liệu số -->
+                        <!-- Column 2: Tài liệu số (Hardcoded) -->
                         <div class="col-lg-4 mb-3">
                             <h5 class="mb-3 pb-2 border-bottom">
-                                <a href="/media" class="text-decoration-none text-dark">Tài nguyên số</a>
+                                <a href="/thu-vien/media" class="text-decoration-none text-dark">Tài nguyên số</a>
                             </h5>
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <nav class="nav flex-column">
-                                        <div class="nav-item">
-                                            <a href="/media/thien-vipassana" class="nav-link py-2 fw-bold">
-                                                Thiền Vipassana (dạy bởi G.N.Goenka)
-                                            </a>
-                                            <a href="/media?media_type=document" class="nav-link py-2 fw-bold">
-                                                Tài liệu
-                                            </a>
-                                            <a href="/media?media_type=video" class="nav-link py-2 fw-bold">
-                                                Video
-                                            </a>
-                                            <a href="/media?media_type=audio" class="nav-link py-2 fw-bold">
-                                                Audio
-                                            </a>
-                                            <a href="/media?media_type=image" class="nav-link py-2 fw-bold">
-                                                Hình ảnh
-                                            </a>
-                                        </div>
-                                    </nav>
+                            <nav class="nav flex-column">
+                                <!-- 1. Thiền Vipassana với submenu -->
+                                <a class="nav-link py-2 fw-bold">
+                                    Thiền Vipassana (dạy bởi S.N.Goenka)
+                                </a>
+                                <div class="nav-item">
+                                    <div class="ps-4">
+                                        <a href="/thu-vien/media/thien-vipassana/phap-thoai" class="nav-link py-1">
+                                            <i class="fa fa-angle-right me-2"></i>Pháp thoại của S.N.Goenka
+                                        </a>
+                                        <a href="/thu-vien/media/thien-vipassana/huong-dan" class="nav-link py-1">
+                                            <i class="fa fa-angle-right me-2"></i>Hướng dẫn thực hành thiền
+                                        </a>
+                                        <a href="/thu-vien/media/thien-vipassana/qa" class="nav-link py-1">
+                                            <i class="fa fa-angle-right me-2"></i>Q&A
+                                        </a>
+                                        <a href="/thu-vien/media/thien-vipassana/tai-lieu" class="nav-link py-1">
+                                            <i class="fa fa-angle-right me-2"></i>Tài liệu
+                                        </a>
+                                    </div>
                                 </div>
-                            </div>
+
+                                <!-- 2. Nội bộ TVPS -->
+                                <a href="/thu-vien/media/noi-bo-tvps" class="nav-link py-2 fw-bold">
+                                    Nội bộ TVPS
+                                </a>
+
+                                <!-- 3. Khu Phật học -->
+                                <a href="/thu-vien/media/phat-hoc" class="nav-link py-2 fw-bold">
+                                    Khu Phật học
+                                </a>
+
+                                <!-- 4. Khu tổng hợp -->
+                                <a href="/thu-vien/media/tong-hop" class="nav-link py-2 fw-bold">
+                                    Khu tổng hợp
+                                </a>
+
+                                <!-- 5. Khu ngoại ngữ -->
+                                <a href="/thu-vien/media/ngoai-ngu" class="nav-link py-2 fw-bold">
+                                    Khu ngoại ngữ
+                                </a>
+
+                                <!-- 6. Nhạc Phật giáo -->
+                                <a href="/thu-vien/media/nhac-phat-giao" class="nav-link py-2 fw-bold">
+                                    Nhạc Phật giáo
+                                </a>
+
+                                <!-- 7. Tài liệu khác -->
+                                <a href="/thu-vien/media/khac" class="nav-link py-2 fw-bold">
+                                    Tài liệu khác
+                                </a>
+                            </nav>
                         </div>
                     </div>
                 </div>

@@ -116,7 +116,7 @@
 
     <!-- Categories Menu -->
     <menuitem id="menu_library_categories"
-              name="Nhóm sách"
+              name="Danh mục nội bộ"
               parent="menu_library_config"
               action="action_library_category"
               sequence="1"/>
@@ -162,14 +162,6 @@
               parent="menu_library_config"
               action="action_library_location"
               sequence="60"/>
-
-
-    <!-- Character Mapping Menu -->
-    <menuitem id="menu_media_vipassana_category"
-            name="Danh mục Thiền Vipassana"
-            parent="menu_library_config"
-            action="action_media_vipassana_category"
-            sequence="15"/>
 
     <!-- Quant Type Menu -->
     <menuitem id="menu_library_quant_type"

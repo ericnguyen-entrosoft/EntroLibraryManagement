@@ -46,6 +46,12 @@ class LibrarySignupRequest(models.Model):
 
     # Additional Info
     organization = fields.Char(string='Đơn vị/Trường học')
+    vipassana_attended = fields.Boolean(
+        string='Đã tham gia khóa thiền Vipassana tại TVPS',
+        default=False,
+        tracking=True,
+        help='Đánh dấu nếu người đăng ký đã tham gia khóa thiền Vipassana tại TVPS'
+    )
     notes = fields.Text(string='Ghi chú')
 
     # Status
@@ -106,6 +112,7 @@ class LibrarySignupRequest(models.Model):
             'id_card_number': self.id_card_number,
             'student_id': self.student_id,
             'date_of_birth': self.date_of_birth,
+            'vipassana_attended': self.vipassana_attended,
             'comment': self.notes,
         }
 

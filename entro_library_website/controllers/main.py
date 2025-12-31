@@ -87,23 +87,16 @@ class LibraryWebsite(http.Controller):
     @http.route([
         '/thu-vien',
         '/thu-vien/page/<int:page>',
-        '/thu-vien/<string:category_slug>',
-        '/thu-vien/<string:category_slug>/page/<int:page>',
+        '/thu-vien/<string:parent_slug>',
+        '/thu-vien/<string:parent_slug>/page/<int:page>',
+        '/thu-vien/<string:parent_slug>/<string:child_slug>',
+        '/thu-vien/<string:parent_slug>/<string:child_slug>/page/<int:page>',
+        # Legacy routes
         '/thu-vien/danh-muc/<model("library.website.category"):category>',
         '/thu-vien/danh-muc/<model("library.website.category"):category>/page/<int:page>',
     ], type='http', auth='public', website=True, sitemap=True)
-    def library_books(self, page=1, category=None, category_slug=None, search='', sortby=None, category_id=None, **kwargs):
+    def library_books(self, page=1, category=None, parent_slug=None, child_slug=None, search='', sortby=None, category_id=None, **kwargs):
         """Trang danh sách sách"""
-
-        # Handle category slug mapping
-        if category_slug and not category:
-            slug_mapping = {
-                'phat-hoc': 'entro_library_website.website_category_phat_hoc',
-                'tong-hop': 'entro_library_website.website_category_tong_hop',
-                'ngoai-ngu': 'entro_library_website.website_category_ngoai_ngu',
-            }
-            if category_slug in slug_mapping:
-                category = request.env.ref(slug_mapping[category_slug], raise_if_not_found=False)
 
         domain = [('website_published', '=', True)]
 
@@ -130,27 +123,74 @@ class LibraryWebsite(http.Controller):
                 ('parallel_title', 'ilike', search),
             ]
 
-        # Filter by category (support multiple categories via checkbox)
-        category_id_list = []
-        # Get all category_id values from request (supports multiple checkboxes)
+        # ========================================
+        # Filter by library.book.category (hierarchical - for slug-based URLs)
+        # ========================================
+        book_category_id_list = []
+        selected_book_category = None
+
+        # Priority 1: Slug-based URL (SEO-friendly)
+        if child_slug:
+            # Child category slug (e.g., /thu-vien/phat-hoc/subcategory)
+            selected_book_category = request.env['library.book.category'].sudo().search([
+                ('slug', '=', child_slug),
+                ('parent_id.slug', '=', parent_slug)
+            ], limit=1)
+            if selected_book_category:
+                book_category_id_list = [selected_book_category.id]
+        elif parent_slug:
+            # Parent category slug (e.g., /thu-vien/phat-hoc)
+            selected_book_category = request.env['library.book.category'].sudo().search([
+                ('slug', '=', parent_slug),
+                ('parent_id', '=', False)
+            ], limit=1)
+            if selected_book_category:
+                book_category_id_list = [selected_book_category.id]
+
+        # Apply library.book.category filter (including child categories)
+        if book_category_id_list:
+            # Get all child categories recursively
+            all_book_category_ids = list(book_category_id_list)
+            book_categories = request.env['library.book.category'].sudo().browse(book_category_id_list)
+            for cat in book_categories:
+                if cat.child_ids:
+                    all_book_category_ids += cat.child_ids.ids
+                    # Recursive for nested children
+                    for child in cat.child_ids:
+                        all_book_category_ids += child.child_ids.ids
+            domain += [('book_category_id', 'in', all_book_category_ids)]
+
+            # Apply access control based on category access_level
+            for cat in book_categories:
+                if cat.access_level == 'members' and request.env.user._is_public():
+                    # Redirect to login if trying to access members-only content
+                    return request.redirect('/web/login?redirect=/thu-vien/' + parent_slug)
+                elif cat.access_level == 'restricted':
+                    # Check if user has permission
+                    if not request.env.user.has_group('entro_library.group_library_manager'):
+                        raise exceptions.AccessError(_('Bạn không có quyền truy cập vào danh mục này.'))
+
+        # ========================================
+        # Filter by library.website.category (for sidebar filter checkboxes)
+        # ========================================
+        website_category_id_list = []
         category_ids_from_request = request.httprequest.args.getlist('category_id')
 
         if category_ids_from_request:
-            category_id_list = [int(cid) for cid in category_ids_from_request if cid]
-            if category_id_list:
-                domain += [('website_category_id', 'in', category_id_list)]
-        # Fallback to single category_id parameter
+            website_category_id_list = [int(cid) for cid in category_ids_from_request if cid]
+            domain += [('website_category_id', 'in', website_category_id_list)]
         elif category_id:
+            # Fallback to single category_id parameter
             if isinstance(category_id, list):
-                category_id_list = [int(cid) for cid in category_id]
+                website_category_id_list = [int(cid) for cid in category_id]
             else:
-                category_id_list = [int(category_id)]
-            if category_id_list:
-                domain += [('website_category_id', 'in', category_id_list)]
-        # Lọc theo danh mục website (legacy URL support)
+                website_category_id_list = [int(category_id)]
+            if website_category_id_list:
+                domain += [('website_category_id', 'in', website_category_id_list)]
         elif category:
+            # Support old single category URL format
             domain += [('website_category_id', '=', category.id)]
-            category_id_list = [category.id]
+            website_category_id_list = [category.id]
 
         # Sorting
         sort_options = {
@@ -169,14 +209,25 @@ class LibraryWebsite(http.Controller):
         books_count = Book.search_count(domain)
 
         # Phân trang
-        ppg = 20  # products per page
-        # Construct base URL based on whether we have a category filter
-        if category:
+        ppg = 20  # books per page
+
+        # Construct base URL - preserve slug-based URLs
+        if child_slug and parent_slug:
+            # Child category slug URL (e.g., /thu-vien/phat-hoc/subcategory)
+            url = f'/thu-vien/{parent_slug}/{child_slug}'
+        elif parent_slug:
+            # Parent category slug URL (e.g., /thu-vien/phat-hoc)
+            url = f'/thu-vien/{parent_slug}'
+        elif category:
+            # Legacy category URL
             url = f'/thu-vien/danh-muc/{category.id}'
-            url_args = {'search': search, 'sortby': sortby}
         else:
+            # Default URL
             url = '/thu-vien'
-            url_args = {'search': search, 'sortby': sortby}
+
+        url_args = {'search': search, 'sortby': sortby}
+        if website_category_id_list:
+            url_args['category_id'] = website_category_id_list
 
         pager = request.website.pager(
             url=url,
@@ -193,15 +244,49 @@ class LibraryWebsite(http.Controller):
             order=order
         )
 
-        # Lấy website categories
+        # Load library.website.category for sidebar filters
+        # Only show website categories that have books in the current book.category context
+        website_category_domain = [
+            ('active', '=', True),
+            ('category_type', 'in', ['book', 'both'])
+        ]
+
+        # If a book.category is selected (via slug), filter website_categories
+        # to only show those that have books in this book.category
+        if book_category_id_list:
+            # Get all child categories recursively
+            all_book_category_ids = list(book_category_id_list)
+            book_categories = request.env['library.book.category'].sudo().browse(book_category_id_list)
+            for cat in book_categories:
+                if cat.child_ids:
+                    all_book_category_ids += cat.child_ids.ids
+                    for child in cat.child_ids:
+                        all_book_category_ids += child.child_ids.ids
+
+            # Find all website_category_ids that have books in this book.category
+            books_in_category = request.env['library.book'].sudo().search([
+                ('book_category_id', 'in', all_book_category_ids),
+                ('website_category_id', '!=', False)
+            ])
+            available_website_category_ids = books_in_category.mapped('website_category_id').ids
+
+            if available_website_category_ids:
+                website_category_domain.append(('id', 'in', available_website_category_ids))
+            else:
+                # No books with website_category in this book.category, show empty list
+                website_category_domain.append(('id', '=', False))
+
         website_categories = request.env['library.website.category'].search(
-            [('active', '=', True), ('category_type', 'in', ['book', 'both'])], order='sequence, name')
+            website_category_domain,
+            order='sequence, name'
+        )
 
         # Keep query parameters
         keep = QueryURL(
-            '/thu-vien',
+            url,
             category=category and category.id,
             search=search,
+            category_id=website_category_id_list,
             sortby=sortby
         )
 
@@ -211,8 +296,15 @@ class LibraryWebsite(http.Controller):
             'pager': pager,
             'search': search,
             'category': category,
-            'category_id_list': category_id_list,
+
+            # library.book.category variables (hierarchical menu)
+            'book_category_id_list': book_category_id_list,
+            'selected_book_category': selected_book_category,
+
+            # library.website.category variables (sidebar filters)
+            'website_category_id_list': website_category_id_list,
             'website_categories': website_categories,
+
             'page_name': 'library_books',
             'keep': keep,
             'sortby': sortby,
@@ -301,14 +393,19 @@ class LibraryWebsite(http.Controller):
     # ====================================
 
     @http.route([
+        '/thu-vien/media',
+        '/thu-vien/media/page/<int:page>',
+        '/thu-vien/media/<string:parent_slug>',
+        '/thu-vien/media/<string:parent_slug>/page/<int:page>',
+        '/thu-vien/media/<string:parent_slug>/<string:child_slug>',
+        '/thu-vien/media/<string:parent_slug>/<string:child_slug>/page/<int:page>',
+        # Legacy routes
         '/media',
         '/media/<path:menu_path>',
         '/media/page/<int:page>',
         '/media/<path:menu_path>/page/<int:page>',
-        '/media/danh-muc/<model("library.website.category"):category>',
-        '/media/danh-muc/<model("library.website.category"):category>/page/<int:page>',
     ], type='http', auth='public', website=True, sitemap=True)
-    def library_media_list(self, page=1, category=None, menu_path=None, search='', media_type=None, category_id=None, sortby=None, **kwargs):
+    def library_media_list(self, page=1, parent_slug=None, child_slug=None, category=None, menu_path=None, search='', media_type=None, category_id=None, sortby=None, **kwargs):
         """Trang danh sách phương tiện"""
 
         domain = [('website_published', '=', True), ('active', '=', True)]
@@ -340,62 +437,74 @@ class LibraryWebsite(http.Controller):
                 ('description', 'ilike', search),
             ]
 
-        # Filter by category (support multiple categories via checkbox)
-        category_id_list = []
-        # Get all category_id values from request (supports multiple checkboxes)
+        # ========================================
+        # Filter by library.media.category (hierarchical - for slug-based URLs)
+        # ========================================
+        media_category_id_list = []
+        selected_media_category = None
+
+        # Priority 1: Slug-based URL (SEO-friendly)
+        if child_slug:
+            # Child category slug (e.g., /thu-vien/media/thien-vipassana/phap-thoai)
+            selected_media_category = request.env['library.media.category'].sudo().search([
+                ('slug', '=', child_slug),
+                ('parent_id.slug', '=', parent_slug)
+            ], limit=1)
+            if selected_media_category:
+                media_category_id_list = [selected_media_category.id]
+        elif parent_slug:
+            # Parent category slug (e.g., /thu-vien/media/phat-hoc)
+            selected_media_category = request.env['library.media.category'].sudo().search([
+                ('slug', '=', parent_slug),
+                ('parent_id', '=', False)
+            ], limit=1)
+            if selected_media_category:
+                media_category_id_list = [selected_media_category.id]
+
+        # Apply library.media.category filter (including child categories)
+        if media_category_id_list:
+            # Get all child categories recursively
+            all_media_category_ids = list(media_category_id_list)
+            media_categories = request.env['library.media.category'].sudo().browse(media_category_id_list)
+            for cat in media_categories:
+                if cat.child_ids:
+                    all_media_category_ids += cat.child_ids.ids
+                    # Recursive for nested children
+                    for child in cat.child_ids:
+                        all_media_category_ids += child.child_ids.ids
+            domain += [('category_id', 'in', all_media_category_ids)]
+
+            # Apply access control based on category access_level
+            for cat in media_categories:
+                if cat.access_level == 'members' and request.env.user._is_public():
+                    # Redirect to login if trying to access members-only content
+                    return request.redirect('/web/login?redirect=/thu-vien/media?category_id=' + str(cat.id))
+                elif cat.access_level == 'restricted':
+                    # Check if user has permission
+                    if not request.env.user.has_group('entro_library.group_library_manager'):
+                        raise exceptions.AccessError(_('Bạn không có quyền truy cập vào danh mục này.'))
+
+        # ========================================
+        # Filter by library.website.category (for sidebar filter checkboxes)
+        # ========================================
+        website_category_id_list = []
         category_ids_from_request = request.httprequest.args.getlist('category_id')
 
         if category_ids_from_request:
-            category_id_list = [int(cid) for cid in category_ids_from_request if cid]
-            if category_id_list:
-                domain += [('website_category_id', 'in', category_id_list)]
+            website_category_id_list = [int(cid) for cid in category_ids_from_request if cid]
+            domain += [('website_category_id', 'in', website_category_id_list)]
         elif category_id:
             # Fallback to single category_id parameter
             if isinstance(category_id, list):
-                category_id_list = [int(cid) for cid in category_id]
+                website_category_id_list = [int(cid) for cid in category_id]
             else:
-                category_id_list = [int(category_id)]
-            if category_id_list:
-                domain += [('website_category_id', 'in', category_id_list)]
+                website_category_id_list = [int(category_id)]
+            if website_category_id_list:
+                domain += [('website_category_id', 'in', website_category_id_list)]
         elif category:
             # Support old single category URL format
             domain += [('website_category_id', '=', category.id)]
-            category_id_list = [category.id]
-
-        # Filter by media type (support multiple types)
-        media_type_list = []
-        # Get all media_type values from request (supports multiple checkboxes)
-        media_types_from_request = request.httprequest.args.getlist('media_type')
-
-        if media_types_from_request:
-            media_type_list = [mt for mt in media_types_from_request if mt]
-            if media_type_list:
-                domain += [('media_type', 'in', media_type_list)]
-        elif media_type:
-            # Fallback to single media_type parameter
-            if isinstance(media_type, list):
-                media_type_list = media_type
-            else:
-                media_type_list = [media_type]
-            if media_type_list:
-                domain += [('media_type', 'in', media_type_list)]
-
-        # Filter by Vipassana categories (only for /media/thien-vipassana)
-        vipassana_category_id_list = []
-        vipassana_category_ids_from_request = request.httprequest.args.getlist('vipassana_category_id')
-
-        # Check if we're on the thien-vipassana page
-        is_vipassana_page = menu_path == 'thien-vipassana' if menu_path else False
-
-        if is_vipassana_page:
-            # Filter to show only media with vipassana categories
-            domain += [('vipassana_category_ids', '!=', False)]
-
-            # Apply specific category filter if selected
-            if vipassana_category_ids_from_request:
-                vipassana_category_id_list = [int(vcid) for vcid in vipassana_category_ids_from_request if vcid]
-                if vipassana_category_id_list:
-                    domain += [('vipassana_category_ids', 'in', vipassana_category_id_list)]
+            website_category_id_list = [category.id]
 
         # Sorting
         sort_options = {
@@ -416,22 +525,26 @@ class LibraryWebsite(http.Controller):
         # Pagination
         ppg = 12  # media per page
 
-        # Construct base URL
-        if menu_path:
-            # Preserve menu path URL (e.g., /media/thien-vipassana)
+        # Construct base URL - preserve slug-based URLs
+        if child_slug and parent_slug:
+            # Child category slug URL (e.g., /thu-vien/media/thien-vipassana/phap-thoai)
+            url = f'/thu-vien/media/{parent_slug}/{child_slug}'
+        elif parent_slug:
+            # Parent category slug URL (e.g., /thu-vien/media/thien-vipassana)
+            url = f'/thu-vien/media/{parent_slug}'
+        elif menu_path:
+            # Legacy menu path URL (e.g., /media/thien-vipassana)
             url = f'/media/{menu_path}'
         elif category:
+            # Legacy category URL
             url = f'/media/danh-muc/{category.id}'
         else:
-            url = '/media'
+            # Default URL
+            url = '/thu-vien/media'
 
         url_args = {'search': search, 'sortby': sortby}
-        if media_type_list:
-            url_args['media_type'] = media_type_list
-        if category_id_list:
-            url_args['category_id'] = category_id_list
-        if vipassana_category_id_list:
-            url_args['vipassana_category_id'] = vipassana_category_id_list
+        if website_category_id_list:
+            url_args['category_id'] = website_category_id_list
 
         pager = request.website.pager(
             url=url,
@@ -448,27 +561,49 @@ class LibraryWebsite(http.Controller):
             order=order
         )
 
-        # Get website categories
+        # Load library.website.category for sidebar filters
+        # Only show website categories that have media in the current media.category context
+        website_category_domain = [
+            ('active', '=', True),
+            ('category_type', 'in', ['media', 'both'])
+        ]
+
+        # If a media.category is selected (via slug), filter website_categories
+        # to only show those that have media in this media.category
+        if media_category_id_list:
+            # Get all child categories recursively
+            all_media_category_ids = list(media_category_id_list)
+            media_categories = request.env['library.media.category'].sudo().browse(media_category_id_list)
+            for cat in media_categories:
+                if cat.child_ids:
+                    all_media_category_ids += cat.child_ids.ids
+                    for child in cat.child_ids:
+                        all_media_category_ids += child.child_ids.ids
+
+            # Find all website_category_ids that have media in this media.category
+            media_in_category = request.env['library.media'].sudo().search([
+                ('category_id', 'in', all_media_category_ids),
+                ('website_category_id', '!=', False)
+            ])
+            available_website_category_ids = media_in_category.mapped('website_category_id').ids
+
+            if available_website_category_ids:
+                website_category_domain.append(('id', 'in', available_website_category_ids))
+            else:
+                # No media with website_category in this media.category, show empty list
+                website_category_domain.append(('id', '=', False))
+
         website_categories = request.env['library.website.category'].search(
-            [('active', '=', True), ('category_type', 'in', ['media', 'both'])],
+            website_category_domain,
             order='sequence, name'
         )
-
-        # Get Vipassana categories if on Vipassana page
-        vipassana_categories = None
-        if is_vipassana_page:
-            vipassana_categories = request.env['media.vipassana.category'].search([
-                ('active', '=', True)
-            ], order='sequence, name')
 
         # Keep query parameters
         keep = QueryURL(
             url,
             category=category and category.id,
             search=search,
-            media_type=media_type_list,
-            category_id=category_id_list,
-            vipassana_category_id=vipassana_category_id_list,
+            category_id=website_category_id_list,
             sortby=sortby
         )
 
@@ -479,12 +614,15 @@ class LibraryWebsite(http.Controller):
             'search': search,
             'category': category,
             'media_type': media_type,
-            'media_type_list': media_type_list,
-            'category_id_list': category_id_list,
-            'vipassana_category_id_list': vipassana_category_id_list,
-            'vipassana_categories': vipassana_categories,
-            'is_vipassana_page': is_vipassana_page,
+
+            # library.media.category variables (hierarchical menu)
+            'media_category_id_list': media_category_id_list,
+            'selected_media_category': selected_media_category,
+
+            # library.website.category variables (sidebar filters)
+            'website_category_id_list': website_category_id_list,
             'website_categories': website_categories,
+
             'page_name': 'library_media',
             'keep': keep,
             'sortby': sortby,

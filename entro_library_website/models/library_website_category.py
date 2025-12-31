@@ -12,9 +12,9 @@ class LibraryWebsiteCategory(models.Model):
     description = fields.Text(string='Mô tả')
     color = fields.Integer(string='Màu')
     category_type = fields.Selection([
-        ('book', 'Book'),
-        ('media', 'Media'),
-        ('both', 'Both')
+        ('book', 'Dành cho tài liệu sách'),
+        ('media', 'Dành cho tài liệu số'),
+        ('both', 'Cả hai')
     ], string='Category Type', required=True, default='both',
        help='Specify whether this category is for Books, Media, or Both')
 

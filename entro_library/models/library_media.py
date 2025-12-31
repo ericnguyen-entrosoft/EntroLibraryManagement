@@ -40,28 +40,18 @@ class LibraryMedia(models.Model):
     thumbnail = fields.Binary(string='Ảnh thu nhỏ', attachment=True)
 
     # Relationships
-    book_ids = fields.Many2many(
+    book_ids = fields.One2many(
         'library.book',
-        'library_media_book_rel',
         'media_id',
-        'book_id',
         string='Sách liên quan'
     )
-    category_id = fields.Many2one('library.media.category', string='Danh mục', tracking=True)
+    category_id = fields.Many2one('library.media.category', string='Nhóm tài nguyên số', tracking=True)
     playlist_ids = fields.Many2many(
         'library.media.playlist',
         'library_playlist_media_rel',
         'media_id',
         'playlist_id',
         string='Danh sách phát'
-    )
-    vipassana_category_ids = fields.Many2many(
-        'media.vipassana.category',
-        'library_media_vipassana_category_rel',
-        'media_id',
-        'category_id',
-        string='Danh mục Vipassana',
-        help='Các danh mục Thiền Vipassana mà phương tiện này thuộc về'
     )
 
     # Metadata
@@ -194,7 +184,7 @@ class LibraryMedia(models.Model):
             'res_model': 'library.book',
             'view_mode': 'list,form',
             'domain': [('id', 'in', self.book_ids.ids)],
-            'context': {'default_media_ids': [(4, self.id)]}
+            'context': {'default_media_id': self.id}
         }
 
 

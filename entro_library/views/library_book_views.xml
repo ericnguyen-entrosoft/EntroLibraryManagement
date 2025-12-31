@@ -155,6 +155,7 @@
                                     <field name="parallel_title" />
                                     <field name="volume_title" />
                                     <field name="category_id" options="{'no_create_edit': False}" />
+                                    <field name="media_id" options="{'no_create_edit': False}" />
                                     <field name="media_link" />
                                 </group>
                                 <group name="registration_info" string="Thông tin đăng ký">
