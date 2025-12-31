@@ -740,7 +740,7 @@
                                     <t t-if="media.storage_type == 'url'">
                                         <div class="alert alert-info text-center p-4">
                                             <i class="fa fa-external-link fa-3x mb-3 d-block"/>
-                                            <a t-att-href="media.url"
+                                            <a t-att-href="media.file_url"
                                                target="_blank"
                                                class="btn btn-primary btn-lg">
                                                 <i class="fa fa-external-link me-2"/>
