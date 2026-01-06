@@ -253,7 +253,7 @@ class LibraryBookUpdateQuantityLine(models.TransientModel):
     )
     code_registration_number = fields.Char(
         string='Mã ĐKCB theo danh mục',
-        readonly=True
+        readonly=False
     )
     location_id = fields.Many2one(
         'library.location',
