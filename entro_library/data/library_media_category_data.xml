@@ -58,7 +58,18 @@
             <field name="access_level">public</field>
         </record>
 
-        <!-- 2. Nội bộ TVPS -->
+        <!-- 2. Pháp thoại -->
+        <record id="media_category_phap_thoai_main" model="library.media.category">
+            <field name="name">Pháp thoại</field>
+            <field name="slug">phap-thoai</field>
+            <field name="sequence">15</field>
+            <field name="icon">fa-microphone</field>
+            <field name="is_website_menu" eval="True"/>
+            <field name="access_level">public</field>
+            <field name="description">Pháp thoại của S.N.Goenka và các bài giảng về Thiền Vipassana</field>
+        </record>
+
+        <!-- 3. Nội bộ TVPS -->
         <record id="media_category_noi_bo" model="library.media.category">
             <field name="name">Nội bộ TVPS</field>
             <field name="slug">noi-bo-tvps</field>
@@ -69,7 +80,7 @@
             <field name="description">Tài liệu dành riêng cho thành viên và cộng tác viên của TVPS</field>
         </record>
 
-        <!-- 3. Khu Phật học -->
+        <!-- 4. Khu Phật học -->
         <record id="media_category_phat_hoc" model="library.media.category">
             <field name="name">Khu Phật học</field>
             <field name="slug">phat-hoc</field>
@@ -80,7 +91,7 @@
             <field name="description">Các tài liệu về Phật pháp, triết lý và giáo lý Phật giáo</field>
         </record>
 
-        <!-- 4. Khu tổng hợp -->
+        <!-- 5. Khu tổng hợp -->
         <record id="media_category_tong_hop" model="library.media.category">
             <field name="name">Khu tổng hợp</field>
             <field name="slug">tong-hop</field>
@@ -91,7 +102,7 @@
             <field name="description">Các tài liệu đa dạng về nhiều chủ đề khác nhau</field>
         </record>
 
-        <!-- 5. Khu ngoại ngữ -->
+        <!-- 6. Khu ngoại ngữ -->
         <record id="media_category_ngoai_ngu" model="library.media.category">
             <field name="name">Khu ngoại ngữ</field>
             <field name="slug">ngoai-ngu</field>
@@ -102,7 +113,7 @@
             <field name="description">Tài liệu bằng tiếng nước ngoài (English, Pali, Sanskrit, etc.)</field>
         </record>
 
-        <!-- 6. Nhạc Phật giáo -->
+        <!-- 7. Nhạc Phật giáo -->
         <record id="media_category_nhac_phat_giao" model="library.media.category">
             <field name="name">Nhạc Phật giáo</field>
             <field name="slug">nhac-phat-giao</field>
@@ -113,7 +124,7 @@
             <field name="description">Nhạc thiền, nhạc Phật giáo và các bản nhạc tâm linh</field>
         </record>
 
-        <!-- 7. Tài liệu khác -->
+        <!-- 8. Tài liệu khác -->
         <record id="media_category_khac" model="library.media.category">
             <field name="name">Tài liệu khác</field>
             <field name="slug">khac</field>
