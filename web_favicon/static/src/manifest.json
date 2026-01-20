@@ -1,0 +1,24 @@
+{
+  "name": "Thư viện Pháp Đăng",
+  "short_name": "Thư viện Pháp Đăng",
+  "description": "Thư viện Pháp Đăng",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#F2E5D5",
+  "theme_color": "#F2B885",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/web_favicon/static/src/img/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/web_favicon/static/src/img/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
