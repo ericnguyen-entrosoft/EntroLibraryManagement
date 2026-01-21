@@ -9,6 +9,7 @@ class LibraryMedia(models.Model):
     _description = 'Phương tiện thư viện'
     _inherit = ['mail.thread', 'mail.activity.mixin']
     _order = 'create_date desc, name'
+    _rec_names_search = ['name', 'author', 'keywords', 'description']
 
     name = fields.Char(string='Tiêu đề', required=True, tracking=True, index=True)
 
