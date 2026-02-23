@@ -1,0 +1,293 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ========== WEBSITE FORM: ĐỀ XUẤT TÀI LIỆU ========== -->
+
+    <template id="resource_request_form" name="Form đề xuất bổ sung tài liệu">
+        <t t-call="website.layout">
+            <t t-set="pageName" t-value="'resource_request_form'"/>
+
+            <div id="wrap" class="js_resource_request_form">
+                <div class="container mt-5 mb-5">
+                    <!-- Page Header -->
+                    <div class="row">
+                        <div class="col-12 text-center mb-4">
+                            <h1 class="display-5 fw-bold" style="color: #8c675a;">Đề Xuất Bổ Sung Tài Liệu</h1>
+                            <p class="lead text-muted">Hãy cho chúng tôi biết tài liệu bạn mong muốn thư viện bổ sung</p>
+                        </div>
+                    </div>
+
+                    <!-- Success Message -->
+                    <div t-if="success_message" class="alert alert-success alert-dismissible fade show" role="alert">
+                        <i class="fa fa-check-circle me-2"/>
+                        <strong>Thành công!</strong> <t t-esc="success_message"/>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"/>
+                    </div>
+
+                    <!-- Error Message -->
+                    <div t-if="error_message" class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <i class="fa fa-exclamation-circle me-2"/>
+                        <strong>Lỗi!</strong>
+                        <ul class="mb-0 mt-2">
+                            <li t-foreach="error_message" t-as="msg">
+                                <t t-esc="msg"/>
+                            </li>
+                        </ul>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"/>
+                    </div>
+
+                    <!-- Form -->
+                    <div class="row justify-content-center">
+                        <div class="col-lg-8">
+                            <div class="card shadow-sm">
+                                <div class="card-body p-4">
+                                    <form action="/thu-vien/de-xuat-tai-lieu/submit" method="POST" enctype="multipart/form-data">
+                                        <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+
+                                        <!-- Loại tài nguyên -->
+                                        <div class="mb-4">
+                                            <label class="form-label fw-bold">
+                                                <i class="fa fa-folder me-2"/>Loại tài nguyên <span class="text-danger">*</span>
+                                            </label>
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <div class="form-check form-check-inline p-3 border rounded w-100"
+                                                        style="cursor: pointer;" onclick="this.querySelector('input').click()">
+                                                        <input class="form-check-input" type="radio" name="request_type" id="type_book"
+                                                            value="book" checked="checked" onchange="toggleResourceFields()"/>
+                                                        <label class="form-check-label w-100" for="type_book" style="cursor: pointer;">
+                                                            <i class="fa fa-book fa-2x d-block mb-2" style="color: #8c675a;"/>
+                                                            <strong>Tài nguyên sách</strong>
+                                                            <p class="small text-muted mb-0">Sách in, tài liệu giấy</p>
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="form-check form-check-inline p-3 border rounded w-100"
+                                                        style="cursor: pointer;" onclick="this.querySelector('input').click()">
+                                                        <input class="form-check-input" type="radio" name="request_type" id="type_digital"
+                                                            value="digital" onchange="toggleResourceFields()"/>
+                                                        <label class="form-check-label w-100" for="type_digital" style="cursor: pointer;">
+                                                            <i class="fa fa-video-camera fa-2x d-block mb-2" style="color: #8c675a;"/>
+                                                            <strong>Tài nguyên số</strong>
+                                                            <p class="small text-muted mb-0">Video, PDF, Audio...</p>
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Thông tin người yêu cầu (nếu chưa đăng nhập) -->
+                                        <t t-if="request.env.user._is_public()">
+                                            <div class="mb-3">
+                                                <label for="requester_name" class="form-label">
+                                                    <i class="fa fa-user me-1"/>Họ tên
+                                                </label>
+                                                <input type="text" class="form-control" id="requester_name" name="requester_name"
+                                                    t-att-value="form_data.get('requester_name', '')"/>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="requester_email" class="form-label">
+                                                    <i class="fa fa-envelope me-1"/>Email <span class="text-danger">*</span>
+                                                </label>
+                                                <input type="email" class="form-control" id="requester_email" name="requester_email"
+                                                    required="required"
+                                                    t-att-value="form_data.get('requester_email', '')"
+                                                    t-attf-class="form-control #{error.get('requester_email') and 'is-invalid'}"/>
+                                                <div t-if="error.get('requester_email')" class="invalid-feedback">
+                                                    <t t-esc="error.get('requester_email')"/>
+                                                </div>
+                                            </div>
+                                        </t>
+
+                                        <!-- Tên tài liệu -->
+                                        <div class="mb-3">
+                                            <label for="title" class="form-label fw-bold">
+                                                <i class="fa fa-file-text me-1"/>Tên tài liệu <span class="text-danger">*</span>
+                                            </label>
+                                            <input type="text" class="form-control" id="title" name="title"
+                                                required="required"
+                                                t-att-value="form_data.get('title', '')"
+                                                t-attf-class="form-control #{error.get('title') and 'is-invalid'}"
+                                                placeholder="Nhập tên đầy đủ của tài liệu..."/>
+                                            <div t-if="error.get('title')" class="invalid-feedback">
+                                                <t t-esc="error.get('title')"/>
+                                            </div>
+                                        </div>
+
+                                        <!-- Tác giả -->
+                                        <div class="mb-3">
+                                            <label for="author" class="form-label">
+                                                <i class="fa fa-user-circle me-1"/>Tác giả
+                                            </label>
+                                            <input type="text" class="form-control" id="author" name="author"
+                                                t-att-value="form_data.get('author', '')"
+                                                placeholder="Tên tác giả hoặc nhà sản xuất nội dung"/>
+                                        </div>
+
+                                        <div class="row">
+                                            <!-- Nhà xuất bản -->
+                                            <div class="col-md-6 mb-3">
+                                                <label for="publisher" class="form-label">
+                                                    <i class="fa fa-building me-1"/>Nhà xuất bản
+                                                </label>
+                                                <input type="text" class="form-control" id="publisher" name="publisher"
+                                                    t-att-value="form_data.get('publisher', '')"/>
+                                            </div>
+
+                                            <!-- Năm xuất bản -->
+                                            <div class="col-md-6 mb-3">
+                                                <label for="publication_year" class="form-label">
+                                                    <i class="fa fa-calendar me-1"/>Năm xuất bản
+                                                </label>
+                                                <input type="number" class="form-control" id="publication_year" name="publication_year"
+                                                    min="1900" max="2100"
+                                                    t-att-value="form_data.get('publication_year', '')"/>
+                                            </div>
+                                        </div>
+
+                                        <!-- CHO SÁCH -->
+                                        <div id="book_fields" class="book-specific">
+                                            <div class="mb-3">
+                                                <label for="isbn" class="form-label">
+                                                    <i class="fa fa-barcode me-1"/>Mã ISBN
+                                                </label>
+                                                <input type="text" class="form-control" id="isbn" name="isbn"
+                                                    t-att-value="form_data.get('isbn', '')"
+                                                    placeholder="VD: 978-604-2-02547-3"/>
+                                            </div>
+
+                                            <div class="mb-3">
+                                                <label for="attachments" class="form-label">
+                                                    <i class="fa fa-paperclip me-1"/>File đính kèm
+                                                </label>
+                                                <input type="file" class="form-control" id="attachments" name="attachments"
+                                                    multiple="multiple"
+                                                    accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"/>
+                                                <small class="form-text text-muted">
+                                                    Có thể đính kèm ảnh bìa, mô tả, hoặc tài liệu liên quan (tối đa 5MB/file)
+                                                </small>
+                                            </div>
+                                        </div>
+
+                                        <!-- CHO TÀI NGUYÊN SỐ -->
+                                        <div id="digital_fields" class="digital-specific" style="display: none;">
+                                            <div class="mb-3">
+                                                <label for="format_type" class="form-label">
+                                                    <i class="fa fa-file-o me-1"/>Định dạng <span class="text-danger">*</span>
+                                                </label>
+                                                <select class="form-select" id="format_type" name="format_type">
+                                                    <option value="">-- Chọn định dạng --</option>
+                                                    <option value="video" t-att-selected="form_data.get('format_type') == 'video' and 'selected'">Video</option>
+                                                    <option value="audio" t-att-selected="form_data.get('format_type') == 'audio' and 'selected'">Audio</option>
+                                                    <option value="pdf" t-att-selected="form_data.get('format_type') == 'pdf' and 'selected'">PDF</option>
+                                                    <option value="ebook" t-att-selected="form_data.get('format_type') == 'ebook' and 'selected'">E-Book</option>
+                                                    <option value="other" t-att-selected="form_data.get('format_type') == 'other' and 'selected'">Khác</option>
+                                                </select>
+                                            </div>
+
+                                            <div class="mb-3">
+                                                <label for="resource_url" class="form-label">
+                                                    <i class="fa fa-link me-1"/>Link tài nguyên <span class="text-danger">*</span>
+                                                </label>
+                                                <input type="url" class="form-control" id="resource_url" name="resource_url"
+                                                    t-att-value="form_data.get('resource_url', '')"
+                                                    t-attf-class="form-control #{error.get('resource_url') and 'is-invalid'}"
+                                                    placeholder="https://youtube.com/watch?v=... hoặc link PDF, Audio..."/>
+                                                <div t-if="error.get('resource_url')" class="invalid-feedback">
+                                                    <t t-esc="error.get('resource_url')"/>
+                                                </div>
+                                                <small class="form-text text-muted">
+                                                    Link đến video YouTube, Vimeo, Google Drive, hoặc website chứa tài nguyên
+                                                </small>
+                                            </div>
+                                        </div>
+
+                                        <!-- Mô tả -->
+                                        <div class="mb-3">
+                                            <label for="description" class="form-label fw-bold">
+                                                <i class="fa fa-align-left me-1"/>Mô tả nội dung <span class="text-danger">*</span>
+                                            </label>
+                                            <textarea class="form-control" id="description" name="description"
+                                                rows="4" required="required"
+                                                t-attf-class="form-control #{error.get('description') and 'is-invalid'}"
+                                                placeholder="Tóm tắt ngắn gọn về nội dung tài liệu..."><t t-esc="form_data.get('description', '')"/></textarea>
+                                            <div t-if="error.get('description')" class="invalid-feedback">
+                                                <t t-esc="error.get('description')"/>
+                                            </div>
+                                        </div>
+
+                                        <!-- Lý do đề xuất -->
+                                        <div class="mb-4">
+                                            <label for="reason" class="form-label">
+                                                <i class="fa fa-lightbulb-o me-1"/>Lý do đề xuất
+                                            </label>
+                                            <textarea class="form-control" id="reason" name="reason"
+                                                rows="3"
+                                                placeholder="Vì sao tài liệu này nên được bổ sung vào thư viện? (không bắt buộc)"><t t-esc="form_data.get('reason', '')"/></textarea>
+                                        </div>
+
+                                        <!-- Submit Button -->
+                                        <div class="d-grid gap-2">
+                                            <button type="submit" class="btn btn-lg" style="background-color: #8c675a; color: white;">
+                                                <i class="fa fa-paper-plane me-2"/>Gửi đề xuất
+                                            </button>
+                                            <a href="/thu-vien" class="btn btn-outline-secondary">
+                                                <i class="fa fa-arrow-left me-2"/>Quay lại thư viện
+                                            </a>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+
+                            <!-- Info Box -->
+                            <div class="card mt-4 border-0" style="background-color: #f8f5f2;">
+                                <div class="card-body">
+                                    <h5 class="card-title">
+                                        <i class="fa fa-info-circle me-2" style="color: #8c675a;"/>Lưu ý
+                                    </h5>
+                                    <ul class="mb-0 small">
+                                        <li>Các trường có dấu <span class="text-danger">*</span> là bắt buộc</li>
+                                        <li>Đối với <strong>tài nguyên sách</strong>: Bạn có thể đính kèm file ảnh bìa hoặc tài liệu liên quan</li>
+                                        <li>Đối với <strong>tài nguyên số</strong>: Vui lòng cung cấp link trực tiếp đến tài nguyên (YouTube, Google Drive, etc.)</li>
+                                        <li>Yêu cầu của bạn sẽ được quản lý thư viện xem xét trong vòng 5-7 ngày làm việc</li>
+                                        <li>Chúng tôi sẽ thông báo kết quả qua email mà bạn cung cấp</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- JavaScript -->
+            <script type="text/javascript">
+                function toggleResourceFields() {
+                    var bookFields = document.getElementById('book_fields');
+                    var digitalFields = document.getElementById('digital_fields');
+                    var isBook = document.getElementById('type_book').checked;
+
+                    if (isBook) {
+                        bookFields.style.display = 'block';
+                        digitalFields.style.display = 'none';
+                        // Remove required from digital fields
+                        document.getElementById('format_type').removeAttribute('required');
+                        document.getElementById('resource_url').removeAttribute('required');
+                    } else {
+                        bookFields.style.display = 'none';
+                        digitalFields.style.display = 'block';
+                        // Add required to digital fields
+                        document.getElementById('format_type').setAttribute('required', 'required');
+                        document.getElementById('resource_url').setAttribute('required', 'required');
+                    }
+                }
+
+                // Initialize on page load
+                document.addEventListener('DOMContentLoaded', function() {
+                    toggleResourceFields();
+                });
+            </script>
+        </t>
+    </template>
+
+</odoo>

@@ -1215,3 +1215,122 @@ class LibraryWebsite(http.Controller):
         }
 
         return request.render("entro_library_website.unified_catalog", values)
+
+    # ====================================
+    # RESOURCE REQUEST ROUTES
+    # ====================================
+
+    @http.route(['/thu-vien/de-xuat-tai-lieu'], type='http', auth='public', website=True)
+    def resource_request_form(self, **kwargs):
+        """Form đề xuất bổ sung tài liệu"""
+
+        values = {
+            'page_name': 'resource_request_form',
+            'error': {},
+            'form_data': {}
+        }
+
+        # Nếu có message từ redirect
+        if kwargs.get('success'):
+            values['success_message'] = 'Yêu cầu của bạn đã được gửi thành công! Chúng tôi sẽ xem xét và phản hồi sớm nhất.'
+
+        return request.render("entro_library_website.resource_request_form", values)
+
+    @http.route(['/thu-vien/de-xuat-tai-lieu/submit'], type='http', auth='public', website=True, methods=['POST'], csrf=True)
+    def resource_request_submit(self, **post):
+        """Xử lý submit form đề xuất tài liệu"""
+
+        error = {}
+        error_message = []
+
+        # Validate required fields
+        required_fields = ['request_type', 'title', 'description']
+        for field in required_fields:
+            if not post.get(field):
+                error[field] = 'Vui lòng điền trường này'
+                error_message.append('Vui lòng điền đầy đủ thông tin bắt buộc.')
+
+        # Validate type-specific fields
+        if post.get('request_type') == 'digital' and not post.get('resource_url'):
+            error['resource_url'] = 'Vui lòng nhập link tài nguyên'
+            error_message.append('Tài nguyên số phải có link.')
+
+        # If user not logged in, require email
+        if request.env.user._is_public():
+            if not post.get('requester_email'):
+                error['requester_email'] = 'Vui lòng nhập email'
+                error_message.append('Vui lòng cung cấp địa chỉ email.')
+
+        if error:
+            values = {
+                'error': error,
+                'error_message': error_message,
+                'form_data': post,
+                'page_name': 'resource_request_form',
+            }
+            return request.render("entro_library_website.resource_request_form", values)
+
+        # Prepare values
+        vals = {
+            'request_type': post.get('request_type'),
+            'title': post.get('title'),
+            'author': post.get('author'),
+            'publisher': post.get('publisher'),
+            'publication_year': int(post.get('publication_year')) if post.get('publication_year') else False,
+            'description': post.get('description'),
+            'reason': post.get('reason'),
+            'isbn': post.get('isbn'),
+        }
+
+        # Handle requester
+        if request.env.user._is_public():
+            # For public users, try to find or create partner by email
+            email = post.get('requester_email')
+            partner = request.env['res.partner'].sudo().search([('email', '=', email)], limit=1)
+            if not partner:
+                partner = request.env['res.partner'].sudo().create({
+                    'name': post.get('requester_name', email),
+                    'email': email,
+                })
+            vals['requester_id'] = partner.id
+        else:
+            vals['requester_id'] = request.env.user.partner_id.id
+
+        # Digital resource specific
+        if post.get('request_type') == 'digital':
+            vals['format_type'] = post.get('format_type')
+            vals['resource_url'] = post.get('resource_url')
+
+        # Handle file upload (for books)
+        if post.get('request_type') == 'book':
+            attachment_ids = []
+            # Handle multiple file uploads
+            uploaded_files = request.httprequest.files.getlist('attachments')
+            for upload in uploaded_files:
+                if upload.filename:
+                    attachment = request.env['ir.attachment'].sudo().create({
+                        'name': upload.filename,
+                        'datas': base64.b64encode(upload.read()),
+                        'res_model': 'library.resource.request',
+                        'res_id': 0,  # Will be updated after creating request
+                    })
+                    attachment_ids.append(attachment.id)
+
+            if attachment_ids:
+                vals['attachment_ids'] = [(6, 0, attachment_ids)]
+
+        # Create request
+        resource_request = request.env['library.resource.request'].sudo().create(vals)
+
+        # Update attachment res_id
+        if vals.get('attachment_ids'):
+            request.env['ir.attachment'].sudo().browse(vals['attachment_ids'][0][2]).write({
+                'res_id': resource_request.id
+            })
+
+        # Auto-submit if user is logged in
+        if not request.env.user._is_public():
+            resource_request.sudo().action_submit()
+
+        # Redirect with success message
+        return request.redirect('/thu-vien/de-xuat-tai-lieu?success=1')

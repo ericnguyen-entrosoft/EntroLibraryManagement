@@ -38,6 +38,7 @@
         'data/library_website_category_data.xml',
         'data/website_menu.xml',
         'data/google_analytics_cron.xml',
+        'data/library_resource_request_sequence.xml',
 
         # Views
         'views/library_website_category_views.xml',
@@ -45,12 +46,18 @@
         'views/library_book_views.xml',
         'views/library_media_views.xml',
         'views/google_analytics_config_views.xml',
+        'views/library_resource_request_views.xml',
         'views/home_templates.xml',
         'views/templates.xml',
         'views/media_templates.xml',
         'views/media_menu_templates.xml',
         'views/portal_templates.xml',
         'views/navbar_templates.xml',
+        'views/resource_request_templates.xml',
+        'views/resource_request_portal_templates.xml',
+
+        # Wizards
+        'wizards/library_request_reject_wizard_views.xml',
     ],
     'assets': {
         'web.assets_frontend': [

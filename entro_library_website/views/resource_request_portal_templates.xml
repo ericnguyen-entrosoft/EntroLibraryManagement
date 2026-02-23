@@ -1,0 +1,246 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Add to portal home -->
+    <template id="portal_my_home_resource_requests" name="Portal My Home: Resource Requests"
+        inherit_id="portal.portal_my_home" priority="45">
+        <xpath expr="//div[hasclass('o_portal_docs')]" position="inside">
+            <t t-call="portal.portal_docs_entry">
+                <t t-set="title">Yêu cầu bổ sung</t>
+                <t t-set="url" t-value="'/my/resource-requests'"/>
+                <t t-set="placeholder_count" t-value="'resource_request_count'"/>
+            </t>
+        </xpath>
+    </template>
+
+    <!-- My Resource Requests List -->
+    <template id="portal_my_resource_requests" name="My Resource Requests">
+        <t t-call="portal.portal_layout">
+            <t t-set="breadcrumbs_searchbar" t-value="True"/>
+
+            <t t-call="portal.portal_searchbar">
+                <t t-set="title">Yêu cầu bổ sung tài liệu của tôi</t>
+            </t>
+
+            <!-- Add New Request Button -->
+            <div class="mb-3 text-end">
+                <a href="/thu-vien/de-xuat-tai-lieu" class="btn btn-primary">
+                    <i class="fa fa-plus me-2"/>Tạo yêu cầu mới
+                </a>
+            </div>
+
+            <div t-if="not requests" class="alert alert-info text-center mt-3">
+                <p class="mb-0">
+                    <i class="fa fa-info-circle fa-2x mb-3 d-block"/>
+                    Bạn chưa có yêu cầu bổ sung tài liệu nào.
+                </p>
+                <a href="/thu-vien/de-xuat-tai-lieu" class="btn btn-primary mt-3">
+                    <i class="fa fa-plus me-2"/>Gửi yêu cầu đầu tiên
+                </a>
+            </div>
+
+            <div t-if="requests" class="row">
+                <t t-foreach="requests" t-as="req">
+                    <div class="col-lg-6 mb-4">
+                        <div class="card h-100">
+                            <div class="card-header d-flex justify-content-between align-items-center"
+                                style="background-color: #8c675a; color: white;">
+                                <h5 class="mb-0">
+                                    <a t-attf-href="/my/resource-request/#{req.id}" style="color: white; text-decoration: none;">
+                                        <t t-esc="req.name"/>
+                                    </a>
+                                </h5>
+                                <span t-attf-class="badge #{req.state == 'draft' and 'bg-secondary' or req.state == 'submitted' and 'bg-info' or req.state == 'approved' and 'bg-success' or req.state == 'rejected' and 'bg-danger' or 'bg-primary'}">
+                                    <t t-if="req.state == 'draft'">Nháp</t>
+                                    <t t-elif="req.state == 'submitted'">Đã gửi</t>
+                                    <t t-elif="req.state == 'approved'">Đã duyệt</t>
+                                    <t t-elif="req.state == 'rejected'">Từ chối</t>
+                                    <t t-else="">Hoàn thành</t>
+                                </span>
+                            </div>
+                            <div class="card-body">
+                                <h5 class="card-title text-truncate" t-esc="req.title"/>
+                                <div class="mb-3">
+                                    <span t-attf-class="badge #{req.request_type == 'book' and 'bg-primary' or 'bg-info'}">
+                                        <i t-attf-class="fa fa-#{req.request_type == 'book' and 'book' or 'video-camera'} me-1"/>
+                                        <t t-if="req.request_type == 'book'">Tài nguyên sách</t>
+                                        <t t-else="">Tài nguyên số</t>
+                                    </span>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-6">
+                                        <small class="text-muted">Tác giả</small>
+                                        <div><strong t-esc="req.author or 'N/A'"/></div>
+                                    </div>
+                                    <div class="col-6">
+                                        <small class="text-muted">Ngày gửi</small>
+                                        <div>
+                                            <strong>
+                                                <t t-if="req.submitted_date">
+                                                    <span t-field="req.submitted_date" t-options="{'widget': 'date'}"/>
+                                                </t>
+                                                <t t-else="">Chưa gửi</t>
+                                            </strong>
+                                        </div>
+                                    </div>
+                                </div>
+                                <a t-attf-href="/my/resource-request/#{req.id}" class="btn btn-sm w-100"
+                                    style="background-color: #8c675a; color: white;">
+                                    <i class="fa fa-eye me-2"/>Xem chi tiết
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </t>
+            </div>
+
+            <div t-if="pager" class="o_portal_pager text-center">
+                <t t-call="portal.pager"/>
+            </div>
+        </t>
+    </template>
+
+    <!-- My Resource Request Detail -->
+    <template id="portal_resource_request_detail" name="My Resource Request Detail">
+        <t t-call="portal.portal_layout">
+            <div class="container mt-4">
+                <div class="card">
+                    <div class="card-header" style="background-color:#8c675a;color:white">
+                        <h5 class="mb-2">
+                            Yêu cầu <span t-esc="resource_request.name"/>
+                            <span t-attf-class="badge #{resource_request.state == 'draft' and 'bg-secondary' or resource_request.state == 'submitted' and 'bg-info' or resource_request.state == 'approved' and 'bg-success' or resource_request.state == 'rejected' and 'bg-danger' or 'bg-primary'} ms-2">
+                                <t t-if="resource_request.state == 'draft'">Nháp</t>
+                                <t t-elif="resource_request.state == 'submitted'">Đã gửi</t>
+                                <t t-elif="resource_request.state == 'approved'">Đã duyệt</t>
+                                <t t-elif="resource_request.state == 'rejected'">Từ chối</t>
+                                <t t-else="">Hoàn thành</t>
+                            </span>
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <h4 class="fw-bold" t-esc="resource_request.title"/>
+                                <p class="mb-2">
+                                    <span t-attf-class="badge #{resource_request.request_type == 'book' and 'bg-primary' or 'bg-info'}">
+                                        <i t-attf-class="fa fa-#{resource_request.request_type == 'book' and 'book' or 'video-camera'} me-1"/>
+                                        <t t-if="resource_request.request_type == 'book'">Tài nguyên sách</t>
+                                        <t t-else="">Tài nguyên số</t>
+                                    </span>
+                                </p>
+                            </div>
+                            <div class="col-md-6 text-end">
+                                <a href="/my/resource-requests" class="btn btn-outline-secondary">
+                                    <i class="fa fa-arrow-left me-2"/>Quay lại danh sách
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- Thông tin chi tiết -->
+                        <table class="table table-bordered">
+                            <tbody>
+                                <tr>
+                                    <th class="bg-light" style="width: 30%;">Tác giả</th>
+                                    <td><t t-esc="resource_request.author or 'N/A'"/></td>
+                                </tr>
+                                <tr t-if="resource_request.publisher">
+                                    <th class="bg-light">Nhà xuất bản</th>
+                                    <td><t t-esc="resource_request.publisher"/></td>
+                                </tr>
+                                <tr t-if="resource_request.publication_year">
+                                    <th class="bg-light">Năm xuất bản</th>
+                                    <td><t t-esc="resource_request.publication_year"/></td>
+                                </tr>
+                                <tr t-if="resource_request.isbn and resource_request.request_type == 'book'">
+                                    <th class="bg-light">ISBN</th>
+                                    <td><t t-esc="resource_request.isbn"/></td>
+                                </tr>
+                                <tr t-if="resource_request.format_type and resource_request.request_type == 'digital'">
+                                    <th class="bg-light">Định dạng</th>
+                                    <td>
+                                        <t t-if="resource_request.format_type == 'pdf'">PDF</t>
+                                        <t t-elif="resource_request.format_type == 'video'">Video</t>
+                                        <t t-elif="resource_request.format_type == 'audio'">Audio</t>
+                                        <t t-elif="resource_request.format_type == 'ebook'">E-Book</t>
+                                        <t t-else="">Khác</t>
+                                    </td>
+                                </tr>
+                                <tr t-if="resource_request.resource_url and resource_request.request_type == 'digital'">
+                                    <th class="bg-light">Link tài nguyên</th>
+                                    <td>
+                                        <a t-att-href="resource_request.resource_url" target="_blank">
+                                            <t t-esc="resource_request.resource_url"/>
+                                            <i class="fa fa-external-link ms-1"/>
+                                        </a>
+                                    </td>
+                                </tr>
+                                <tr t-if="resource_request.submitted_date">
+                                    <th class="bg-light">Ngày gửi</th>
+                                    <td><span t-field="resource_request.submitted_date"/></td>
+                                </tr>
+                                <tr t-if="resource_request.approval_date">
+                                    <th class="bg-light">Ngày phê duyệt</th>
+                                    <td><span t-field="resource_request.approval_date"/></td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <!-- Mô tả -->
+                        <div class="mb-3">
+                            <h5 class="fw-bold">Mô tả nội dung</h5>
+                            <p class="text-muted" t-esc="resource_request.description"/>
+                        </div>
+
+                        <!-- Lý do đề xuất -->
+                        <div class="mb-3" t-if="resource_request.reason">
+                            <h5 class="fw-bold">Lý do đề xuất</h5>
+                            <p class="text-muted" t-esc="resource_request.reason"/>
+                        </div>
+
+                        <!-- Lý do từ chối -->
+                        <div class="alert alert-danger" t-if="resource_request.state == 'rejected' and resource_request.rejection_reason">
+                            <h5 class="alert-heading">
+                                <i class="fa fa-exclamation-circle me-2"/>Lý do từ chối
+                            </h5>
+                            <p class="mb-0" t-esc="resource_request.rejection_reason"/>
+                        </div>
+
+                        <!-- Tài nguyên đã tạo -->
+                        <div class="alert alert-success" t-if="resource_request.state == 'done'">
+                            <h5 class="alert-heading">
+                                <i class="fa fa-check-circle me-2"/>Yêu cầu đã hoàn thành
+                            </h5>
+                            <p class="mb-2">Tài liệu đã được bổ sung vào thư viện!</p>
+                            <t t-if="resource_request.created_book_id">
+                                <a t-attf-href="/thu-vien/sach/#{resource_request.created_book_id.id}"
+                                    class="btn btn-sm btn-success" target="_blank">
+                                    <i class="fa fa-book me-2"/>Xem sách đã tạo
+                                </a>
+                            </t>
+                            <t t-if="resource_request.created_digital_resource_id">
+                                <a t-attf-href="/media/#{resource_request.created_digital_resource_id.id}"
+                                    class="btn btn-sm btn-success" target="_blank">
+                                    <i class="fa fa-video-camera me-2"/>Xem tài nguyên số đã tạo
+                                </a>
+                            </t>
+                        </div>
+
+                        <!-- Files đính kèm -->
+                        <div t-if="resource_request.attachment_ids" class="mb-3">
+                            <h5 class="fw-bold">File đính kèm</h5>
+                            <ul class="list-group">
+                                <li class="list-group-item" t-foreach="resource_request.attachment_ids" t-as="attachment">
+                                    <a t-attf-href="/web/content/#{attachment.id}?download=true" target="_blank">
+                                        <i class="fa fa-paperclip me-2"/>
+                                        <t t-esc="attachment.name"/>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+</odoo>

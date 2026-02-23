@@ -30,3 +30,8 @@ access_library_website_slider_public,library.website.slider.public,model_library
 access_google_analytics_config_manager,google.analytics.config.manager,model_google_analytics_config,entro_library.group_library_manager,1,1,1,1
 access_google_analytics_config_user,google.analytics.config.user,model_google_analytics_config,entro_library.group_library_user,1,0,0,0
 access_google_analytics_config_system,google.analytics.config.system,model_google_analytics_config,base.group_system,1,1,1,1
+access_library_resource_request_user,library.resource.request.user,model_library_resource_request,entro_library.group_library_user,1,1,1,1
+access_library_resource_request_manager,library.resource.request.manager,model_library_resource_request,entro_library.group_library_manager,1,1,1,1
+access_library_resource_request_portal,library.resource.request.portal,model_library_resource_request,base.group_portal,1,1,1,0
+access_library_resource_request_public,library.resource.request.public,model_library_resource_request,base.group_public,1,0,1,0
+access_library_request_reject_wizard_manager,library.request.reject.wizard.manager,model_library_request_reject_wizard,entro_library.group_library_manager,1,1,1,1

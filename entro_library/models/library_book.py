@@ -4,6 +4,7 @@ from datetime import timedelta
 import re
 import unicodedata
 from ..utils.cutter_generator import CutterGenerator
+
 class LibraryBook(models.Model):
     _name = 'library.book'
     _description = 'Quản lý sách'

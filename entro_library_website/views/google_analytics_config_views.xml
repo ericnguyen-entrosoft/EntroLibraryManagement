@@ -91,15 +91,6 @@
         <field name="name">Google Analytics Configuration</field>
         <field name="res_model">google.analytics.config</field>
         <field name="view_mode">list,form</field>
-        <field name="help" type="html">
-            <p class="o_view_nocontent_smiling_face">
-                Configure Google Analytics Integration
-            </p>
-            <p>
-                Set up your Google Analytics 4 property to automatically fetch visitor statistics
-                and display them on your library website homepage.
-            </p>
-        </field>
     </record>
 
     <!-- Menu Items -->

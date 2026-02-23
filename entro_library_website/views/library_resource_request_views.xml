@@ -1,0 +1,271 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- List View -->
+    <record id="library_resource_request_view_list" model="ir.ui.view">
+        <field name="name">library.resource.request.view.list</field>
+        <field name="model">library.resource.request</field>
+        <field name="arch" type="xml">
+            <list string="Yêu cầu bổ sung tài liệu" sample="1">
+                <field name="name"/>
+                <field name="title"/>
+                <field name="requester_id"/>
+                <field name="request_type"/>
+                <field name="submitted_date"/>
+                <field name="state"
+                    decoration-success="state == 'approved'"
+                    decoration-danger="state == 'rejected'"
+                    decoration-info="state == 'submitted'"
+                    decoration-muted="state == 'draft'"
+                    widget="badge"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Form View -->
+    <record id="library_resource_request_view_form" model="ir.ui.view">
+        <field name="name">library.resource.request.view.form</field>
+        <field name="model">library.resource.request</field>
+        <field name="arch" type="xml">
+            <form string="Yêu cầu bổ sung tài liệu">
+                <header>
+                    <button name="action_submit"
+                        string="Gửi yêu cầu"
+                        type="object"
+                        class="btn-primary"
+                        invisible="state != 'draft'"/>
+
+                    <button name="action_approve"
+                        string="Phê duyệt"
+                        type="object"
+                        class="btn-success"
+                        invisible="state != 'submitted'"
+                        groups="entro_library.group_library_manager"/>
+
+                    <button name="action_reject"
+                        string="Từ chối"
+                        type="object"
+                        class="btn-danger"
+                        invisible="state != 'submitted'"
+                        groups="entro_library.group_library_manager"/>
+
+                    <button name="action_reset_to_draft"
+                        string="Đưa về nháp"
+                        type="object"
+                        invisible="state not in ['submitted', 'rejected']"
+                        groups="entro_library.group_library_manager"/>
+
+                    <field name="state" widget="statusbar"
+                        statusbar_visible="draft,submitted,approved,done"/>
+                </header>
+
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_created_resource"
+                            type="object"
+                            class="oe_stat_button"
+                            icon="fa-book"
+                            invisible="state != 'done'">
+                            <div class="o_stat_info">
+                                <span class="o_stat_text">Xem tài nguyên</span>
+                            </div>
+                        </button>
+                    </div>
+
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+
+                    <group>
+                        <group>
+                            <field name="request_type" widget="radio"/>
+                            <field name="requester_id" readonly="state != 'draft'"/>
+                            <field name="submitted_date" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="reviewer_id"/>
+                            <field name="approved_by" readonly="1"/>
+                            <field name="approval_date" readonly="1"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="Thông tin tài liệu" name="resource_info">
+                            <group>
+                                <group>
+                                    <field name="title" required="1"/>
+                                    <field name="author"/>
+                                    <field name="publisher"/>
+                                    <field name="publication_year"/>
+                                </group>
+                                <group>
+                                    <!-- Cho sách -->
+                                    <field name="isbn" invisible="request_type != 'book'"/>
+                                    <field name="cover_image" widget="image" class="oe_avatar"/>
+
+                                    <!-- Cho tài nguyên số -->
+                                    <field name="format_type"
+                                        invisible="request_type != 'digital'"
+                                        required="request_type == 'digital'"/>
+                                    <field name="resource_url"
+                                        widget="url"
+                                        invisible="request_type != 'digital'"
+                                        required="request_type == 'digital'"
+                                        placeholder="https://..."/>
+                                </group>
+                            </group>
+
+                            <group>
+                                <field name="description"
+                                    placeholder="Mô tả ngắn gọn về nội dung tài liệu..."/>
+                                <field name="reason"
+                                    placeholder="Vì sao tài liệu này nên được bổ sung vào thư viện?"/>
+                            </group>
+
+                            <!-- File đính kèm chỉ cho sách -->
+                            <group string="File đính kèm" invisible="request_type != 'book'">
+                                <field name="attachment_ids" widget="many2many_binary" nolabel="1"/>
+                            </group>
+                        </page>
+
+                        <page string="Xử lý" name="processing"
+                            invisible="state == 'draft'">
+                            <group>
+                                <field name="rejection_reason"
+                                    invisible="state != 'rejected'"/>
+                                <field name="notes"/>
+                            </group>
+
+                            <group string="Tài nguyên đã tạo"
+                                invisible="state != 'done'">
+                                <field name="created_book_id"
+                                    invisible="request_type != 'book'"/>
+                                <field name="created_digital_resource_id"
+                                    invisible="request_type != 'digital'"/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <!-- Kanban View -->
+    <record id="library_resource_request_view_kanban" model="ir.ui.view">
+        <field name="name">library.resource.request.view.kanban</field>
+        <field name="model">library.resource.request</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_small_column" default_group_by="state" sample="1">
+                <field name="name"/>
+                <field name="title"/>
+                <field name="requester_id"/>
+                <field name="request_type"/>
+                <field name="state"/>
+                <field name="submitted_date"/>
+
+                <templates>
+                    <t t-name="card">
+                        <div class="oe_kanban_content">
+                            <div class="o_kanban_record_top">
+                                <div class="o_kanban_record_headings">
+                                    <strong class="o_kanban_record_title">
+                                        <field name="title"/>
+                                    </strong>
+                                    <div class="o_kanban_record_subtitle">
+                                        <field name="name"/>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="o_kanban_record_body">
+                                <div class="row">
+                                    <div class="col-12">
+                                        <i class="fa fa-user"/> <field name="requester_id"/>
+                                    </div>
+                                    <div class="col-12 mt-1">
+                                        <span class="badge"
+                                            t-attf-class="badge-{{record.request_type.raw_value == 'book' ? 'primary' : 'info'}}">
+                                            <i t-attf-class="fa fa-{{record.request_type.raw_value == 'book' ? 'book' : 'video-camera'}}"/>
+                                            <t t-esc="record.request_type.value"/>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="o_kanban_record_bottom mt-2">
+                                <div class="oe_kanban_bottom_left">
+                                    <field name="submitted_date" widget="date"/>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- Search View -->
+    <record id="library_resource_request_view_search" model="ir.ui.view">
+        <field name="name">library.resource.request.view.search</field>
+        <field name="model">library.resource.request</field>
+        <field name="arch" type="xml">
+            <search string="Tìm yêu cầu">
+                <field name="name" string="Số yêu cầu"/>
+                <field name="title" string="Tên tài liệu"/>
+                <field name="requester_id" string="Người yêu cầu"/>
+                <field name="author" string="Tác giả"/>
+
+                <filter string="Nháp" name="draft" domain="[('state', '=', 'draft')]"/>
+                <filter string="Đã gửi" name="submitted" domain="[('state', '=', 'submitted')]"/>
+                <filter string="Đã duyệt" name="approved" domain="[('state', '=', 'approved')]"/>
+                <filter string="Từ chối" name="rejected" domain="[('state', '=', 'rejected')]"/>
+                <filter string="Hoàn thành" name="done" domain="[('state', '=', 'done')]"/>
+
+                <separator/>
+                <filter string="Tài nguyên sách" name="book" domain="[('request_type', '=', 'book')]"/>
+                <filter string="Tài nguyên số" name="digital" domain="[('request_type', '=', 'digital')]"/>
+
+                <separator/>
+                <filter string="Của tôi" name="my_requests"
+                    domain="[('requester_id.user_ids', 'in', [uid])]"/>
+
+                <group expand="0" string="Nhóm theo">
+                    <filter string="Trạng thái" name="group_state" context="{'group_by': 'state'}"/>
+                    <filter string="Loại tài nguyên" name="group_type" context="{'group_by': 'request_type'}"/>
+                    <filter string="Người yêu cầu" name="group_requester" context="{'group_by': 'requester_id'}"/>
+                    <filter string="Tháng gửi" name="group_month" context="{'group_by': 'submitted_date:month'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="library_resource_request_action" model="ir.actions.act_window">
+        <field name="name">Yêu cầu bổ sung tài liệu</field>
+        <field name="res_model">library.resource.request</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="context">{'search_default_submitted': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Chưa có yêu cầu bổ sung tài liệu nào
+            </p>
+            <p>
+                Người dùng có thể gửi yêu cầu bổ sung tài liệu mới thông qua website.
+            </p>
+        </field>
+    </record>
+
+    <!-- Menu -->
+    <menuitem id="menu_library_resource_request"
+        name="Yêu cầu bổ sung"
+        parent="entro_library.menu_library_root"
+        action="library_resource_request_action"
+        sequence="50"/>
+
+</odoo>

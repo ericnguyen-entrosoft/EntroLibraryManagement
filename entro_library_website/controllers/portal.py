@@ -24,6 +24,11 @@ class LibraryPortal(CustomerPortal):
                 ('state', 'in', ['active', 'available']),
             ])
 
+        if 'resource_request_count' in counters:
+            values['resource_request_count'] = request.env['library.resource.request'].search_count([
+                ('requester_id', '=', partner.id),
+            ])
+
         return values
 
     # ========== MY BORROWINGS ==========
@@ -372,3 +377,94 @@ class LibraryPortal(CustomerPortal):
         }
 
         return request.render("entro_library_website.portal_borrowing_history", values)
+
+    # ========== RESOURCE REQUESTS ==========
+
+    @http.route(['/my/resource-requests', '/my/resource-requests/page/<int:page>'],
+                type='http', auth="user", website=True)
+    def portal_my_resource_requests(self, page=1, sortby=None, filterby=None, **kw):
+        """Danh sách yêu cầu bổ sung tài liệu của tôi"""
+
+        values = self._prepare_portal_layout_values()
+        partner = request.env.user.partner_id
+        ResourceRequest = request.env['library.resource.request']
+
+        # Domain
+        domain = [('requester_id', '=', partner.id)]
+
+        # Filters
+        searchbar_filters = {
+            'all': {'label': _('Tất cả'), 'domain': []},
+            'draft': {'label': _('Nháp'), 'domain': [('state', '=', 'draft')]},
+            'submitted': {'label': _('Đã gửi'), 'domain': [('state', '=', 'submitted')]},
+            'approved': {'label': _('Đã duyệt'), 'domain': [('state', '=', 'approved')]},
+            'rejected': {'label': _('Từ chối'), 'domain': [('state', '=', 'rejected')]},
+        }
+
+        if not filterby:
+            filterby = 'all'
+        domain += searchbar_filters[filterby]['domain']
+
+        # Sorting
+        searchbar_sortings = {
+            'date': {'label': _('Ngày gửi'), 'order': 'create_date desc'},
+            'name': {'label': _('Số yêu cầu'), 'order': 'name'},
+        }
+
+        if not sortby:
+            sortby = 'date'
+        order = searchbar_sortings[sortby]['order']
+
+        # Count
+        request_count = ResourceRequest.search_count(domain)
+
+        # Pager
+        pager = portal_pager(
+            url="/my/resource-requests",
+            url_args={'sortby': sortby, 'filterby': filterby},
+            total=request_count,
+            page=page,
+            step=self._items_per_page
+        )
+
+        # Get requests
+        requests = ResourceRequest.search(
+            domain,
+            order=order,
+            limit=self._items_per_page,
+            offset=pager['offset']
+        )
+
+        values.update({
+            'requests': requests,
+            'page_name': 'resource_request',
+            'pager': pager,
+            'default_url': '/my/resource-requests',
+            'searchbar_sortings': searchbar_sortings,
+            'searchbar_filters': searchbar_filters,
+            'sortby': sortby,
+            'filterby': filterby,
+        })
+
+        return request.render("entro_library_website.portal_my_resource_requests", values)
+
+    @http.route(['/my/resource-request/<int:request_id>'],
+                type='http', auth="user", website=True)
+    def portal_my_resource_request_detail(self, request_id, **kw):
+        """Chi tiết yêu cầu bổ sung tài liệu"""
+
+        try:
+            resource_request = request.env['library.resource.request'].browse(request_id)
+            # Check access
+            if resource_request.requester_id != request.env.user.partner_id:
+                raise AccessError(_("Bạn không có quyền truy cập yêu cầu này"))
+
+        except (AccessError, MissingError):
+            return request.redirect('/my')
+
+        values = {
+            'resource_request': resource_request,
+            'page_name': 'resource_request_detail',
+        }
+
+        return request.render("entro_library_website.portal_resource_request_detail", values)
