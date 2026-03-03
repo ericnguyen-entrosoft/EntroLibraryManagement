@@ -385,7 +385,7 @@
 
                     .quick-access-grid {
                     display: grid;
-                    grid-template-columns: repeat(6, 1fr);
+                    grid-template-columns: repeat(8, 1fr);
                     gap: 1.5rem;
                     }
 
@@ -409,13 +409,15 @@
 
                     .quick-access-card:nth-child(1),
                     .quick-access-card:nth-child(3),
-                    .quick-access-card:nth-child(5) {
+                    .quick-access-card:nth-child(5),
+                    .quick-access-card:nth-child(7) {
                     background: var(--light-gray);
                     }
 
                     .quick-access-card:nth-child(2),
                     .quick-access-card:nth-child(4),
-                    .quick-access-card:nth-child(6) {
+                    .quick-access-card:nth-child(6),
+                    .quick-access-card:nth-child(8) {
                     background: var(--light-navy);
                     }
 
@@ -1634,7 +1636,7 @@
                     }
 
                     .quick-access-grid {
-                    grid-template-columns: repeat(3, 1fr);
+                    grid-template-columns: repeat(4, 1fr);
                     gap: 0.75rem;
                     }
 
@@ -1791,9 +1793,17 @@
                                 <i class="fa-solid fa-cloud-arrow-down"></i>
                                 <h3 class="quick-access-title">Tài nguyên số</h3>
                             </a>
-                            <a href="/thu-vien/media/noi-bo-tvps" class="quick-access-card">
-                                <i class="fa-solid fa-place-of-worship quick-access-icon"></i>
-                                <h3 class="quick-access-title">Nội bộ TVPS</h3>
+                            <a href="/thu-vien/media/ngoai-ngu" class="quick-access-card">
+                                <i class="fa-brands fa-leanpub quick-access-icon"></i>
+                                <h3 class="quick-access-title">Học ngoại ngữ</h3>
+                            </a>
+                            <a href="/thu-vien/media/nhac-phat-giao" class="quick-access-card">
+                                <i class="fa-solid fa-file-audio quick-access-icon"/>
+                                <h3 class="quick-access-title">Nhạc Phật giáo</h3>
+                            </a>
+                            <a href="/thu-vien/media/sach-noi" class="quick-access-card">
+                                <i class="fa-solid fa-microphone quick-access-icon"></i>
+                                <h3 class="quick-access-title">Sách nói</h3>
                             </a>
                         </div>
                     </div>

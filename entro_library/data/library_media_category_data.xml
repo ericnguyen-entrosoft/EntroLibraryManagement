@@ -113,7 +113,16 @@
             <field name="description">Tài liệu bằng tiếng nước ngoài (English, Pali, Sanskrit, etc.)</field>
         </record>
 
-        <!-- 7. Nhạc Phật giáo -->
+        <!-- Sách nói -->
+        <record id="media_category_sach_noi" model="library.media.category">
+            <field name="name">Sách nói</field>
+            <field name="slug">sach-noi</field>
+            <field name="sequence">55</field>
+            <field name="icon">fa-solid fa-microphone</field>
+            <field name="is_website_menu" eval="True"/>
+            <field name="access_level">public</field>
+            <field name="description">Sách nói</field>
+        </record>
         <record id="media_category_nhac_phat_giao" model="library.media.category">
             <field name="name">Nhạc Phật giáo</field>
             <field name="slug">nhac-phat-giao</field>
